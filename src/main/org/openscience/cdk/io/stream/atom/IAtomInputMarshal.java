@@ -23,26 +23,28 @@
  */
 package org.openscience.cdk.io.stream.atom;
 
-import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObject;
 
 import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * Defines a marshal that will marshal the contents of an IAtom into an output
+ * Defines a inputs the contents of a component from an IAtomContainer.
  *
  * @author John May
  * @cdk.module interfaces
  */
-public interface IAtomInputMarshal<A extends IAtom> {
+public interface IAtomInputMarshal<C extends IChemObject> {
 
     /**
      * Reads specific information from the input stream
      *
-     * @param in   data input stream
-     * @param atom instance of atom to read into
+     * @param in        data input
+     * @param chemObj   a component of an atom container (IAtom/IBond)
+     * @param container the container that is being read (note atoms and bonds should not be added in this method)
      */
-    public void read(final DataInput in, final A atom) throws IOException;
+    public void read(final DataInput in, final IAtomContainer container, final C chemObj) throws IOException;
 
     /**
      * Invocation should set the default value for the field you're reading. Currently
@@ -50,8 +52,8 @@ public interface IAtomInputMarshal<A extends IAtom> {
      * and that object is cloned. Therefore it is not possible to have
      * conditional default values
      *
-     * @param atom atom that will have a default value set
+     * @param chemObj chem object that will have a default value set
      */
-    public void setDefault(final IAtom atom);
+    public void setDefault(final C chemObj);
 
 }
