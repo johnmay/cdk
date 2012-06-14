@@ -25,6 +25,7 @@ package org.openscience.cdk.io.stream;
 
 import org.openscience.cdk.interfaces.IChemObject;
 
+import java.io.DataInput;
 import java.io.IOException;
 
 /**
@@ -47,5 +48,16 @@ public interface IChemObjectInput<C extends IChemObject> {
      * @throws IOException low-level io exception
      */
     public C read() throws IOException;
+
+    /**
+     * IOC method
+     *
+     * @param in
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    public C read(DataInput in) throws IOException;
 
 }
