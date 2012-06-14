@@ -23,8 +23,8 @@
  */
 package org.openscience.cdk.io.stream.atom;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.silent.ChemObject;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -33,19 +33,19 @@ import java.io.IOException;
  * @author John May
  * @cdk.module interfaces
  */
-public interface IAtomOutputMarshal<C extends ChemObject, D extends ChemObject> {
+public interface IAtomOutputMarshal<A extends IAtom> {
 
-    public void write(final DataOutput out, final IAtomContainer container, final C chemObj) throws IOException;
+    public void write(final DataOutput out, final IAtomContainer container, final A atom) throws IOException;
 
     /**
      * Indicate that a particular property is the default value.
      * This could be null or 0, the default value when read is
      * set by the setDefault method on the {@see IAtomInputMarshal}
      *
-     * @param chemObject
+     * @param atom
      *
      * @return
      */
-    public boolean isDefault(final D chemObject);
+    public boolean isDefault(final IAtom atom);
 
 }

@@ -18,17 +18,6 @@ public class AggregatedBondOutput
     private Map<Byte, BondOutput>    outputs  = new HashMap<Byte, BondOutput>();
     private List<IBondOutputMarshal> marshals = new ArrayList<IBondOutputMarshal>(8);
 
-    // could remove this map but need a conversion utility
-    private static final Map<Integer, Byte> indexMap = new HashMap<Integer, Byte>(8) {{
-        put(0, (byte) 0x01);
-        put(1, (byte) 0x02);
-        put(2, (byte) 0x04);
-        put(3, (byte) 0x08);
-        put(4, (byte) 0x10);
-        put(5, (byte) 0x20);
-        put(6, (byte) 0x40);
-        // 0x80 is reserved atm
-    }};
 
     public AggregatedBondOutput(IBondOutputMarshal... marshals) {
         this(Arrays.asList(marshals));
@@ -50,7 +39,7 @@ public class AggregatedBondOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(container, bond)) {
-                flag |= indexMap.get(i);
+                flag |= ((2 << i) / 2);
             }
         }
 
@@ -72,7 +61,7 @@ public class AggregatedBondOutput
         List<IBondOutputMarshal> marshalList = new ArrayList<IBondOutputMarshal>(8);
 
         for (int i = 0; i < marshals.size(); i++) {
-            byte mask = indexMap.get(i);
+            int mask = (2 << i) / 2;
             if ((mask & flag) == mask) {
                 marshalList.add(marshals.get(i));
             }

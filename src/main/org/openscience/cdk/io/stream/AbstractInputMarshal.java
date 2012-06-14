@@ -29,4 +29,9 @@ public class AbstractInputMarshal {
         return in.readShort() + Short.MAX_VALUE;
     }
 
+
+    public static int readByte(DataInput in) throws IOException {
+        return in.readByte();
+    }
+
 }

@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom.marshal;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.stream.atom.AtomInputMarshal;
 
 import java.io.DataInput;
@@ -14,12 +15,12 @@ public class ValencyInput
         extends AtomInputMarshal<IAtom> {
 
     @Override
-    public void read(DataInput in, IAtom atom) throws IOException {
+    public void read(final DataInput in, final IAtomContainer container, final IAtom atom) throws IOException {
         atom.setValency(readUnsignedByte(in));
     }
 
     @Override
-    public void setDefault(IAtom atom) {
+    public void setDefault(final IAtom atom) {
         atom.setValency(0);
     }
 }

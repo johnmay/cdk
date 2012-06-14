@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 
@@ -13,25 +14,13 @@ import java.util.*;
  * @author John May
  * @cdk.module io
  */
-public class AggregatedAtomInput implements IAtomInputMarshal {
+public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputMarshal {
 
-    private final List<IAtomInputMarshal> marshals = new ArrayList<IAtomInputMarshal>(8);
-    private final Map<Byte, AtomInput>    inputs   = new HashMap<Byte, AtomInput>();
+    private final List<IAtomInputMarshal>    marshals = new ArrayList<IAtomInputMarshal>(8);
+    private final Map<Byte, AtomInputFormat> inputs   = new HashMap<Byte, AtomInputFormat>();
 
     private final IAtom       templateAtom;
     private final IPseudoAtom templatePseudoAtom;
-
-    // could remove this map but need a conversion utility
-    private static final Map<Integer, Byte> indexMap = new HashMap<Integer, Byte>(8) {{
-        put(0, (byte) 0x01);
-        put(1, (byte) 0x02);
-        put(2, (byte) 0x04);
-        put(3, (byte) 0x08);
-        put(4, (byte) 0x10);
-        put(5, (byte) 0x20);
-        put(6, (byte) 0x40);
-        // 0x80 is reserved to indicate a pseudo atom
-    }};
 
     public AggregatedAtomInput(IChemObjectBuilder builder,
                                IAtomInputMarshal... marshals) {
@@ -57,8 +46,8 @@ public class AggregatedAtomInput implements IAtomInputMarshal {
 
     }
 
-    public IAtom read(DataInput in) throws IOException {
-        return getAtomInput(in, in.readByte()).read(in);
+    public IAtom read(DataInput in, IAtomContainer container) throws IOException {
+        return getAtomInput(in, in.readByte()).read(in, container);
     }
 
     /**
@@ -69,10 +58,10 @@ public class AggregatedAtomInput implements IAtomInputMarshal {
      *
      * @return
      */
-    private AtomInput getAtomInput(final DataInput in, final byte flag) {
+    private AtomInputFormat getAtomInput(final DataInput in, final byte flag) {
 
         // normally I would use 'containsKey()' but we want to optimise for speed
-        AtomInput input = inputs.get(flag);
+        AtomInputFormat input = inputs.get(flag);
 
         if (input == null) {
             input = createAtomInput(in, flag);
@@ -84,27 +73,27 @@ public class AggregatedAtomInput implements IAtomInputMarshal {
     }
 
     /**
-     * Creates a new {@see AtomInput} for a given flag
+     * Creates a new {@see AtomInputFormat} for a given flag
      *
      * @param flag
      *
      * @return
      */
-    private AtomInput createAtomInput(final DataInput in, final byte flag) {
+    private AtomInputFormat createAtomInput(final DataInput in, final byte flag) {
 
         IAtom template = getTemplateAtom(flag);
         List<IAtomInputMarshal> marshalList = new ArrayList<IAtomInputMarshal>(8);
 
         for (int i = 0; i < marshals.size(); i++) {
 
-            byte mask = indexMap.get(i);
+            int mask = (2 << i) / 2;
 
             if ((mask & flag) == mask) {
                 marshalList.add(marshals.get(i));
             }
         }
 
-        return new AtomInput(template, marshalList.toArray(new IAtomInputMarshal[marshalList.size()]));
+        return new AtomInputFormat(template, marshalList.toArray(new IAtomInputMarshal[marshalList.size()]));
 
     }
 
@@ -113,8 +102,8 @@ public class AggregatedAtomInput implements IAtomInputMarshal {
     }
 
     @Override
-    public void read(DataInput in, IAtom atom) throws IOException {
-        getAtomInput(in, in.readByte()).read(in, atom);
+    public void read(DataInput in, IAtomContainer container, IAtom atom) throws IOException {
+        getAtomInput(in, in.readByte()).read(in, container, atom);
     }
 
     @Override

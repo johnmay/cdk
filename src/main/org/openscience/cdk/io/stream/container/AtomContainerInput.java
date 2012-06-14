@@ -47,7 +47,7 @@ public class AtomContainerInput
         int atomCount = readUnsignedShort(in);
 
         for (int i = 0; i < atomCount; i++) {
-            container.addAtom(atomInput.read(in));
+            container.addAtom(atomInput.read(in, container));
         }
 
         // read bond data

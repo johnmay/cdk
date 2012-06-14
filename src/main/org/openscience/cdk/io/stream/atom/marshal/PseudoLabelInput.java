@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom.marshal;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.io.stream.atom.AtomInputMarshal;
 
@@ -37,7 +38,7 @@ public class PseudoLabelInput
      * @see IPseudoAtom#setLabel(String)
      */
     @Override
-    public void read(DataInput in, IPseudoAtom atom) throws IOException {
+    public void read(final DataInput in, final IAtomContainer container, final IPseudoAtom atom) throws IOException {
         atom.setLabel(in.readUTF());
     }
 
@@ -49,13 +50,13 @@ public class PseudoLabelInput
      * @inheritDoc
      */
     @Override
-    public void setDefault(IAtom atom) {
+    public void setDefault(final IAtom atom) {
         if (atom instanceof IPseudoAtom) {
             setDefault((IPseudoAtom) atom);
         }
     }
 
-    private void setDefault(IPseudoAtom atom) {
+    private void setDefault(final IPseudoAtom atom) {
         atom.setLabel("");
     }
 

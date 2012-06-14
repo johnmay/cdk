@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 
 import java.io.DataOutput;
@@ -17,18 +18,6 @@ public class AggregatedAtomOutput
 
     private Map<Byte, AtomOutput>    outputs  = new HashMap<Byte, AtomOutput>();
     private List<IAtomOutputMarshal> marshals = new ArrayList<IAtomOutputMarshal>(8);
-
-    // could remove this map but need a conversion utility
-    private static final Map<Integer, Byte> indexMap = new HashMap<Integer, Byte>(8) {{
-        put(0, (byte) 0x01);
-        put(1, (byte) 0x02);
-        put(2, (byte) 0x04);
-        put(3, (byte) 0x08);
-        put(4, (byte) 0x10);
-        put(5, (byte) 0x20);
-        put(6, (byte) 0x40);
-        // 0x80 is reserved to indicate a pseudo atom
-    }};
 
     public AggregatedAtomOutput(IAtomOutputMarshal... marshals) {
         this(Arrays.asList(marshals));
@@ -50,7 +39,7 @@ public class AggregatedAtomOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(atom)) {
-                flag |= indexMap.get(i);
+                flag |= (byte) Math.pow(2, i);
             }
         }
 
@@ -73,7 +62,7 @@ public class AggregatedAtomOutput
 
         for (int i = 0; i < marshals.size(); i++) {
 
-            int mask = indexMap.get(i);
+            int mask = (2 << i) / 2;
 
             if ((mask & flag) == mask) {
                 marshalList.add(marshals.get(i));
@@ -85,10 +74,10 @@ public class AggregatedAtomOutput
     }
 
     @Override
-    public void write(DataOutput out, IAtom atom) throws IOException {
+    public void write(DataOutput out, IAtomContainer container, IAtom atom) throws IOException {
         final byte flag = createFlag(atom);
         out.writeByte(flag);
-        getAtomOutput(flag).write(out, atom);
+        getAtomOutput(flag).write(out, container, atom);
     }
 
     @Override

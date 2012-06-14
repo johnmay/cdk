@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom.marshal;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.stream.atom.AtomInputMarshal;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
 
@@ -36,7 +37,7 @@ public class AtomicNumberInput
      * @inheritDoc
      */
     @Override
-    public void read(DataInput in, IAtom atom) throws IOException {
+    public void read(final DataInput in, final IAtomContainer container, final IAtom atom) throws IOException {
         atom.setAtomicNumber(readUnsignedByte(in));
         atom.setSymbol(PeriodicTable.getSymbol(atom.getAtomicNumber()));
     }

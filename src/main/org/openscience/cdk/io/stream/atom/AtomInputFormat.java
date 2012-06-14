@@ -2,7 +2,6 @@ package org.openscience.cdk.io.stream.atom;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.stream.IAtomContainerComponentInput;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -13,11 +12,11 @@ import java.io.IOException;
  */
 public class AtomInputFormat {
 
-    private final IAtom                          template;
-    private final IAtomContainerComponentInput[] marshals;
+    private final IAtom               template;
+    private final IAtomInputMarshal[] marshals;
 
     public AtomInputFormat(IAtom template,
-                           IAtomContainerComponentInput[] marshals) {
+                           IAtomInputMarshal[] marshals) {
 
         this.marshals = marshals;
         this.template = template;

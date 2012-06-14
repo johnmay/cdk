@@ -1,6 +1,7 @@
 package org.openscience.cdk.io.stream.atom.marshal;
 
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.io.stream.atom.AtomOutputMarshal;
 
@@ -36,7 +37,7 @@ public class PseudoLabelOutput
      * @see org.openscience.cdk.interfaces.IPseudoAtom#getLabel()
      */
     @Override
-    public void write(DataOutput out, IPseudoAtom atom) throws IOException {
+    public void write(DataOutput out, IAtomContainer container, IPseudoAtom atom) throws IOException {
         out.writeUTF(atom.getLabel());
     }
 

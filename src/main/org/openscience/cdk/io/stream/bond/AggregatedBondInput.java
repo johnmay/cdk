@@ -20,18 +20,6 @@ public class AggregatedBondInput implements IBondInputMarshal {
 
     private final IBond templateBond;
 
-    // could remove this map but need a conversion utility
-    private static final Map<Integer, Byte> indexMap = new HashMap<Integer, Byte>(8) {{
-        put(0, (byte) 0x01);
-        put(1, (byte) 0x02);
-        put(2, (byte) 0x04);
-        put(3, (byte) 0x08);
-        put(4, (byte) 0x10);
-        put(5, (byte) 0x20);
-        put(6, (byte) 0x40);
-        // 0x80 is reserved atm
-    }};
-
     public AggregatedBondInput(IChemObjectBuilder builder,
                                IBondInputMarshal... marshals) {
         this(builder, Arrays.asList(marshals));
@@ -87,7 +75,7 @@ public class AggregatedBondInput implements IBondInputMarshal {
 
         for (int i = 0; i < marshals.size(); i++) {
 
-            byte mask = indexMap.get(i);
+            int mask = (2 << i) / 2;
 
             if ((mask & flag) == mask) {
                 marshalList.add(marshals.get(i));

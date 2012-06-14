@@ -37,7 +37,7 @@ public class AtomContainerOutput
         writeAsUnsignedShort(out, container.getAtomCount());
 
         for (IAtom atom : container.atoms()) {
-            atomMarshal.write(out, atom);
+            atomMarshal.write(out, container, atom);
         }
 
         // output bond data
