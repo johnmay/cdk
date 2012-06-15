@@ -25,13 +25,4 @@ public abstract class AtomInputMarshal<A extends IAtom>
         // do nothing - leave value as null
     }
 
-    @Override
-    public void read(DataInput in, IAtomContainer container, IChemObject chemobj) throws IOException {
-        read(in, container, (IAtom) chemobj);
-    }
-
-    @Override
-    public void setDefault(IChemObject atom) {
-        setDefault((IAtom) atom);
-    }
 }
