@@ -19,6 +19,8 @@ public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputM
     private final List<IAtomInputMarshal>    marshals = new ArrayList<IAtomInputMarshal>(8);
     private final Map<Byte, AtomInputFormat> inputs   = new HashMap<Byte, AtomInputFormat>();
 
+    private IChemObjectBuilder builder;
+
     private final IAtom       templateAtom;
     private final IPseudoAtom templatePseudoAtom;
 
@@ -37,6 +39,8 @@ public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputM
 
         if (marshals.size() > 7)
             throw new InvalidParameterException("Too many marshals to aggregate, use a nested aggregator");
+
+        this.builder = builder;
 
         templateAtom = builder.newInstance(IAtom.class);
         templatePseudoAtom = builder.newInstance(IPseudoAtom.class);
@@ -86,11 +90,13 @@ public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputM
 
         for (int i = 0; i < marshals.size(); i++) {
 
+            // create the mask from the index, 0->00000001, 1->000000010, 2->00000100, 3->00001000 etc
             int mask = (2 << i) / 2;
 
             if ((mask & flag) == mask) {
                 marshalList.add(marshals.get(i));
             }
+
         }
 
         return new AtomInputFormat(template, marshalList.toArray(new IAtomInputMarshal[marshalList.size()]));
