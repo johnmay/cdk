@@ -15,10 +15,10 @@ import java.util.Map;
  */
 public class BondOrderInput extends BondInputMarshal {
 
-    private static final Map<Integer, IBond.Order> orders = new HashMap<Integer, IBond.Order>(3) {{
-        put(2, IBond.Order.DOUBLE);
-        put(3, IBond.Order.TRIPLE);
-        put(4, IBond.Order.QUADRUPLE);
+    private static final Map<Byte, IBond.Order> orders = new HashMap<Byte, IBond.Order>(3) {{
+        put((byte) 2, IBond.Order.DOUBLE);
+        put((byte) 3, IBond.Order.TRIPLE);
+        put((byte) 4, IBond.Order.QUADRUPLE);
     }};
 
     @Override
