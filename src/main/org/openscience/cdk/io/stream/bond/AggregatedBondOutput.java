@@ -39,7 +39,7 @@ public class AggregatedBondOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(container, bond)) {
-                flag |= ((2 << i) / 2);
+                flag |= (2 << i) / 2;
             }
         }
 

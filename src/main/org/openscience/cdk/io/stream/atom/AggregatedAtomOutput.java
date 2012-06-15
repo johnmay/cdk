@@ -39,7 +39,7 @@ public class AggregatedAtomOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(atom)) {
-                flag |= (byte) Math.pow(2, i);
+                flag |= (2 << i) / 2;
             }
         }
 
