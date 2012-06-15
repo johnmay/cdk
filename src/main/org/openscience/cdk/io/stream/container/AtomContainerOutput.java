@@ -32,6 +32,11 @@ public class AtomContainerOutput
     }
 
     public void write(IAtomContainer container) throws IOException {
+        write(out, container);
+    }
+
+    @Override
+    public void write(DataOutput out, IAtomContainer container) throws IOException {
 
         // output atom data
         writeAsUnsignedShort(out, container.getAtomCount());
@@ -48,5 +53,4 @@ public class AtomContainerOutput
         }
 
     }
-
 }

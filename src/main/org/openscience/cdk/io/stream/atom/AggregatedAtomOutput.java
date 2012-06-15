@@ -82,6 +82,8 @@ public class AggregatedAtomOutput
 
     @Override
     public boolean isDefault(IAtom atom) {
-        return false; // should always be false as it's aggregated we could check here whether all the flags are off
+        // should always be false as it's aggregated we could check here whether all the flags are off
+        // but would have to move the atom mask 0X80 to not indicate pseudo atoms
+        return false;
     }
 }

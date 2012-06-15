@@ -25,6 +25,7 @@ package org.openscience.cdk.io.stream;
 
 import org.openscience.cdk.interfaces.IChemObject;
 
+import java.io.DataOutput;
 import java.io.IOException;
 
 /**
@@ -47,5 +48,15 @@ public interface IChemObjectOutput<C extends IChemObject> {
      * @throws IOException low-level io exception
      */
     public void write(C chemObj) throws IOException;
+
+    /**
+     * Stateless method
+     *
+     * @param out
+     * @param chemObj
+     *
+     * @throws IOException
+     */
+    public void write(DataOutput out, C chemObj) throws IOException;
 
 }
