@@ -39,7 +39,7 @@ public class AggregatedAtomOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(atom)) {
-                flag |= (2 << i) / 2;
+                flag |= (1 << i);
             }
         }
 
@@ -56,15 +56,17 @@ public class AggregatedAtomOutput
         return output;
     }
 
-    private AtomOutput createAtomOutput(byte flag) {
+    /**
+     * Given a fingerprint of the format to write and AtomOutput is created
+     * @param fingerprint
+     * @return
+     */
+    private AtomOutput createAtomOutput(byte fingerprint) {
 
         List<IAtomOutputMarshal> marshalList = new ArrayList<IAtomOutputMarshal>(8);
 
         for (int i = 0; i < marshals.size(); i++) {
-
-            int mask = (2 << i) / 2;
-
-            if ((mask & flag) == mask) {
+            if ((fingerprint & 1 << i) != 0) {
                 marshalList.add(marshals.get(i));
             }
         }
@@ -73,12 +75,20 @@ public class AggregatedAtomOutput
 
     }
 
+    /**
+     * Delegates writing of the output to a selected AtomOutput
+     * @param out
+     * @param container
+     * @param atom
+     * @throws IOException
+     */
     @Override
     public void write(DataOutput out, IAtomContainer container, IAtom atom) throws IOException {
         final byte flag = createFlag(atom);
         out.writeByte(flag);
         getAtomOutput(flag).write(out, container, atom);
     }
+
 
     @Override
     public boolean isDefault(IAtom atom) {

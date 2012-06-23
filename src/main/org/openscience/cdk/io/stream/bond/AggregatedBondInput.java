@@ -74,10 +74,7 @@ public class AggregatedBondInput implements IBondInputMarshal {
         List<IBondInputMarshal> marshalList = new ArrayList<IBondInputMarshal>(8);
 
         for (int i = 0; i < marshals.size(); i++) {
-
-            int mask = (2 << i) / 2;
-
-            if ((mask & flag) == mask) {
+            if ((flag & 1 << i) != 0) {
                 marshalList.add(marshals.get(i));
             }
         }

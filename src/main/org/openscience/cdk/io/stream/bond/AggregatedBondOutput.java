@@ -39,7 +39,7 @@ public class AggregatedBondOutput
 
         for (int i = 0; i < marshals.size(); i++) {
             if (!marshals.get(i).isDefault(container, bond)) {
-                flag |= (2 << i) / 2;
+                flag |= 1 << i;
             }
         }
 
@@ -61,8 +61,7 @@ public class AggregatedBondOutput
         List<IBondOutputMarshal> marshalList = new ArrayList<IBondOutputMarshal>(8);
 
         for (int i = 0; i < marshals.size(); i++) {
-            int mask = (2 << i) / 2;
-            if ((mask & flag) == mask) {
+            if ((1 << i & flag) != 0) {
                 marshalList.add(marshals.get(i));
             }
         }

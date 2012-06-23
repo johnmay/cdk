@@ -90,10 +90,8 @@ public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputM
 
         for (int i = 0; i < marshals.size(); i++) {
 
-            // create the mask from the index, 0->00000001, 1->000000010, 2->00000100, 3->00001000 etc
-            int mask = (2 << i) / 2;
-
-            if ((mask & flag) == mask) {
+            // check whether the i'th bit is set, 0->00000001, 1->000000010, 2->00000100, 3->00001000 etc
+            if ( (flag & 1 << i) != 0) {
                 marshalList.add(marshals.get(i));
             }
 
@@ -104,7 +102,7 @@ public class AggregatedAtomInput extends AtomInputMarshal implements IAtomInputM
     }
 
     private IAtom getTemplateAtom(final byte flag) {
-        return (flag & 0x80) == 0x80 ? templatePseudoAtom : templateAtom;
+        return (flag & 0x80) != 0 ? templatePseudoAtom : templateAtom;
     }
 
     @Override
