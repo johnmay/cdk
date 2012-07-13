@@ -682,6 +682,9 @@ public class UniversalIsomorphismTesterTest extends CDKTestCase
 
     @Test public void testMatcher_SymbolAndCharge() throws CDKException {
 
+        IAtomMatcher matcher = AtomMatcherFactory.and(SymbolMatcher.class, FormalChargeMatcher.class);
+
+        System.out.println("Matcher: " + matcher);
         IAtomContainer dalanine   = loadMDLV2000("/data/mdl/ChEBI_15570.mol");
         IAtomContainer dalaninate = loadMDLV2000("/data/mdl/ChEBI_32435.mol");
         IAtomContainer dalaninium = loadMDLV2000("/data/mdl/ChEBI_32436.mol");
@@ -689,11 +692,19 @@ public class UniversalIsomorphismTesterTest extends CDKTestCase
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate));
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
+       // Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
+
+
+        System.out.println(dalaninate.getAtomCount());
 
         // test with symbol and charge matching (not yet implemented)
-        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate));
         Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
         Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
+        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate, matcher));
+        //Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium,  matcher));
+        //Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium,matcher));
+
+        System.out.println("}");
 
     }
 
