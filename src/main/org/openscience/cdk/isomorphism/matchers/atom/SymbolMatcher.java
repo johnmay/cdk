@@ -47,7 +47,7 @@ public class SymbolMatcher implements IAtomMatcher {
     public boolean matches(IAtom query, IAtom subject) {
 
         String querySymbol   = query.getSymbol();
-        String subjectSymbol = query.getSymbol();
+        String subjectSymbol = subject.getSymbol();
 
         return querySymbol != null ? querySymbol.equals(subjectSymbol) : subjectSymbol == null;
 
