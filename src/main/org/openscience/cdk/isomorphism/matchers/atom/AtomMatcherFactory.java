@@ -22,6 +22,7 @@
 package org.openscience.cdk.isomorphism.matchers.atom;
 
 import org.openscience.cdk.isomorphism.matchers.atom.combinator.AndMatcher;
+import org.openscience.cdk.isomorphism.matchers.atom.combinator.NotMatcher;
 import org.openscience.cdk.isomorphism.matchers.atom.combinator.OrMatcher;
 
 import java.util.Arrays;
@@ -87,13 +88,13 @@ public class AtomMatcherFactory {
     /**
      * Access an appropriate matcher for a given matcher name. If no
      * matcher is found for the class a runtime exception is thrown.
-     *
+     * <p/>
      * Current matcher names are:
      * <ul>
-     *    <li>symbol</li>
-     *    <li>formalcharge</li>
+     * <li>symbol</li>
+     * <li>formalcharge</li>
      * </ul>
-     *
+     * <p/>
      * <p/>
      * <pre>{@code
      *     AtomMatcherFactory.ofName("symbol");
@@ -117,10 +118,20 @@ public class AtomMatcherFactory {
 
     }
 
+    public static IAtomMatcher ofObject(Object obj) {
+        if (obj instanceof IAtomMatcher)
+            return (IAtomMatcher) obj;
+        if (obj instanceof Class && IAtomMatcher.class.isAssignableFrom((Class) obj))
+            return ofClass((Class<? extends IAtomMatcher>) obj);
+        if (obj instanceof String)
+            return ofName((String) obj);
+        throw new IllegalArgumentException("Object could not be converted into an AtomMatcher");
+    }
+
     /**
      * Access an array of atom matchers given a variable array of atom matcher
      * classes.
-     *
+     * <p/>
      * If any class is not found a runtime exception is thrown
      *
      * @param classes classes of atom matchers
@@ -158,6 +169,18 @@ public class AtomMatcherFactory {
 
     }
 
+    public static IAtomMatcher[] ofObjects(Object... objs) {
+
+        IAtomMatcher[] matchers = new IAtomMatcher[objs.length];
+
+        for (int i = 0; i < objs.length; i++) {
+            matchers[i] = ofObject(objs[i]);
+        }
+
+        return matchers;
+
+    }
+
     /**
      * Convenience method for creating an 'and' matcher. The and matcher can be used
      * with two or more atom matchers. When used with more then two matchers the operation
@@ -183,6 +206,22 @@ public class AtomMatcherFactory {
     }
 
     /**
+     * Convenience method for creating an 'and' matcher from matcher objects. This method
+     * takes a variable array of matchers (IAtomMatcher, Class objects and String (names).
+     *
+     * @param objects variable array of matcher objects, classes or names
+     *
+     * @return combined matcher
+     *
+     * @see #ofClass(Class)
+     * @see #ofClasses(Class[])
+     * @see #or(IAtomMatcher...)
+     */
+    public static IAtomMatcher and(Object... objects) {
+        return and(ofObjects(objects));
+    }
+
+    /**
      * Convenience method for creating an 'and' matcher from matcher names. This method
      * uses the ofNames method to convert the names to instances and then calls
      * {@see #and(IAtomMatcher ...)} to create the combinator.
@@ -193,7 +232,6 @@ public class AtomMatcherFactory {
      *
      * @see #ofName(String)
      * @see #ofNames(String...)
-     * @see #and(IAtomMatcher...)
      */
     public static IAtomMatcher and(String... matcherNames) {
         return and(ofNames(matcherNames));
@@ -211,7 +249,6 @@ public class AtomMatcherFactory {
      *
      * @see #ofClass(Class)
      * @see #ofClasses(Class[])
-     * @see #and(IAtomMatcher...)
      */
     public static IAtomMatcher and(Class<? extends IAtomMatcher>... matcherClasses) {
         return and(ofClasses(matcherClasses));
@@ -273,6 +310,71 @@ public class AtomMatcherFactory {
      */
     public static IAtomMatcher or(Class<? extends IAtomMatcher>... matcherClasses) {
         return or(ofClasses(matcherClasses));
+    }
+
+    /**
+     * Convenience method for creating an 'or' matcher from matcher objects. This method
+     * takes a variable array of matchers (IAtomMatcher, Class objects and String (names).
+     *
+     * @param objects variable array of matcher objects, classes or names
+     *
+     * @return combined matcher
+     *
+     * @see #ofClass(Class)
+     * @see #ofClasses(Class[])
+     * @see #or(IAtomMatcher...)
+     */
+    public static IAtomMatcher or(Object... objects) {
+        return or(ofObjects(objects));
+    }
+
+
+    /**
+     * Create an inverter for the provided matcher in the form of a
+     * 'not' matcher.
+     *
+     * @param matcher atom matcher implementation
+     *
+     * @return return an atom matcher that will inverse the return value of the provided matcher
+     */
+    public static IAtomMatcher not(IAtomMatcher matcher) {
+        return new NotMatcher(matcher);
+    }
+
+    /**
+     * Create an inverter for the provided matcher in the form of a
+     * 'not' matcher using the class.
+     *
+     * @param matcherClass class of an atom matcher implementation
+     *
+     * @return return an atom matcher that will inverse the return value of the provided matcher
+     */
+    public static IAtomMatcher not(Class<? extends IAtomMatcher> matcherClass) {
+        return new NotMatcher(ofClass(matcherClass));
+    }
+
+    /**
+     * Create an condition inverter for the provided matcher in the form of a
+     * 'not' matcher using the name.
+     *
+     * @param matcherName name of an atom matcher implementation
+     *
+     * @return return an atom matcher that will inverse the return value of the provided matcher
+     */
+    public static IAtomMatcher not(String matcherName) {
+        return new NotMatcher(ofName(matcherName));
+    }
+
+    /**
+     * Create an condition inverter for the provided matcher in the form of a
+     * 'not' matcher using the class.
+     *
+     * @param object an instance of atom matcher, class or string
+     *
+     * @return return an atom matcher that will inverse the return value of the provided matcher
+     */
+    public static IAtomMatcher not(Object object) {
+        return not(ofObject(object));
     }
 
 
