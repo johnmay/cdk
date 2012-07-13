@@ -1,5 +1,9 @@
-/*  Copyright (C) 2002-2007  The Chemistry Development Kit (CDK) project
- *                     2012  Kevin Lawson <kevin.lawson@syngenta.com>
+/*  $RCSfile: $
+ *  $Author$
+ *  $Date$
+ *  $Revision$
+ *
+ *  Copyright (C) 2002-2007  The Chemistry Development Kit (CDK) project
  *
  *  Contact: cdk-devel@lists.sourceforge.net
  *
@@ -23,10 +27,6 @@
  */
 package org.openscience.cdk.smiles;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
@@ -34,47 +34,51 @@ import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IAtomType.Hybridization;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.interfaces.IAtomType.Hybridization;
 import org.openscience.cdk.ringsearch.AllRingsFinder;
 import org.openscience.cdk.ringsearch.SSSRFinder;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 import org.openscience.cdk.tools.manipulator.RingManipulator;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 /**
  * Tool that tries to deduce bond orders based on connectivity and hybridization
- * for a number of common ring systems of up to seven-membered rings.
- *
+ * for a number of common ring systems of up to seven-membered rings. It assumes
+ * that atom types have been perceived before that class is used.
+ * 
  * <p>The calculation can be interrupted with {@link #setInterrupted(boolean)},
  * but assumes that this class is not used in a threaded fashion. When a calculation
  * is interrupted, the boolean is reset to false.
  *
  * @author Todd Martin
- * @author Kevin Lawson
  * @cdk.module smiles
  * @cdk.githash
  * @cdk.keyword bond order
- *
+ * 
  * @cdk.bug 1895805
  * @cdk.bug 1931262
- *
+ * 
  * @cdk.threadnonsafe
  */
 @TestClass("org.openscience.cdk.smiles.DeduceBondSystemToolTest")
 public class DeduceBondSystemTool {
 
-    private AllRingsFinder allRingsFinder;
+	private AllRingsFinder allRingsFinder;
     private static ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(DeduceBondSystemTool.class);
-
+	
     private List<Integer[]> listOfRings = null;
-
-    private boolean interrupted;
+    	
+	private boolean interrupted;
 
     /**
      * Constructor for the DeduceBondSystemTool object.
@@ -96,23 +100,23 @@ public class DeduceBondSystemTool {
 
     /**
      * Determines if, according to the algorithms implemented in this class, the given
-     * molecule has properly distributed double bonds.
+     * AtomContainer has properly distributed double bonds.
      *
-     * @param  m {@link IMolecule} to check the bond orders for.
+     * @param  m {@link IAtomContainer} to check the bond orders for.
      * @return true, if bond orders are properly distributed
      * @throws CDKException thrown when something went wrong
      */
     @TestMethod("testPyrrole")
-    public boolean isOK(IMolecule m) throws CDKException {
+    public boolean isOK(IAtomContainer m) throws CDKException {
         // OK, we take advantage here from the fact that this class does not take
         // into account rings larger than 7 atoms. See fixAromaticBondOrders().
         IRingSet rs = allRingsFinder.findAllRings(m,7);
     	storeRingSystem(m, rs);
     	boolean StructureOK=this.isStructureOK(m);
     	IRingSet irs=this.removeExtraRings(m);
-
+    	
     	if (irs==null) throw new CDKException("error in AllRingsFinder.findAllRings");
-
+    	
     	int count=this.getBadCount(m,irs);
 
         return StructureOK && count == 0;
@@ -120,164 +124,131 @@ public class DeduceBondSystemTool {
 
     /**
      * Added missing bond orders based on atom type information.
-     *
-     * @param molecule {@link IMolecule} for which to distribute double bond orders
-     * @return a {@link IMolecule} with assigned double bonds.
+     * 
+     * @param atomContainer {@link IAtomContainer} for which to distribute double bond orders
+     * @return a {@link IAtomContainer} with assigned double bonds.
      * @throws CDKException if something went wrong.
      */
     @TestMethod("xtestQuinone,xtestPyrrole")
-    public IMolecule fixAromaticBondOrders(IMolecule molecule) throws CDKException {
+    public IAtomContainer fixAromaticBondOrders(IAtomContainer atomContainer) throws CDKException {
         // OK, we take advantage here from the fact that this class does not take
         // into account rings larger than 7 atoms. See fixAromaticBondOrders().
-        IRingSet rs = allRingsFinder.findAllRings(molecule,7);
-    	storeRingSystem(molecule, rs);
-
+        IRingSet rs = allRingsFinder.findAllRings(atomContainer,7);
+    	storeRingSystem(atomContainer, rs);
+    	
         IRingSet ringSet;
 
         // TODO remove rings with nonsp2 carbons(?) and rings larger than 7 atoms
-        ringSet = removeExtraRings(molecule);
-
+        ringSet = removeExtraRings(atomContainer);
+        
         if (ringSet==null) throw new CDKException("failure in AllRingsFinder.findAllRings");
         
-        this.FixPyridineNOxides(molecule,ringSet);
-
-        //We need to establish which rings share bonds and set up sets of such interdependant rings
-        List<Integer[]> rBondsArray = null;
-        List<List<Integer>> ringGroups = null;
-
-        //Start by getting a list (same dimensions and ordering as ringset) of all the ring bond numbers in the reduced ring set
-        rBondsArray = getRingSystem(molecule, ringSet);
-
-        //Now find out which share a bond and assign them accordingly to groups
-        ringGroups = assignRingGroups(rBondsArray);
-
-        //Set up the array of MasterLists to pass to Loop function - one for each dependant group of rings
-        List<List> MasterLists;
-        MasterLists = new ArrayList<List>();
-        //MasterLists = new ArrayList<List>(Collections.nCopies(ringGroups.size(),  new ArrayList()));
-        for(int i = 0; i < ringGroups.size(); i++){
-            MasterLists.add(new ArrayList());
-        }
+        List MasterList = new ArrayList();
 
         //this.counter=0;// counter which keeps track of all current possibilities for placing double bonds
+        
+        this.FixPyridineNOxides(atomContainer,ringSet);
+        
 
-        for (int i = 0; i < ringSet.getAtomContainerCount(); i++) {
+        for (int i = 0; i <= ringSet.getAtomContainerCount() - 1; i++) {
 
             IRing ring = (IRing) ringSet.getAtomContainer(i);
 
             // only takes into account rings up to 7 atoms... if that changes,
             // make sure to update the findAllRings() calls too!
-
-            //Add double bond possibilities to the appropriate MasterList element corresponding to a group of rings
             if (ring.getAtomCount() == 5) {
-                fiveMemberedRingPossibilities(molecule, ring, MasterLists.get(getRingGroupNumber(ringGroups,i)));
+                fiveMemberedRingPossibilities(atomContainer, ring, MasterList);
             } else if (ring.getAtomCount() == 6) {
-                sixMemberedRingPossibilities(molecule, ring, MasterLists.get(getRingGroupNumber(ringGroups,i)));
+                sixMemberedRingPossibilities(atomContainer, ring, MasterList);
             } else if (ring.getAtomCount() == 7){
-                sevenMemberedRingPossibilities(molecule, ring, MasterLists.get(getRingGroupNumber(ringGroups,i)));
+                sevenMemberedRingPossibilities(atomContainer, ring, MasterList);
                 //TODO- add code for all 7 membered aromatic ring possibilities not just 3 bonds
             } else {
             	//TODO: what about other rings systems?
             	logger.debug("Found ring of size: " + ring.getAtomCount());
             }
         }
-        List<IMoleculeSet> soms;
-        soms = new ArrayList<IMoleculeSet>();
-        List<IMolecule> retMols;
-        retMols = new ArrayList<IMolecule>();
-        Boolean successfulColouring = true;
 
-        //Loop through each group of rings checking all choices of double bond combis and seeing if you can get a
-        //proper molecule.  Save putative mols as you go in case you can't get a perfect combi
-        for(int i = 0; i < ringGroups.size(); i++){
-            soms.add(molecule.getBuilder().newInstance(IMoleculeSet.class));
-            retMols.add(null);
-            int [] choices;
+        IAtomContainerSet som = atomContainer.getBuilder().newInstance(IAtomContainerSet.class);
 
-            //if (number> 1000000) return null;
+//		int number=1; // total number of possibilities
+//		
+//		for (int ii=0;ii<=MasterList.size()-1;ii++) {
+//		ArrayList ringlist=(ArrayList)MasterList.get(ii);
+//		number*=ringlist.size();
+//		}
+//		logger.debug("number= "+number);			
 
-            choices = new int [MasterLists.get(i).size()];
 
-            if (MasterLists.get(i).size() > 0) {
-                IMolecule iMolecule = loop(System.currentTimeMillis(), molecule, 0, MasterLists.get(i), choices, soms.get(i));
-                if (iMolecule != null){
-                    retMols.set(i, iMolecule);
-                } else
-                    successfulColouring = false;
-            }
+        int [] choices;
+
+        //if (number> 1000000) return null;
+
+        choices = new int [MasterList.size()];
+
+        if (MasterList.size() > 0) {
+            IAtomContainer iAtomContainer = loop(System.currentTimeMillis(), atomContainer, 0, MasterList, choices, som);
+            if (iAtomContainer != null) return iAtomContainer;
         }
-        if(!successfulColouring){
+
+
+        int mincount = 99999999;
+
+        int best = -1; // one with minimum number of bad atoms
+
+        // minimize number of potentially bad nitrogens among AtomContainers in the set
+
+        for (int i = 0; i <= som.getAtomContainerCount() - 1; i++) {
+
+            IAtomContainer mol = som.getAtomContainer(i);
+
+            ringSet = removeExtraRings(mol);
             
-            //OK - failed to get a set of all perfect mols - need to look at the less than perfect combis
-            for (int i = 0; i < retMols.size(); i++){
-                
-                //Find the best molcule if there isn't one there already
-                if(retMols.get(i) == null){
-                    int mincount = 99999999;
+            if (ringSet==null) continue;
+            
+            int count = getBadCount(mol, ringSet);
 
-                    int best = -1; // one with minimum number of bad atoms
+            //logger.debug(i + "\t" + count);
 
-                    // minimize number of potentially bad nitrogens among molecules in the set
-
-                    for (int j = 0; j <= soms.get(i).getAtomContainerCount() - 1; j++) {
-
-                        IMolecule mol = soms.get(i).getMolecule(j);
-
-                        ringSet = removeExtraRings(mol);
-
-                        if (ringSet==null) continue;
-
-                        int count = getBadCount(mol, ringSet);
-
-                        //logger.debug(j + "\t" + count);
-
-                        if (count < mincount) {
-                            mincount = count;
-                            best = j;
-                       }
-                   }
-
-                if (soms.get(i).getAtomContainerCount() > 0)
-                    retMols.set(i, soms.get(i).getMolecule(best));
-                }
+            if (count < mincount) {
+                mincount = count;
+                best = i;
             }
+            
         }
-        IMolecule retVal = null;
-        retVal = combineRetMols(retMols);
-        if(retVal != null)
-            return retVal;
-        else
-            return molecule;
+
+        if (som.getAtomContainerCount() > 0) return som.getAtomContainer(best);
+        return atomContainer;
     }
 
-    private void FixPyridineNOxides(IMolecule molecule,IRingSet ringSet) {
-
+    private void FixPyridineNOxides(IAtomContainer atomContainer,IRingSet ringSet) {
+    	
     	//convert n(=O) to [n+][O-]
-
-    	for (int i=0;i<molecule.getAtomCount();i++) {
-    		IAtom ai=molecule.getAtom(i);
-
-    		if (ai.getSymbol().equals("N") &&
+    	
+    	for (int i=0;i< atomContainer.getAtomCount();i++) {
+    		IAtom ai= atomContainer.getAtom(i);
+    		
+    		if (ai.getSymbol().equals("N") && 
     			(ai.getFormalCharge() == null || ai.getFormalCharge() == 0)) {
     			if (inRingSet(ai,ringSet)) {
-    				List<IAtom> ca=molecule.getConnectedAtomsList(ai);
+    				List<IAtom> ca= atomContainer.getConnectedAtomsList(ai);
                     for (IAtom caj : ca) {
-                        if (caj.getSymbol().equals("O") && molecule.getBond(ai, caj).getOrder() == IBond.Order.DOUBLE) {
+                        if (caj.getSymbol().equals("O") && atomContainer.getBond(ai, caj).getOrder() == IBond.Order.DOUBLE) {
                             ai.setFormalCharge(1);
                             caj.setFormalCharge(-1);
-                            molecule.getBond(ai, caj).setOrder(IBond.Order.SINGLE);
+                            atomContainer.getBond(ai, caj).setOrder(IBond.Order.SINGLE);
                         }
                     }// end for (int j=0;j<ca.size();j++)
-
+    				
     			} // end if (inRingSet(ai,ringSet)) {
     		} // end if (ai.getSymbol().equals("N") && ai.getFormalCharge()==0)
-
-    	} // end for (int i=0;i<molecule.getAtomCount();i++)
-
-
-
+    		
+    	} // end for (int i=0;i<atomContainer.getAtomCount();i++)
+    	
+	
+	
     }
-    private void applyBonds(IMolecule m, ArrayList al) {
+    private void applyBonds(IAtomContainer m, ArrayList al) {
 
         //logger.debug("");
 
@@ -294,14 +265,17 @@ public class DeduceBondSystemTool {
 
             IBond b = m.getBond(m.getAtom(i1), m.getAtom(i2));
             b.setOrder(IBond.Order.DOUBLE);
+
+
         }
+
     }
 
-    private void fiveMemberedRingPossibilities(IMolecule m, IRing r, List MasterList) {
+    private void fiveMemberedRingPossibilities(IAtomContainer m, IRing r, List MasterList) {
         // 5 possibilities for placing 2 double bonds
         // 5 possibilities for placing 1 double bond
 
-        int [] num = new int [5]; // stores atom numbers based on atom numbers in molecule instead of ring
+        int [] num = new int [5]; // stores atom numbers based on atom numbers in AtomContainer instead of ring
 
         for (int j = 0; j <= 4; j++) {
             num[j] = m.getAtomNumber(r.getAtom(j));
@@ -361,7 +335,7 @@ public class DeduceBondSystemTool {
 
     }
 
-    private void sixMemberedRingPossibilities(IMolecule m, IRing r, List MasterList) {
+    private void sixMemberedRingPossibilities(IAtomContainer m, IRing r, List MasterList) {
         // 2 possibilities for placing 3 double bonds
         // 6 possibilities for placing 2 double bonds
         // 6 possibilities for placing 1 double bonds
@@ -469,7 +443,7 @@ public class DeduceBondSystemTool {
 
     }
 
-    private void sevenMemberedRingPossibilities(IMolecule m, IRing r, List MasterList) {
+    private void sevenMemberedRingPossibilities(IAtomContainer m, IRing r, List MasterList) {
         // for now only consider case where have 3 double bonds
 
         IAtom[] ringatoms = new IAtom[7];
@@ -517,10 +491,12 @@ public class DeduceBondSystemTool {
         mal.add(al5);
 
         MasterList.add(mal);
+
+
     }
 
 
-    private int getBadCount(IMolecule molecule, IRingSet ringSet) {
+    private int getBadCount(IAtomContainer atomContainer, IRingSet ringSet) {
         // finds count of nitrogens in the rings that have 4 bonds
         // to non hydrogen atoms and one to hydrogen
         // or nitrogens with 2 double bonds to atoms in the ringset
@@ -530,8 +506,8 @@ public class DeduceBondSystemTool {
 
         int count = 0;
 
-        for (int j = 0; j <= molecule.getAtomCount() - 1; j++) {
-            IAtom atom = molecule.getAtom(j);
+        for (int j = 0; j <= atomContainer.getAtomCount() - 1; j++) {
+            IAtom atom = atomContainer.getAtom(j);
 
             //logger.debug(mol.getBondOrderSum(a));
 
@@ -541,31 +517,34 @@ public class DeduceBondSystemTool {
                 if (atom.getSymbol().equals("N")) {
                     if (atom.getFormalCharge() == 0) {
 //						logger.debug(mol.getBondOrderSum(a));
-                        if (molecule.getBondOrderSum(atom) == 4) {
+                        if (atomContainer.getBondOrderSum(atom) == 4) {
                             count++; //
-                        } else if (molecule.getBondOrderSum(atom) == 5) {
+                        } else if (atomContainer.getBondOrderSum(atom) == 5) {
                             // check if have 2 double bonds to atom in ring
                             int doublebondcount = 0;
-                            java.util.List ca = molecule.getConnectedAtomsList(atom);
+                            java.util.List ca = atomContainer.getConnectedAtomsList(atom);
 
                             for (int k = 0; k <= ca.size() - 1; k++) {
-                                if (molecule.getBond(atom, (IAtom)ca.get(k)).getOrder() == IBond.Order.DOUBLE) {
+                                if (atomContainer.getBond(atom, (IAtom)ca.get(k)).getOrder() == IBond.Order.DOUBLE) {
                                     if (inRingSet((IAtom)ca.get(k), ringSet)) {
                                         doublebondcount++;
                                     }
                                 }
                             }
+
                             if (doublebondcount == 2) {
                                 count++;
                             }
+
+
                         }
                     } else if (atom.getFormalCharge() == 1) {
-                        if (molecule.getBondOrderSum(atom) == 5) {
+                        if (atomContainer.getBondOrderSum(atom) == 5) {
                             count++;
                         }
                     }
                 } else if (atom.getSymbol().equals("S")) {
-                    if (molecule.getBondOrderSum(atom) > 2) {
+                    if (atomContainer.getBondOrderSum(atom) > 2) {
                         count++;
                     }
                 }
@@ -585,8 +564,8 @@ public class DeduceBondSystemTool {
         return false;
     }
 
-    private IMolecule loop(long starttime, IMolecule molecule, int index,
-    		               List MasterList, int [] choices, IMoleculeSet som) throws CDKException {
+    private IAtomContainer loop(long starttime, IAtomContainer atomContainer, int index,
+    		               List MasterList, int [] choices, IAtomContainerSet som) throws CDKException {
 
         //logger.debug(System.currentTimeMillis());
 
@@ -594,9 +573,9 @@ public class DeduceBondSystemTool {
 
         long diff = time - starttime;
 
-        if (diff > 10000) {
-        	//time out after 10 seconds
-        	throw new CDKException("Timed out after 10 seconds.");
+        if (diff > 100000) { 
+        	//time out after 100 seconds
+        	throw new CDKException("Timed out after 100 seconds.");
         } else if (this.interrupted) {
             // reset the interruption
             this.interrupted = false;
@@ -605,7 +584,7 @@ public class DeduceBondSystemTool {
 
         ArrayList ringlist = (ArrayList) MasterList.get(index);
 
-        IMolecule mnew2 = null;
+        IAtomContainer mnew2 = null;
 
         for (int i = 0; i <= ringlist.size() - 1; i++) {
 
@@ -614,11 +593,11 @@ public class DeduceBondSystemTool {
             if (index == MasterList.size() - 1) {
                 //logger.debug(choices[0]+"\t"+choices[1]);
 
-                IMolecule mnew = null;
+                IAtomContainer mnew = null;
                 try {
-                    mnew = (IMolecule) molecule.clone();
+                    mnew = (IAtomContainer) atomContainer.clone();
                 } catch (Exception e) {
-                    logger.error("Failed to clone molecule: ", e.getMessage());
+                    logger.error("Failed to clone atomContainer: ", e.getMessage());
                     logger.debug(e);
                 }
 
@@ -632,62 +611,63 @@ public class DeduceBondSystemTool {
 
                 if (isStructureOK(mnew)) {
 
-                    IRingSet rs = this.removeExtraRings(mnew); // need to redo this since created new molecule (mnew)
+                    IRingSet rs = this.removeExtraRings(mnew); // need to redo this since created new atomContainer (mnew)
 
                     if (rs != null) {
 
-                        int count = this.getBadCount(mnew, rs);
-                        // logger.debug("bad count="+count);
+						int count = this.getBadCount(mnew, rs);
+						// logger.debug("bad count="+count);
 
-                        if (count == 0) {
-                                // logger.debug("found match after "+counter+"
-                                // iterations");
-                                return mnew; // dont worry about adding to set
-                                                                // just finish
-                        } else {
-                                som.addMolecule(mnew);
-                        }
-                    }
+						if (count == 0) {
+							// logger.debug("found match after "+counter+"
+							// iterations");
+							return mnew; // dont worry about adding to set
+											// just finish
+						} else {
+							som.addAtomContainer(mnew);
+						}
+					}
                 }
 
             }
 
             if (index + 1 <= MasterList.size() - 1) {
                 // logger.debug("here3="+counter);
-                mnew2 = loop(starttime, molecule, index + 1, MasterList, choices, som); //recursive def
+                mnew2 = loop(starttime, atomContainer, index + 1, MasterList, choices, som); //recursive def
             }
 
 
-            if (mnew2 instanceof IMolecule) {
+            if (mnew2 instanceof IAtomContainer) {
                 return mnew2;
             }
         }
         return null;
+
     }
 
-    private boolean isStructureOK(IMolecule molecule) {
+    private boolean isStructureOK(IAtomContainer atomContainer) {
         try {
-        	CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(molecule.getBuilder());
-            Iterator<IAtom> atoms = molecule.atoms().iterator();
+        	CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(atomContainer.getBuilder());
+            Iterator<IAtom> atoms = atomContainer.atoms().iterator();
             while (atoms.hasNext()) {
             	IAtom atom = atoms.next();
-            	IAtomType matched = matcher.findMatchingAtomType(molecule, atom);
+            	IAtomType matched = matcher.findMatchingAtomType(atomContainer, atom);
             	if (matched == null) return false;
             }
 
-        	IRingSet ringSet = recoverRingSystem(molecule);
+        	IRingSet ringSet = recoverRingSystem(atomContainer);
             //logger.debug("Rs size= "+rs.size());
 
         	// clear aromaticity flags
-            for (int i = 0; i <= molecule.getAtomCount() - 1; i++) {
-                molecule.getAtom(i).setFlag(CDKConstants.ISAROMATIC, false);
+            for (int i = 0; i <= atomContainer.getAtomCount() - 1; i++) {
+                atomContainer.getAtom(i).setFlag(CDKConstants.ISAROMATIC, false);
             }
             for (int i = 0; i <= ringSet.getAtomContainerCount() - 1; i++) {
                 IRing r = (IRing) ringSet.getAtomContainer(i);
                 r.setFlag(CDKConstants.ISAROMATIC, false);
             }
             // now, detect aromaticity from cratch, and mark rings as aromatic too (if ...)
-            CDKHueckelAromaticityDetector.detectAromaticity(molecule);
+            CDKHueckelAromaticityDetector.detectAromaticity(atomContainer);
             for (int i = 0; i <= ringSet.getAtomContainerCount() - 1; i++) {
             	IRing ring = (IRing) ringSet.getAtomContainer(i);
             	RingManipulator.markAromaticRings(ring);
@@ -704,15 +684,14 @@ public class DeduceBondSystemTool {
                 IRing ring = (IRing) ringSet.getAtomContainer(i);
 
                 //logger.debug(k+"\t"+r.getAtomCount()+"\t"+r.getFlag(CDKConstants.ISAROMATIC));
-                //javax.swing.JOptionPane.showMessageDialog(null,i + " " + ring.getFlag(CDKConstants.ISAROMATIC));
                 if (Check[i]) {
-
+                	
                     for (int j = 0; j <= ring.getAtomCount() - 1; j++) {
                         if (ring.getAtom(j).getImplicitHydrogenCount() != CDKConstants.UNSET && ring.getAtom(j).getImplicitHydrogenCount() < 0) {
                         	return false;
                         }
                     }
-
+                	
                     if (!ring.getFlag(CDKConstants.ISAROMATIC)) {
 //						logger.debug(counter+"\t"+"ring not aromatic"+"\t"+r.getAtomCount());
                         return false;
@@ -733,10 +712,10 @@ public class DeduceBondSystemTool {
      * Removes rings which do not have all sp2/planar3 aromatic atoms and also gets rid of rings that have more than
      * 7 or less than 5 atoms in them.
      *
-     * @param m The molecule from which we want to remove rings
+     * @param m The AtomContainer from which we want to remove rings
      * @return The set of reduced rings
      */
-    private IRingSet removeExtraRings(IMolecule m) {
+    private IRingSet removeExtraRings(IAtomContainer m) {
 
         try {
             SSSRFinder arf = new SSSRFinder(m);
@@ -764,7 +743,7 @@ public class DeduceBondSystemTool {
 
                     //logger.debug(j+"\t"+r.getAtomAt(j).getSymbol()+"\t"+r.getAtomAt(j).getHybridization());
 
-                    if (r.getAtom(j).getHybridization() == CDKConstants.UNSET ||
+                    if (r.getAtom(j).getHybridization() == CDKConstants.UNSET || 
                     	!(r.getAtom(j).getHybridization() == Hybridization.SP2 ||
                     	r.getAtom(j).getHybridization() == Hybridization.PLANAR3)) {
                     	rs.removeAtomContainer(i);
@@ -800,6 +779,7 @@ public class DeduceBondSystemTool {
         for (int i = 0; i <= Check.length - 1; i++) {
             Check[i] = true;
         }
+
         iloop:
 
         for (int i = 0; i <= rs.getAtomContainerCount() - 1; i++) {
@@ -831,35 +811,19 @@ public class DeduceBondSystemTool {
             	Check[i] = false;
             	continue;
             }
+
         }
+
         return Check;
     }
 
     /**
-     * Stores an IRingSet corresponding to a molecule using the bond numbers.
-     *
-     * @param mol      The IMolecule for which to store the IRingSet.
+     * Stores an IRingSet corresponding to a AtomContainer using the bond numbers.
+     * 
+     * @param mol      The IAtomContainer for which to store the IRingSet.
      * @param ringSet  The IRingSet to store
      */
-    private List<Integer[]> getRingSystem(IMolecule mol, IRingSet ringSet) {
-        List<Integer[]> bondsArray;
-        bondsArray= new ArrayList<Integer[]>();
-    	for (int r = 0; r < ringSet.getAtomContainerCount(); ++r) {
-    		IRing ring = (IRing)ringSet.getAtomContainer(r);
-    		Integer[] bondNumbers = new Integer[ring.getBondCount()];
-    		for (int i = 0; i < ring.getBondCount(); ++i)
-    			bondNumbers[i] = mol.getBondNumber(ring.getBond(i));
-    		bondsArray.add(bondNumbers);
-    	}
-        return bondsArray;
-    }
-    /**
-     * Stores an IRingSet corresponding to a molecule using the bond numbers.
-     *
-     * @param mol      The IMolecule for which to store the IRingSet.
-     * @param ringSet  The IRingSet to store
-     */
-    private void storeRingSystem(IMolecule mol, IRingSet ringSet) {
+    private void storeRingSystem(IAtomContainer mol, IRingSet ringSet) {
     	listOfRings = new ArrayList<Integer[]>(); // this is a list of int arrays
     	for (int r = 0; r < ringSet.getAtomContainerCount(); ++r) {
     		IRing ring = (IRing)ringSet.getAtomContainer(r);
@@ -869,134 +833,14 @@ public class DeduceBondSystemTool {
     		listOfRings.add(bondNumbers);
     	}
     }
+    
     /**
-     * Assigns a set of rings to groups each sharing a bond
-     * @param rBondsArray
-     * @param ringGroups
-     */
-    private List<List<Integer>> assignRingGroups(List<Integer[]> rBondsArray){
-        List<List<Integer>> ringGroups;
-        ringGroups = new ArrayList<List<Integer>>();
-        for(int i = 0; i < rBondsArray.size()-1; i++){    //for each ring except the last in rBondsArray
-            for(int j = 0; j < rBondsArray.get(i).length; j++){ //for each bond in each ring
-
-                //check there's no shared bond with any other ring already in ringGroups
-                for(int k = i+1; k < rBondsArray.size(); k++){
-                    for(int l = 0; l < rBondsArray.get(k).length; l++){  //for each ring in each ring
-
-                        //Is there a bond in common? Then add both rings
-                        if(rBondsArray.get(i)[j] == rBondsArray.get(k)[l]){
-                            if(i!=k){
-                            ringGroups.add(new ArrayList<Integer>());
-                            ringGroups.get(ringGroups.size()-1).add(i);
-                            ringGroups.get(ringGroups.size()-1).add(k);
-                            }
-                        }
-                     }
-                }
-            }
-        }
-        while(combineGroups(ringGroups));
-
-        //Anything not added yet is a singleton
-        for(int i = 0; i < rBondsArray.size(); i++){
-            boolean found = false;
-            for (int j = 0; j < ringGroups.size(); j++){
-                if(ringGroups.get(j).contains(i)){
-                    found = true;
-                    break;
-                }
-            }
-            if(!found){
-                ringGroups.add(new ArrayList<Integer>());
-                ringGroups.get(ringGroups.size()-1).add(i);
-            }
-        }
-        return ringGroups;
-    }
-    /**
-     * 
-     * @param ringGroups
-     * @return
-     */
-    private Boolean combineGroups(List<List<Integer>> ringGroups){
-        for(int i=0; i < ringGroups.size()-1; i++){
-
-            //Look for another group to combine with it
-            for(int j=i+1; j < ringGroups.size(); j++){
-                for( int k=0; k < ringGroups.get(j).size(); k++){
-                    if(ringGroups.get(i).contains(ringGroups.get(j).get(k))){
-
-                        //Add all the new elements
-                        for(int l=0; l < ringGroups.get(j).size(); l++){
-                           if(!ringGroups.get(i).contains(ringGroups.get(j).get(l))){
-                               ringGroups.get(i).add(ringGroups.get(j).get(l));
-                           }
-                        }
-                        ringGroups.remove(j);
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    /**
-     * Returns the group number a particular ringIndex belongs to
-     * @param ringGroups
-     * @param ringIndex
-     * @return
-     */
-    private Integer getRingGroupNumber(List<List<Integer>> ringGroups, Integer ringIndex){
-       for(int i = 0; i < ringGroups.size(); i++) {
-           if(ringGroups.get(i).contains(ringIndex))
-                   return i;
-       }
-       return null;
-    }
-    /**
-     * Combines several molecules to include all double bonds from rings in each
-     * @param retMols
-     * @return
-     */
-    private IMolecule combineRetMols(List<IMolecule> retMols){
-        IMolecule combi = null;
-        try {
-                combi = (IMolecule) retMols.get(0).clone();
-            } catch (Exception e) {
-                logger.error("Failed to clone molecule: ", e.getMessage());
-                logger.debug(e);
-            }
-
-        //Only work on the relevant ring bonds
-        IRingSet ringset = removeExtraRings(combi);
-        List<Integer[]> rBondsArray = null;
-
-        //Get hold of the bond numbers
-        rBondsArray = getRingSystem(combi, ringset);
-
-        //Cycle through each molecule
-        for(int i = 1; i < retMols.size(); i++){
-
-            //and set  ring bonds to double that are double in any of the other molecules
-            for (Integer[] cbonds: rBondsArray){
-                for (int j = 0; j < cbonds.length; j++){
-                    if(retMols.get(i).getBond(cbonds[j]).getOrder() == IBond.Order.DOUBLE)
-                        combi.getBond(cbonds[j]).setOrder(IBond.Order.DOUBLE);
-                }
-            }
-        }
-        return combi;
-    }
-
-
-    /**
-     * Recovers a RingSet corresponding to a molecule that has been
+     * Recovers a RingSet corresponding to a AtomContainer that has been
      * stored by storeRingSystem().
-     *
-     * @param mol      The IMolecule for which to recover the IRingSet.
+     * 
+     * @param mol      The IAtomContainer for which to recover the IRingSet.     
      */
-    private IRingSet recoverRingSystem(IMolecule mol) {
+    private IRingSet recoverRingSystem(IAtomContainer mol) {
     	IRingSet ringSet = mol.getBuilder().newInstance(IRingSet.class);
         for (Integer[] bondNumbers : listOfRings) {
             IRing ring = mol.getBuilder().newInstance(IRing.class,bondNumbers.length);

@@ -34,7 +34,6 @@ import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.formats.PubChemCompoundsXMLFormat;
 import org.openscience.cdk.io.pubchemxml.PubChemXMLHelper;
@@ -66,7 +65,7 @@ extends DefaultIteratingChemObjectReader<IAtomContainer> {
     
     private boolean nextAvailableIsKnown;
     private boolean hasNext;
-    private IMolecule nextMolecule;
+    private IAtomContainer nextMolecule;
     
     /**
      * Constructs a new IteratingPCCompoundXMLReader that can read Molecule from a given Reader and IChemObjectBuilder.

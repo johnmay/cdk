@@ -32,6 +32,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.smiles.smarts.SMARTSQueryTool;
 
 import java.util.BitSet;
+import java.util.Map;
 
 /**
  * This fingerprinter generates 79 bit fingerprints using the E-State 
@@ -84,6 +85,11 @@ public class EStateFingerprinter implements IFingerprinter {
             if (status) fingerPrint.set(i, true);
         }
         return fingerPrint;
+    }
+
+    /** {@inheritDoc} */
+    public Map<String, Integer> getRawFingerprint(IAtomContainer iAtomContainer) throws CDKException {
+        throw new UnsupportedOperationException();
     }
 
     @TestMethod("testGetSize")

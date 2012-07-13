@@ -28,7 +28,6 @@ import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.math.MathTools;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -47,22 +46,23 @@ import org.openscience.cdk.tools.manipulator.BondManipulator;
  * 
  * @cdk.githash
  * @cdk.keyword structure generator
+ * @cdk.module structgen
  */
 public class RandomGenerator {
 	
 	ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(RandomGenerator.class);
 	
-	private IMolecule proposedStructure = null;
-	private IMolecule molecule = null;
-	private IMolecule trial = null;
+	private IAtomContainer proposedStructure = null;
+	private IAtomContainer molecule = null;
+	private IAtomContainer trial = null;
 
 	/**
 	 * Constructs a RandomGenerator with a given starting structure.
 	 *
 	 * @param   molecule  The starting structure
 	 */
-	public RandomGenerator(IMolecule molecule)
+	public RandomGenerator(IAtomContainer molecule)
 	{
 		setMolecule(molecule);
 	}
@@ -75,13 +75,13 @@ public class RandomGenerator {
 	 *
 	 * @return A proposed molecule    
 	 */
-	public IMolecule proposeStructure()
+	public IAtomContainer proposeStructure()
 	{
 		logger.debug("RandomGenerator->proposeStructure() Start");
 		do
 		{
 			try {
-				trial = (IMolecule)molecule.clone();
+				trial = (IAtomContainer)molecule.clone();
 			} catch (CloneNotSupportedException e) {
 				logger.error("Could not clone IAtomContainer!" + e.getMessage());
 				trial = null;
@@ -325,7 +325,7 @@ public class RandomGenerator {
 	 *
 	 * @param   molecule  a starting structure for this generator
 	 */
-	public void setMolecule(IMolecule molecule)
+	public void setMolecule(IAtomContainer molecule)
 	{
 		this.molecule = molecule;	
 	}
@@ -337,7 +337,7 @@ public class RandomGenerator {
 	 *
 	 * @return The molecule    
 	 */
-	public IMolecule getMolecule()
+	public IAtomContainer getMolecule()
 	{
 		return this.molecule;
 	}

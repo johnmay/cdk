@@ -48,7 +48,6 @@ import org.openscience.cdk.FragmentAtomTest;
 import org.openscience.cdk.IsotopeTest;
 import org.openscience.cdk.LonePairTest;
 import org.openscience.cdk.MappingTest;
-import org.openscience.cdk.MoleculeSetTest;
 import org.openscience.cdk.MoleculeTest;
 import org.openscience.cdk.MonomerTest;
 import org.openscience.cdk.PolymerTest;
@@ -69,7 +68,6 @@ import org.openscience.cdk.protein.data.PDBAtomTest;
 import org.openscience.cdk.protein.data.PDBMonomerTest;
 import org.openscience.cdk.protein.data.PDBPolymerTest;
 import org.openscience.cdk.protein.data.PDBStructureTest;
-import org.openscience.cdk.stereo.TetrahedralChiralityTest;
 
 /**
  * TestSuite that runs all the sample tests.
@@ -108,7 +106,6 @@ import org.openscience.cdk.stereo.TetrahedralChiralityTest;
     RingTest.class,
     RingSetTest.class,
     AtomContainerSetTest.class,
-    MoleculeSetTest.class,
     ReactionSetTest.class,
     SingleElectronTest.class,
     StrandTest.class,
@@ -119,8 +116,6 @@ import org.openscience.cdk.stereo.TetrahedralChiralityTest;
     AdductFormulaTest.class,
     MolecularFormulaSetTest.class,
     MolecularFormulaTest.class,
-    
-    TetrahedralChiralityTest.class,
 
     // test from test.event
     ChemObjectChangeEventTest.class,

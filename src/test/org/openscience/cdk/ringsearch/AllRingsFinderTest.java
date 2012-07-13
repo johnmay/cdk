@@ -28,20 +28,19 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.Ring;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.io.CMLReader;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.nonotify.NNChemFile;
+import org.openscience.cdk.silent.ChemFile;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -72,7 +71,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IRingSet ringSet = null;
 		AllRingsFinder arf = new AllRingsFinder();
 		if (standAlone) arf.debug = true;
-		Molecule molecule = MoleculeFactory.makeEthylPropylPhenantren();
+		IAtomContainer molecule = MoleculeFactory.makeEthylPropylPhenantren();
 		//display(molecule);
 
 		ringSet = arf.findAllRings(molecule);
@@ -87,7 +86,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IRingSet ringSet = null;
 		AllRingsFinder arf = new AllRingsFinder();
 		if (standAlone) arf.debug = true;
-		Molecule molecule = MoleculeFactory.makeEthylPropylPhenantren();
+		IAtomContainer molecule = MoleculeFactory.makeEthylPropylPhenantren();
 		//display(molecule);
 
 		ringSet = arf.findAllRings(molecule);
@@ -108,14 +107,14 @@ public class AllRingsFinderTest extends CDKTestCase
 	
 	@Test public void testFindAllRings_IAtomContainer_boolean() throws Exception {
 		AllRingsFinder arf = new AllRingsFinder();
-		Molecule molecule = MoleculeFactory.makeEthylPropylPhenantren();
+		IAtomContainer molecule = MoleculeFactory.makeEthylPropylPhenantren();
 		arf.findAllRings(molecule);
 	}
 	
 	@Test(expected = CDKException.class) public void testSetTimeout_long() throws Exception {
 		AllRingsFinder arf = new AllRingsFinder();
 		arf.setTimeout(1);
-		Molecule molecule = MoleculeFactory.makeEthylPropylPhenantren();
+		IAtomContainer molecule = MoleculeFactory.makeEthylPropylPhenantren();
         arf.findAllRings(molecule);
     }
 	
@@ -143,7 +142,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IChemFile chemFile = (IChemFile) reader.read(new org.openscience.cdk.ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
 
 		ringSet = arf.findAllRings(molecule);
 		Assert.assertEquals(20, ringSet.getAtomContainerCount());
@@ -159,10 +158,10 @@ public class AllRingsFinderTest extends CDKTestCase
 		String filename = "data/mdl/ring_03419.mol";
 		InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
 		MDLV2000Reader reader = new MDLV2000Reader(ins);
-		IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+		IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
 
 		ringSet = arf.findAllRings(molecule);
 		// the 1976 value was empirically derived, and might not be accurate
@@ -180,7 +179,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IChemFile chemFile = (IChemFile) reader.read(new org.openscience.cdk.ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
 
 		ringSet = arf.findAllRings(molecule);
 		Assert.assertEquals(14, ringSet.getAtomContainerCount());
@@ -196,7 +195,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IChemFile chemFile = (IChemFile) reader.read(new org.openscience.cdk.ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
 
 		ringSet = arf.findAllRings(molecule);
 		Assert.assertEquals(3, ringSet.getAtomContainerCount());
@@ -214,7 +213,7 @@ public class AllRingsFinderTest extends CDKTestCase
         IChemFile chemFile = (IChemFile) reader.read(new org.openscience.cdk.ChemFile());
         IChemSequence seq = chemFile.getChemSequence(0);
         IChemModel model = seq.getChemModel(0);
-        IMolecule mol = model.getMoleculeSet().getMolecule(0);
+        IAtomContainer mol = model.getMoleculeSet().getAtomContainer(0);
         //logger.debug("Constructed Molecule");
         //logger.debug("Starting AllRingsFinder");
         ringSet = new AllRingsFinder().findAllRings(mol);
@@ -243,7 +242,7 @@ public class AllRingsFinderTest extends CDKTestCase
 		IChemFile chemFile = (IChemFile) reader.read(new org.openscience.cdk.ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMolecule mol = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer mol = model.getMoleculeSet().getAtomContainer(0);
 		if (standAlone) System.out.println("Constructed Molecule");
 		if (standAlone) System.out.println("Starting AllRingsFinder");
 		IRingSet ringSet = new AllRingsFinder().findAllRings(mol);
@@ -255,7 +254,7 @@ public class AllRingsFinderTest extends CDKTestCase
 
     @Test public void testRingFlags1() throws Exception {
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule molecule = sp.parseSmiles("c1ccccc1");
+        IAtomContainer molecule = sp.parseSmiles("c1ccccc1");
 
         AllRingsFinder arf = new AllRingsFinder();
         arf.findAllRings(molecule);
@@ -272,7 +271,7 @@ public class AllRingsFinderTest extends CDKTestCase
 
     @Test public void testRingFlags2() throws Exception {
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule molecule = sp.parseSmiles("c1cccc1CC");
+        IAtomContainer molecule = sp.parseSmiles("c1cccc1CC");
 
 
         AllRingsFinder arf = new AllRingsFinder();
@@ -295,10 +294,10 @@ public class AllRingsFinderTest extends CDKTestCase
       String filename = "data/mdl/ring_03419.mol";
       InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
       MDLV2000Reader reader = new MDLV2000Reader(ins);
-      IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+      IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
       IChemSequence seq = chemFile.getChemSequence(0);
       IChemModel model = seq.getChemModel(0);
-      IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+      IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
       ringSet = arf.findAllRings(molecule,6);
       Assert.assertEquals(12, ringSet.getAtomContainerCount());
     }
@@ -310,10 +309,10 @@ public class AllRingsFinderTest extends CDKTestCase
       String filename = "data/mdl/four-ring-5x10.mol";
       InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
       MDLV2000Reader reader = new MDLV2000Reader(ins);
-      IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+      IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
       IChemSequence seq = chemFile.getChemSequence(0);
       IChemModel model = seq.getChemModel(0);
-      IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+      IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
       // there are 5x10 squares (four-rings) in the 5x10 molecule 
       ringSet = arf.findAllRings(molecule,4);
       Assert.assertEquals(50, ringSet.getAtomContainerCount());
@@ -326,10 +325,10 @@ public class AllRingsFinderTest extends CDKTestCase
       String filename = "data/mdl/four-ring-5x10.mol";
       InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
       MDLV2000Reader reader = new MDLV2000Reader(ins);
-      IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+      IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
       IChemSequence seq = chemFile.getChemSequence(0);
       IChemModel model = seq.getChemModel(0);
-      IMolecule molecule = model.getMoleculeSet().getMolecule(0);
+      IAtomContainer molecule = model.getMoleculeSet().getAtomContainer(0);
       // there are 5x10 four-rings (squares ) = 50
       // there are (9x5) + (4x10) six-rings   = 85
       // combined 135

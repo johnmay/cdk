@@ -33,7 +33,6 @@ import org.openscience.cdk.Bond;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.config.Elements;
@@ -44,11 +43,9 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IElement;
 import org.openscience.cdk.interfaces.IMolecularFormula;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.nonotify.NNAtom;
-import org.openscience.cdk.nonotify.NNMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.AtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -66,9 +63,9 @@ import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 public class CDKHydrogenAdderTest extends CDKTestCase {
 
 	private final static CDKHydrogenAdder adder =
-	    CDKHydrogenAdder.getInstance(NoNotificationChemObjectBuilder.getInstance());
+	    CDKHydrogenAdder.getInstance(SilentChemObjectBuilder.getInstance());
 	private final static CDKAtomTypeMatcher matcher =
-	    CDKAtomTypeMatcher.getInstance(NoNotificationChemObjectBuilder.getInstance());
+	    CDKAtomTypeMatcher.getInstance(SilentChemObjectBuilder.getInstance());
 
     @Test
     public void testInstance() {
@@ -77,8 +74,8 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     
     @Test
     public void testMethane() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
     	molecule.addAtom(newAtom);
     	IAtomType type = matcher.findMatchingAtomType(molecule, newAtom);
     	Assert.assertNotNull(type);
@@ -91,9 +88,9 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testFormaldehyde() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
-    	IAtom newAtom2 = new NNAtom(Elements.OXYGEN);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
+    	IAtom newAtom2 = new Atom(Elements.OXYGEN);
     	molecule.addAtom(newAtom);
     	molecule.addAtom(newAtom2);
     	molecule.addBond(0,1,CDKConstants.BONDORDER_DOUBLE);
@@ -113,9 +110,9 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testMethanol() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
-    	IAtom newAtom2 = new NNAtom(Elements.OXYGEN);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
+    	IAtom newAtom2 = new Atom(Elements.OXYGEN);
     	molecule.addAtom(newAtom);
     	molecule.addAtom(newAtom2);
     	molecule.addBond(0,1,CDKConstants.BONDORDER_SINGLE);
@@ -135,9 +132,9 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testHCN() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
-    	IAtom newAtom2 = new NNAtom(Elements.NITROGEN);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
+    	IAtom newAtom2 = new Atom(Elements.NITROGEN);
     	molecule.addAtom(newAtom);
     	molecule.addAtom(newAtom2);
     	molecule.addBond(0,1,CDKConstants.BONDORDER_TRIPLE);
@@ -157,9 +154,9 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testMethylAmine() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
-    	IAtom newAtom2 = new NNAtom(Elements.NITROGEN);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
+    	IAtom newAtom2 = new Atom(Elements.NITROGEN);
     	molecule.addAtom(newAtom);
     	molecule.addAtom(newAtom2);
     	molecule.addBond(0,1,CDKConstants.BONDORDER_SINGLE);
@@ -179,9 +176,9 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testMethyleneImine() throws Exception {
-    	IMolecule molecule = new NNMolecule();
-    	IAtom newAtom = new NNAtom(Elements.CARBON);
-    	IAtom newAtom2 = new NNAtom(Elements.NITROGEN);
+        IAtomContainer molecule = new AtomContainer();
+    	IAtom newAtom = new Atom(Elements.CARBON);
+    	IAtom newAtom2 = new Atom(Elements.NITROGEN);
     	molecule.addAtom(newAtom);
     	molecule.addAtom(newAtom2);
     	molecule.addBond(0,1,CDKConstants.BONDORDER_DOUBLE);
@@ -201,7 +198,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
     
     @Test public void testSulphur() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom atom = new Atom("S");
         mol.addAtom(atom);
     	IAtomType type = matcher.findMatchingAtomType(mol, atom);
@@ -216,7 +213,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testProton() throws Exception {
-    	Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
     	Atom proton = new Atom("H");
     	proton.setFormalCharge(+1);
     	mol.addAtom(proton);
@@ -235,7 +232,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testHydrogen() throws Exception {
-    	Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
     	Atom proton = new Atom("H");
     	mol.addAtom(proton);
     	IAtomType type = matcher.findMatchingAtomType(mol, proton);
@@ -246,14 +243,14 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
 
     	Assert.assertEquals(1, mol.getAtomCount());
     	IMolecularFormula formula = MolecularFormulaManipulator.getMolecularFormula(mol);
-    	Assert.assertEquals(1, MolecularFormulaManipulator.getElementCount(formula,mol.getBuilder().newInstance(IElement.class,"H")));
+    	Assert.assertEquals(2, MolecularFormulaManipulator.getElementCount(formula,mol.getBuilder().newInstance(IElement.class,"H")));
     	Assert.assertEquals(0, mol.getConnectedBondsCount(proton));
     	Assert.assertNotNull(proton.getImplicitHydrogenCount());
     	Assert.assertEquals(1, proton.getImplicitHydrogenCount().intValue());
     }
 
     @Test public void testAmmonia() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom nitrogen = new Atom("N");
         mol.addAtom(nitrogen);
         IAtomType type = matcher.findMatchingAtomType(mol, nitrogen);
@@ -266,7 +263,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testAmmonium() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom nitrogen = new Atom("N");
         nitrogen.setFormalCharge(+1);
         mol.addAtom(nitrogen);
@@ -280,7 +277,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testWater() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom oxygen = new Atom("O");
         mol.addAtom(oxygen);
         IAtomType type = matcher.findMatchingAtomType(mol, oxygen);
@@ -293,7 +290,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testHydroxonium() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom oxygen = new Atom("O");
         oxygen.setFormalCharge(+1);
         mol.addAtom(oxygen);
@@ -307,7 +304,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testHydroxyl() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom oxygen = new Atom("O");
         oxygen.setFormalCharge(-1);
         mol.addAtom(oxygen);
@@ -335,7 +332,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
     
     private void halogenTest(String halogen) throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom atom = new Atom(halogen);
         mol.addAtom(atom);
         IAtomType type = matcher.findMatchingAtomType(mol, atom);
@@ -349,7 +346,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     private void negativeHalogenTest(String halogen) throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom atom = new Atom(halogen);
         atom.setFormalCharge(-1);
         mol.addAtom(atom);
@@ -364,7 +361,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testSulfite() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom s = new Atom("S");
         Atom o1 = new Atom("O");
         Atom o2 = new Atom("O");
@@ -408,7 +405,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
     
     @Test public void testAceticAcid() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom carbonylOxygen = new Atom("O");
         Atom hydroxylOxygen = new Atom("O");
         Atom methylCarbon = new Atom("C");
@@ -435,7 +432,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testEthane() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom carbon1 = new Atom("C");
         Atom carbon2 = new Atom("C");
         Bond b = new Bond(carbon1, carbon2, IBond.Order.SINGLE);
@@ -453,7 +450,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
 
     @Test
     public void testEthaneWithPresetImplicitHCount() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom carbon1 = new Atom("C");
         Atom carbon2 = new Atom("C");
         Bond b = new Bond(carbon1, carbon2, IBond.Order.SINGLE);
@@ -473,7 +470,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testEthene() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom carbon1 = new Atom("C");
         Atom carbon2 = new Atom("C");
         Bond b = new Bond(carbon1, carbon2, IBond.Order.DOUBLE);
@@ -490,7 +487,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testEthyne() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom carbon1 = new Atom("C");
         Atom carbon2 = new Atom("C");
         Bond b = new Bond(carbon1, carbon2, IBond.Order.TRIPLE);
@@ -507,7 +504,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testAromaticSaturation() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         mol.addAtom(new Atom("C")); // 0
         mol.addAtom(new Atom("C")); // 1
         mol.addAtom(new Atom("C")); // 2
@@ -538,7 +535,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
 
     @Test public void testaddImplicitHydrogensToSatisfyValency_OldValue() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         mol.addAtom(new Atom("C"));
         Atom oxygen = new Atom("O");
         mol.addAtom(oxygen);
@@ -556,7 +553,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
 
     @Test public void testAdenine() throws Exception
     {
-    	IMolecule mol = new Molecule(); // Adenine
+    	IAtomContainer mol = new AtomContainer(); // Adenine
     	IAtom a1 = mol.getBuilder().newInstance(IAtom.class,"C");
     	a1.setPoint2d(new Point2d(21.0223, -17.2946));  mol.addAtom(a1);
     	IAtom a2 = mol.getBuilder().newInstance(IAtom.class,"C");
@@ -610,11 +607,11 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
      *
      */
     @Test public void testBug1727373() throws Exception {
-        Molecule molecule = null;
+        IAtomContainer molecule = null;
         String filename = "data/mdl/carbocations.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader = new MDLV2000Reader(ins);
-        molecule = reader.read(new Molecule());
+        molecule = reader.read(new AtomContainer());
     	findAndConfigureAtomTypesForAllAtoms(molecule);
         adder.addImplicitHydrogens(molecule);
         Assert.assertEquals(2,molecule.getAtom(0).getImplicitHydrogenCount().intValue());
@@ -630,7 +627,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
         String filename = "data/mdl/furan.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader = new MDLV2000Reader(ins);
-        IMolecule molecule = reader.read(new Molecule());
+        IAtomContainer molecule = reader.read(new AtomContainer());
     	findAndConfigureAtomTypesForAllAtoms(molecule);
         adder.addImplicitHydrogens(molecule);
         Assert.assertEquals(1,molecule.getAtom(0).getImplicitHydrogenCount().intValue());
@@ -644,7 +641,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
         String filename = "data/mdl/furan.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader = new MDLV2000Reader(ins);
-        IMolecule molecule = reader.read(new Molecule());
+        IAtomContainer molecule = reader.read(new AtomContainer());
         findAndConfigureAtomTypesForAllAtoms(molecule);
         for (IAtom atom : molecule.atoms()) {
             adder.addImplicitHydrogens(molecule, atom);
@@ -657,14 +654,14 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
 
     @Test
     public void testPseudoAtom() throws Exception {
-        IMolecule molecule = new Molecule();
+        IAtomContainer molecule = new AtomContainer();
         molecule.addAtom(new PseudoAtom("Waterium"));
         findAndConfigureAtomTypesForAllAtoms(molecule);
         Assert.assertNull(molecule.getAtom(0).getImplicitHydrogenCount());
     }
 
     @Test public void testNaCl() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom cl = new Atom("Cl");
         cl.setFormalCharge(-1);
         mol.addAtom(cl);
@@ -714,7 +711,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
      * @cdk.bug 1627763
      */
     @Test public void testBug1627763() throws Exception {
-    	IMolecule mol = new Molecule();
+    	IAtomContainer mol = new AtomContainer();
     	mol.addAtom(mol.getBuilder().newInstance(IAtom.class,"C"));
     	mol.addAtom(mol.getBuilder().newInstance(IAtom.class,"O"));
     	mol.addBond(mol.getBuilder().newInstance(IBond.class,
@@ -738,7 +735,7 @@ public class CDKHydrogenAdderTest extends CDKTestCase {
     }
     
     @Test public void testMercaptan() throws Exception {
-    	IMolecule mol = new Molecule();
+    	IAtomContainer mol = new AtomContainer();
     	mol.addAtom(mol.getBuilder().newInstance(IAtom.class,"C"));
     	mol.addAtom(mol.getBuilder().newInstance(IAtom.class,"C"));
     	mol.addAtom(mol.getBuilder().newInstance(IAtom.class,"C"));

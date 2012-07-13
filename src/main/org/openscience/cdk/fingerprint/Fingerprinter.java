@@ -198,6 +198,11 @@ public class Fingerprinter implements IFingerprinter {
 		return getFingerprint(container, null);
 	}
 
+    /** {@inheritDoc} */   
+    public Map<String, Integer> getRawFingerprint(IAtomContainer iAtomContainer) throws CDKException {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Get all paths of lengths 0 to the specified length.
      *

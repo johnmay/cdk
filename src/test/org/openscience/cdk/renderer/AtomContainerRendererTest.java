@@ -25,16 +25,15 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.renderer.elements.IRenderingElement;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
@@ -53,11 +52,11 @@ import org.openscience.cdk.renderer.generators.IGenerator;
  */
 public class AtomContainerRendererTest {
 	
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 	
 	private StructureDiagramGenerator sdg = new StructureDiagramGenerator();
 	
-	public IMolecule layout(IMolecule molecule) {
+	public IAtomContainer layout(IAtomContainer molecule) {
 		sdg.setMolecule(molecule);
 		try {
 			sdg.generateCoordinates();
@@ -67,8 +66,8 @@ public class AtomContainerRendererTest {
 		return sdg.getMolecule();
 	}
 	
-	public IMolecule makeSquare() {
-		IMolecule square = builder.newInstance(IMolecule.class);
+	public IAtomContainer makeSquare() {
+		IAtomContainer square = builder.newInstance(IAtomContainer.class);
 		square.addAtom(builder.newInstance(IAtom.class,"C"));
 		square.addAtom(builder.newInstance(IAtom.class,"C"));
 		square.addAtom(builder.newInstance(IAtom.class,"C"));
@@ -83,7 +82,7 @@ public class AtomContainerRendererTest {
 	
 	@Test
 	public void testSquareMolecule() {
-		IMolecule square = makeSquare();
+	    IAtomContainer square = makeSquare();
 		
 		List<IGenerator<IAtomContainer>> generators =
 			new ArrayList<IGenerator<IAtomContainer>>();

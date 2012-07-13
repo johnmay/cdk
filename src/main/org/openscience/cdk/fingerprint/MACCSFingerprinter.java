@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.annotations.TestClass;
@@ -39,8 +40,8 @@ import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.ringsearch.AllRingsFinder;
 import org.openscience.cdk.smiles.smarts.SMARTSQueryTool;
@@ -140,12 +141,17 @@ public class MACCSFingerprinter implements IFingerprinter {
             }
         }
         // bit 166 (*).(*)
-        IMoleculeSet part 
+        IAtomContainerSet part 
             = ConnectivityChecker.partitionIntoMolecules(atomContainer);
-        if (part.getMoleculeCount() > 1)  fingerPrint.set(165,true);
+        if (part.getAtomContainerCount() > 1)  fingerPrint.set(165,true);
 
 
         return fingerPrint;
+    }
+
+    /** {@inheritDoc} */
+    public Map<String, Integer> getRawFingerprint(IAtomContainer iAtomContainer) throws CDKException {
+        throw new UnsupportedOperationException();
     }
 
     @TestMethod("getsize")

@@ -26,33 +26,22 @@
  */
 package org.openscience.cdk.io;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
-
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.ICrystal;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IPDBPolymer;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionScheme;
@@ -68,8 +57,17 @@ import org.openscience.cdk.libio.cml.ICMLCustomizer;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Serializes a {@link IMoleculeSet} or a {@link IMolecule} object to CML 2 code.
+ * Serializes a {@link IAtomContainerSet} or a {@link IAtomContainer} object to CML 2 code.
  * Chemical Markup Language is an XML-based file format {@cdk.cite PMR99}.
  * Output can be redirected to other Writer objects like {@link StringWriter}
  * and {@link FileWriter}. An example:
@@ -195,7 +193,7 @@ public class CMLWriter extends DefaultChemObjectWriter {
 			if (IChemModel.class.equals(interfaces[i])) return true;
 			if (IChemFile.class.equals(interfaces[i])) return true;
 			if (IChemSequence.class.equals(interfaces[i])) return true;
-			if (IMoleculeSet.class.equals(interfaces[i])) return true;
+			if (IAtomContainerSet.class.equals(interfaces[i])) return true;
 			if (IReactionSet.class.equals(interfaces[i])) return true;
 			if (IReaction.class.equals(interfaces[i])) return true;
 		}
@@ -205,15 +203,14 @@ public class CMLWriter extends DefaultChemObjectWriter {
     /**
      * Serializes the IChemObject to CML and redirects it to the output Writer.
      *
-     * @param object A Molecule of MoleculeSet object
+     * @param object A Molecule of AtomContaineSet object
      */
     public void write(IChemObject object) throws CDKException {
        
-        if (!(object instanceof IMolecule) &&
-            !(object instanceof IAtomContainer) &&
+        if (!(object instanceof IAtomContainer) &&
+            !(object instanceof IAtomContainerSet) &&
             !(object instanceof IReaction) &&
             !(object instanceof IReactionSet) &&
-            !(object instanceof IMoleculeSet) &&
             !(object instanceof IChemSequence) &&
             !(object instanceof IChemModel) &&
             !(object instanceof IChemFile) &&
@@ -242,8 +239,6 @@ public class CMLWriter extends DefaultChemObjectWriter {
         Element root = null;
         if (object instanceof IPDBPolymer) {
         	root = convertor.cdkPDBPolymerToCMLMolecule((IPDBPolymer)object);
-    	} else if (object instanceof IMolecule) {
-    		root = convertor.cdkMoleculeToCMLMolecule((IMolecule)object);
         } else if (object instanceof ICrystal) {
         	root = convertor.cdkCrystalToCMLMolecule((ICrystal)object);
         } else if (object instanceof IAtom) {
@@ -256,8 +251,8 @@ public class CMLWriter extends DefaultChemObjectWriter {
     		root = convertor.cdkReactionSchemeToCMLReactionSchemeAndMoleculeList((IReactionScheme)object);
         } else if (object instanceof IReactionSet) {
         	root = convertor.cdkReactionSetToCMLReactionList((IReactionSet)object);
-        } else if (object instanceof IMoleculeSet) {
-        	root = convertor.cdkMoleculeSetToCMLList((IMoleculeSet)object);
+        } else if (object instanceof IAtomContainerSet) {
+        	root = convertor.cdkAtomContainerSetToCMLList((IAtomContainerSet)object);
         } else if (object instanceof IChemSequence) {
         	root = convertor.cdkChemSequenceToCMLList((IChemSequence)object);
         } else if (object instanceof IChemModel) {
@@ -297,33 +292,33 @@ public class CMLWriter extends DefaultChemObjectWriter {
     }
 
     private void initIOSettings() {
-        cmlIds = new BooleanIOSetting("CMLIDs", IOSetting.LOW,
+        cmlIds = addSetting(new BooleanIOSetting("CMLIDs", IOSetting.Importance.LOW,
           "Should the output use CML identifiers?", 
-          "true");
+          "true"));
 
-        namespacedOutput = new BooleanIOSetting("NamespacedOutput", IOSetting.LOW,
+        namespacedOutput = addSetting(new BooleanIOSetting("NamespacedOutput", IOSetting.Importance.LOW,
           "Should the output use namespaced output?", 
-          "true");
+          "true"));
 
-        namespacePrefix = new StringIOSetting("NamespacePrefix", IOSetting.LOW,
+        namespacePrefix = addSetting(new StringIOSetting("NamespacePrefix", IOSetting.Importance.LOW,
           "What should the namespace prefix be? [empty is no prefix]",
-          "");
+          ""));
           
-        schemaInstanceOutput = new BooleanIOSetting("SchemaInstance", IOSetting.LOW,
+        schemaInstanceOutput = addSetting(new BooleanIOSetting("SchemaInstance", IOSetting.Importance.LOW,
           "Should the output use the Schema-Instance attribute?", 
-          "false");
+          "false"));
         
-        instanceLocation = new StringIOSetting("InstanceLocation", IOSetting.LOW,
+        instanceLocation = addSetting(new StringIOSetting("InstanceLocation", IOSetting.Importance.LOW,
           "Where is the schema found?",
-          "");
+          ""));
 
-        indent = new BooleanIOSetting("Indenting", IOSetting.LOW,
+        indent = addSetting(new BooleanIOSetting("Indenting", IOSetting.Importance.LOW,
           "Should the output be indented?", 
-          "true");
+          "true"));
 
-        xmlDeclaration = new BooleanIOSetting("XMLDeclaration", IOSetting.LOW,
+        xmlDeclaration = addSetting(new BooleanIOSetting("XMLDeclaration", IOSetting.Importance.LOW,
                 "Should the output contain an XML declaration?",
-                "true");
+                "true"));
     }
     
     private void customizeJob() {
@@ -338,18 +333,6 @@ public class CMLWriter extends DefaultChemObjectWriter {
         }
         fireIOSettingQuestion(indent);
         fireIOSettingQuestion(xmlDeclaration);
-    }
-
-    public IOSetting[] getIOSettings() {
-        IOSetting[] settings = new IOSetting[7];
-        settings[0] = cmlIds;
-        settings[1] = namespacedOutput;
-        settings[2] = namespacePrefix;
-        settings[3] = schemaInstanceOutput;
-        settings[4] = instanceLocation;
-        settings[5] = indent;
-        settings[6] = xmlDeclaration;
-        return settings;
     }
 
 }

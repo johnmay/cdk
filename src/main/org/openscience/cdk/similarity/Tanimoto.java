@@ -34,6 +34,9 @@ import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 
 import java.util.BitSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *  Calculates the Tanimoto coefficient for a given pair of two 
@@ -67,9 +70,12 @@ import java.util.BitSet;
 public class Tanimoto 
 {
 
+    private Tanimoto() {
+    }
+    
     /**
      * Evaluates Tanimoto coefficient for two bit sets.
-     *
+     * <p>
      * @param bitset1 A bitset (such as a fingerprint) for the first molecule
      * @param bitset2 A bitset (such as a fingerprint) for the second molecule
      * @return The Tanimoto coefficient
@@ -81,7 +87,7 @@ public class Tanimoto
         float _bitset1_cardinality = bitset1.cardinality();
         float _bitset2_cardinality = bitset2.cardinality();
         if (bitset1.size() != bitset2.size()) {
-            throw new CDKException("Bisets must have the same bit length");
+            throw new CDKException("Bitsets must have the same bit length");
         }
         BitSet one_and_two = (BitSet)bitset1.clone();
         one_and_two.and(bitset2);
@@ -91,7 +97,7 @@ public class Tanimoto
     
     /**
      * Evaluates the continuous Tanimoto coefficient for two real valued vectors.
-     *
+     * <p>
      * @param features1 The first feature vector
      * @param features2 The second feature vector
      * @return The continuous Tanimoto coefficient
@@ -115,5 +121,32 @@ public class Tanimoto
             b2 += features2[i]*features2[i];
         }
         return (float)ab/(float)(a2+b2-ab);
+    }
+
+    /**
+     * Evaluate continuous Tanimoto coefficient for two feature,count fingerprint representations.
+     * <p>
+     * Note that feature/count type fingerprints may not be of the same length.
+     * 
+     * @param features1 The first feature map
+     * @param features2 The second feature map
+     * @return The Tanimoto coefficient
+     */
+    @TestMethod("testTanimoto4")
+    public static float calculate(Map<String, Integer> features1, Map<String, Integer> features2) {
+        Set<String> common = new TreeSet<String>(features1.keySet());
+        common.retainAll(features2.keySet());
+        double xy = 0., x = 0., y = 0.;
+        for (String s : common) {
+            int c1 = features1.get(s), c2 = features2.get(s);
+            xy += Math.max(c1, c2);
+        }
+        for (Integer c : features1.values()) {
+            x += c;
+        }
+        for (Integer c : features2.values()) {
+            y += c;
+        }
+        return (float) (xy / (x + y - xy));
     }
 }

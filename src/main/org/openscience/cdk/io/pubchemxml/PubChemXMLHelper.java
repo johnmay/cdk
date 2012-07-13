@@ -36,12 +36,12 @@ import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IElement;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IElement;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -112,8 +112,8 @@ public class PubChemXMLHelper {
   public final static String EL_PROPS_FVAL = "PC-InfoData_value_fval";
   public final static String EL_PROPS_BVAL = "PC-InfoData_value_binary";
 
-    public IMoleculeSet parseCompoundsBlock(XmlPullParser parser) throws Exception {
-    	IMoleculeSet set = builder.newInstance(IMoleculeSet.class);
+    public IAtomContainerSet parseCompoundsBlock(XmlPullParser parser) throws Exception {
+        IAtomContainerSet set = builder.newInstance(IAtomContainerSet.class);
     	// assume the current element is PC-Compounds
     	if (!parser.getName().equals(EL_PCCOMPOUNDS)) {
     		return null;
@@ -126,10 +126,10 @@ public class PubChemXMLHelper {
     			}
     		} else if (parser.getEventType() == XmlPullParser.START_TAG) {
     			if (EL_PCCOMPOUND.equals(parser.getName())) {
-    				IMolecule molecule = parseMolecule(parser, builder);
+    			    IAtomContainer molecule = parseMolecule(parser, builder);
     				if (molecule.getAtomCount() > 0) {
     					// skip empty PC-Compound's
-    					set.addMolecule(molecule);
+    					set.addAtomContainer(molecule);
     				}
     			}
     		}
@@ -151,7 +151,7 @@ public class PubChemXMLHelper {
     			}
     		} else if (parser.getEventType() == XmlPullParser.START_TAG) {
     			if (EL_PCCOMPOUNDS.equals(parser.getName())) {
-    				IMoleculeSet set = parseCompoundsBlock(parser);
+    				IAtomContainerSet set = parseCompoundsBlock(parser);
     				model.setMoleculeSet(set);
     			} else if (EL_PCSUBSTANCE_SID.equals(parser.getName())) {
     				String sid = getSID(parser);
@@ -194,7 +194,7 @@ public class PubChemXMLHelper {
         return cid;
     }
 
-  public void parseAtomElements(XmlPullParser parser, IMolecule molecule) throws Exception {
+  public void parseAtomElements(XmlPullParser parser, IAtomContainer molecule) throws Exception {
 		while (parser.next() != XmlPullParser.END_DOCUMENT) {
 			if (parser.getEventType() == XmlPullParser.END_TAG) {
     			if (EL_ATOMSELEMENT.equals(parser.getName())) {
@@ -217,7 +217,7 @@ public class PubChemXMLHelper {
 		}
 	}
 	
-	public void parserAtomBlock(XmlPullParser parser, IMolecule molecule) throws Exception {
+	public void parserAtomBlock(XmlPullParser parser, IAtomContainer molecule) throws Exception {
 		while (parser.next() != XmlPullParser.END_DOCUMENT) {
 			if (parser.getEventType() == XmlPullParser.END_TAG) {
     			if (EL_ATOMBLOCK.equals(parser.getName())) {
@@ -233,7 +233,7 @@ public class PubChemXMLHelper {
 		}
 	}
 	
-    public void parserCompoundInfoData(XmlPullParser parser, IMolecule molecule) throws Exception {
+    public void parserCompoundInfoData(XmlPullParser parser, IAtomContainer molecule) throws Exception {
         String urn_label = null;
         String urn_name = null;
         String sval = null;
@@ -262,7 +262,7 @@ public class PubChemXMLHelper {
         }
     }
 
-    public void parseAtomCharges(XmlPullParser parser, IMolecule molecule) throws Exception {
+    public void parseAtomCharges(XmlPullParser parser, IAtomContainer molecule) throws Exception {
     	while (parser.next() != XmlPullParser.END_DOCUMENT) {
     		if (parser.getEventType() == XmlPullParser.END_TAG) {
     			if (EL_ATOMSCHARGE.equals(parser.getName())) {
@@ -291,8 +291,8 @@ public class PubChemXMLHelper {
     	}
     }
 
-	public IMolecule parseMolecule(XmlPullParser parser, IChemObjectBuilder builder) throws Exception {
-    	IMolecule molecule = builder.newInstance(IMolecule.class);
+	public IAtomContainer parseMolecule(XmlPullParser parser, IChemObjectBuilder builder) throws Exception {
+	    IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
     	// assume the current element is PC-Compound
     	if (!parser.getName().equals("PC-Compound")) {
     		return null;
@@ -322,7 +322,7 @@ public class PubChemXMLHelper {
     }
 
 
-	public void parserBondBlock(XmlPullParser parser, IMolecule molecule) throws Exception {
+	public void parserBondBlock(XmlPullParser parser, IAtomContainer molecule) throws Exception {
 		List<String> id1s = new ArrayList<String>();
 		List<String> id2s = new ArrayList<String>();
 		List<String> orders = new ArrayList<String>();
@@ -368,7 +368,7 @@ public class PubChemXMLHelper {
 		}
 	}
 
-    public void parserCoordBlock(XmlPullParser parser, IMolecule molecule) throws Exception {
+    public void parserCoordBlock(XmlPullParser parser, IAtomContainer molecule) throws Exception {
         List<String> ids = new ArrayList<String>();
         List<String> xs = new ArrayList<String>();
         List<String> ys = new ArrayList<String>();

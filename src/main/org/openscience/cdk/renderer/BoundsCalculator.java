@@ -22,18 +22,17 @@
  */
 package org.openscience.cdk.renderer;
 
-import java.awt.geom.Rectangle2D;
-
-import javax.vecmath.Point2d;
-
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
+
+import javax.vecmath.Point2d;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Utility class for calculating the 2D bounding rectangles (bounds) 
@@ -55,7 +54,7 @@ public class BoundsCalculator {
      */
     @TestMethod("testCalculateBounds_IChemModel")
     public static Rectangle2D calculateBounds(IChemModel chemModel) {
-        IMoleculeSet moleculeSet = chemModel.getMoleculeSet();
+        IAtomContainerSet moleculeSet = chemModel.getMoleculeSet();
         IReactionSet reactionSet = chemModel.getReactionSet();
         Rectangle2D totalBounds = new Rectangle2D.Double();
         if (moleculeSet != null) {
@@ -100,8 +99,8 @@ public class BoundsCalculator {
     @TestMethod("testCalculateBounds_IReaction")
     public static Rectangle2D calculateBounds(IReaction reaction) {
         // get the participants in the reaction
-        IMoleculeSet reactants = reaction.getReactants();
-        IMoleculeSet products = reaction.getProducts();
+        IAtomContainerSet reactants = reaction.getReactants();
+        IAtomContainerSet products = reaction.getProducts();
         if (reactants == null || products == null) return null;
 
         // determine the bounds of everything in the reaction
@@ -116,7 +115,7 @@ public class BoundsCalculator {
      * @return the bounding rectangle of the molecule set
      */
     @TestMethod("testCalculateBounds_IMoleculeSet")
-    public static Rectangle2D calculateBounds(IMoleculeSet moleculeSet) {
+    public static Rectangle2D calculateBounds(IAtomContainerSet moleculeSet) {
         Rectangle2D totalBounds = new Rectangle2D.Double();
         for (int i = 0; i < moleculeSet.getAtomContainerCount(); i++) {
             IAtomContainer container = moleculeSet.getAtomContainer(i);

@@ -39,9 +39,8 @@ import org.openscience.cdk.interfaces.IBioPolymer;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMonomer;
-import org.openscience.cdk.nonotify.NNChemFile;
 import org.openscience.cdk.protein.data.PDBAtom;
 import org.openscience.cdk.protein.data.PDBMonomer;
 import org.openscience.cdk.protein.data.PDBPolymer;
@@ -82,8 +81,8 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
         
         StringReader stringReader = new StringReader(data); 
         PDBReader reader = new PDBReader(stringReader);
-        reader.getIOSettings()[0].setSetting("false");   // UseRebondTool
-        reader.getIOSettings()[1].setSetting("true");  // ReadConnectSection
+        reader.getSetting("UseRebondTool").setSetting("false");      // UseRebondTool
+        reader.getSetting("ReadConnectSection").setSetting("true");  // ReadConnectSection
 
         ChemObject object = new ChemFile();
         reader.read(object);
@@ -93,7 +92,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
                             .getChemSequence(0)
                                 .getChemModel(0)
                                     .getMoleculeSet()
-                                        .getMolecule(0)
+                                        .getAtomContainer(0)
                                             .getBondCount();
         /*
          * if ReadConnectSection=true and UseRebondTool=false
@@ -139,7 +138,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
         ISimpleChemObjectReader oReader = new PDBReader(ins);
         Assert.assertNotNull(oReader);
 
-        IChemFile oChemFile = (IChemFile)oReader.read(new NNChemFile());
+        IChemFile oChemFile = (IChemFile)oReader.read(new ChemFile());
         Assert.assertNotNull(oChemFile);
         Assert.assertEquals(oChemFile.getChemSequenceCount(), 1);
 
@@ -149,9 +148,9 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 
         IChemModel oModel = oSeq.getChemModel(0);
         Assert.assertNotNull(oModel);
-        Assert.assertEquals(1, oModel.getMoleculeSet().getMoleculeCount());
+        Assert.assertEquals(1, oModel.getMoleculeSet().getAtomContainerCount());
 
-        IAtomContainer container = oModel.getMoleculeSet().getMolecule(0);
+        IAtomContainer container = oModel.getMoleculeSet().getAtomContainer(0);
         Assert.assertFalse(container instanceof IBioPolymer);
         Assert.assertTrue(container instanceof IAtomContainer);
         IAtomContainer oMol = (IAtomContainer)container;
@@ -205,7 +204,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 		ISimpleChemObjectReader reader = new PDBReader(ins);
 		Assert.assertNotNull(reader);
 
-		ChemFile chemFile = (ChemFile) reader.read(new NNChemFile());
+		ChemFile chemFile = (ChemFile) reader.read(new ChemFile());
 		Assert.assertNotNull(chemFile);
 		Assert.assertEquals(1, chemFile.getChemSequenceCount());
 
@@ -215,9 +214,9 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 
 		IChemModel model = seq.getChemModel(0);
 		Assert.assertNotNull(model);
-		Assert.assertEquals(1, model.getMoleculeSet().getMoleculeCount());
+		Assert.assertEquals(1, model.getMoleculeSet().getAtomContainerCount());
 
-		IAtomContainer container = model.getMoleculeSet().getMolecule(0);
+		IAtomContainer container = model.getMoleculeSet().getAtomContainer(0);
 		Assert.assertTrue(container instanceof IBioPolymer);
 		IBioPolymer mol = (IBioPolymer)container;
 		Assert.assertNotNull(mol);
@@ -265,9 +264,9 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 	public IChemFile getChemFile(ISimpleChemObjectReader reader, boolean useRebond) throws Exception {
         Assert.assertNotNull(reader);
         
-        reader.getIOSettings()[0].setSetting(String.valueOf(useRebond));
+        reader.getSetting("UseRebondTool").setSetting(String.valueOf(useRebond));
 
-        IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+        IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
         Assert.assertNotNull(chemFile);
         return chemFile;
 	}
@@ -285,8 +284,8 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 
         IChemModel model = seq.getChemModel(0);
         Assert.assertNotNull(model);
-        Assert.assertEquals(moleculeCount, model.getMoleculeSet().getMoleculeCount());
-        return model.getMoleculeSet().getMolecule(0);
+        Assert.assertEquals(moleculeCount, model.getMoleculeSet().getAtomContainerCount());
+        return model.getMoleculeSet().getAtomContainer(0);
 	}
 	
 	public void testObjectCountsChemFile(IChemFile chemFile, 
@@ -321,7 +320,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 	    ISimpleChemObjectReader reader = new PDBReader(ins);
 	    Assert.assertNotNull(reader);
 
-	    IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+	    IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
 	    Assert.assertNotNull(chemFile);
 	    Assert.assertEquals(1, chemFile.getChemSequenceCount());
 
@@ -331,9 +330,9 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 
 	    IChemModel model = seq.getChemModel(0);
 	    Assert.assertNotNull(model);
-	    Assert.assertEquals(1, model.getMoleculeSet().getMoleculeCount());
+	    Assert.assertEquals(1, model.getMoleculeSet().getAtomContainerCount());
 
-	    IAtomContainer container = model.getMoleculeSet().getMolecule(0);
+	    IAtomContainer container = model.getMoleculeSet().getAtomContainer(0);
 	    Assert.assertTrue(container instanceof IBioPolymer);
 	    IBioPolymer polymer = (IBioPolymer)container;
 
@@ -400,7 +399,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
         String filename = "data/pdb/hetatm_only.pdb";
         IChemFile chemFile = getChemFile(filename, true);
         IAtomContainer atomContainer = getFirstAtomContainer(chemFile, 1, 1, 1);
-        Assert.assertTrue(atomContainer instanceof IMolecule);
+        Assert.assertTrue(atomContainer instanceof IAtomContainer);
         Assert.assertEquals(14, atomContainer.getAtomCount());
         Assert.assertEquals(15, atomContainer.getBondCount());
     }
@@ -449,7 +448,7 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 	    ISimpleChemObjectReader reader = new PDBReader(ins);
 	    Assert.assertNotNull(reader);
 
-	    IChemFile chemFile = (IChemFile) reader.read(new NNChemFile());
+	    IChemFile chemFile = (IChemFile) reader.read(new ChemFile());
 	    Assert.assertNotNull(chemFile);
 	    Assert.assertEquals(1, chemFile.getChemSequenceCount());
 
@@ -459,9 +458,9 @@ public class PDBReaderTest extends SimpleChemObjectReaderTest {
 
 	    IChemModel model = seq.getChemModel(0);
 	    Assert.assertNotNull(model);
-	    Assert.assertEquals(1, model.getMoleculeSet().getMoleculeCount());
+	    Assert.assertEquals(1, model.getMoleculeSet().getAtomContainerCount());
 
-	    IAtomContainer container = model.getMoleculeSet().getMolecule(0);
+	    IAtomContainer container = model.getMoleculeSet().getAtomContainer(0);
 	    Assert.assertTrue(container instanceof IBioPolymer);
 	    IBioPolymer polymer = (IBioPolymer)container;
 

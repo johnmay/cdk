@@ -32,8 +32,8 @@ import javax.vecmath.Point3d;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.AtomContainer;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 
@@ -51,7 +51,7 @@ public class PCCompoundXMLReaderTest extends SimpleChemObjectReaderTest {
 
     @Test public void testAccepts() throws Exception {
     	PCCompoundXMLReader reader = new PCCompoundXMLReader();
-    	Assert.assertTrue(reader.accepts(Molecule.class));
+    	Assert.assertTrue(reader.accepts(AtomContainer.class));
     }
 
     @Test public void testReading() throws Exception {
@@ -59,7 +59,7 @@ public class PCCompoundXMLReaderTest extends SimpleChemObjectReaderTest {
         logger.info("Testing: " + filename);
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         PCCompoundXMLReader reader = new PCCompoundXMLReader(ins);
-        IMolecule molecule = (IMolecule)reader.read(new Molecule());
+        IAtomContainer molecule = (IAtomContainer)reader.read(new AtomContainer());
         Assert.assertNotNull(molecule);
 
         // check atom stuff
@@ -86,7 +86,7 @@ public class PCCompoundXMLReaderTest extends SimpleChemObjectReaderTest {
         logger.info("Testing: " + filename);
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         PCCompoundXMLReader reader = new PCCompoundXMLReader(ins);
-        IMolecule molecule = (IMolecule)reader.read(new Molecule());
+        IAtomContainer molecule = (IAtomContainer)reader.read(new AtomContainer());
         Assert.assertNotNull(molecule);
 
         // check atom stuff

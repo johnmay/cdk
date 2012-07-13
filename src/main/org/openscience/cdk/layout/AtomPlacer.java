@@ -46,7 +46,6 @@ import org.openscience.cdk.graph.matrix.ConnectionMatrix;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -331,7 +330,7 @@ public class AtomPlacer
      */
     public void placeLinearChain(IAtomContainer atomContainer, Vector2d initialBondVector, double bondLength)
     {
-        IMolecule withh = atomContainer.getBuilder().newInstance(IMolecule.class,atomContainer);
+        IAtomContainer withh = atomContainer.getBuilder().newInstance(IAtomContainer.class,atomContainer);
 
         // BUGFIX - withh does not have cloned cloned atoms, so changes are
         // reflected in our atom container. If we're using implicit hydrogens
@@ -551,7 +550,7 @@ public class AtomPlacer
      *@exception  org.openscience.cdk.exception.NoSuchAtomException  Description of
      *      the Exception
      */
-    public IAtomContainer getInitialLongestChain(IMolecule molecule) throws CDKException
+    public IAtomContainer getInitialLongestChain(IAtomContainer molecule) throws CDKException
     {
         logger.debug("Start of getInitialLongestChain()");
         double[][] conMat = ConnectionMatrix.getMatrix(molecule);
@@ -608,7 +607,7 @@ public class AtomPlacer
      *@exception  org.openscience.cdk.exception.CDKException  Description of the
      *      Exception
      */
-    public IAtomContainer getLongestUnplacedChain(IMolecule molecule, IAtom startAtom) throws CDKException
+    public IAtomContainer getLongestUnplacedChain(IAtomContainer molecule, IAtom startAtom) throws CDKException
     {
         logger.debug("Start of getLongestUnplacedChain.");
         //ConnectivityChecker cc = new ConnectivityChecker();

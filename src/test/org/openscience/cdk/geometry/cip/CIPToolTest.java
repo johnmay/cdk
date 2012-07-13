@@ -39,14 +39,14 @@ import org.openscience.cdk.geometry.cip.CIPTool.CIP_CHIRALITY;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
 import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
 import org.openscience.cdk.io.CMLReader;
-import org.openscience.cdk.nonotify.NNChemFile;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.ChemFile;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.stereo.StereoTool;
@@ -58,8 +58,8 @@ import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
  */
 public class CIPToolTest extends CDKTestCase {
 
-    static SmilesParser smiles = new SmilesParser(NoNotificationChemObjectBuilder.getInstance());
-    static IMolecule molecule;
+    static SmilesParser smiles = new SmilesParser(SilentChemObjectBuilder.getInstance());
+    static IAtomContainer molecule;
     static ILigand[] ligands;
 
     @BeforeClass
@@ -187,7 +187,7 @@ public class CIPToolTest extends CDKTestCase {
      */
     @Test
     public void testGetLigandLigands() throws Exception {
-        IMolecule molecule = smiles.parseSmiles("CC(C)C(CC)(C(C)(C)C)[H]");
+        IAtomContainer molecule = smiles.parseSmiles("CC(C)C(CC)(C(C)(C)C)[H]");
         ILigand ligand = CIPTool.defineLigand(molecule, new VisitedAtoms(), 3, 1);
         ILigand[] sideChains = CIPTool.getLigandLigands(ligand);
         Assert.assertEquals(2, sideChains.length);
@@ -207,7 +207,7 @@ public class CIPToolTest extends CDKTestCase {
      */
     @Test
     public void testGetLigandLigands_VisitedTracking() throws Exception {
-        IMolecule molecule = smiles.parseSmiles("CC(C)C(CC)(C(C)(C)C)[H]");
+        IAtomContainer molecule = smiles.parseSmiles("CC(C)C(CC)(C(C)(C)C)[H]");
         ILigand ligand = CIPTool.defineLigand(molecule, new VisitedAtoms(), 3, 1);
         ILigand[] sideChains = CIPTool.getLigandLigands(ligand);
         for (ILigand ligand2 : sideChains) {
@@ -223,7 +223,7 @@ public class CIPToolTest extends CDKTestCase {
      */
     @Test
     public void testGetLigandLigands_DoubleTriple() throws Exception {
-        IMolecule molecule = smiles.parseSmiles("CC(C)C(C#N)(C(=C)C)[H]");
+        IAtomContainer molecule = smiles.parseSmiles("CC(C)C(C#N)(C(=C)C)[H]");
         ILigand ligand = CIPTool.defineLigand(molecule, new VisitedAtoms(), 3, 1);
         ILigand[] sideChains = CIPTool.getLigandLigands(ligand);
         Assert.assertEquals(2, sideChains.length);
@@ -240,7 +240,7 @@ public class CIPToolTest extends CDKTestCase {
 
     @Test
     public void testDefineLigand_ImplicitHydrogen() throws Exception {
-        IMolecule molecule = smiles.parseSmiles("CC(C)C(C#N)(C(=C)C)");
+        IAtomContainer molecule = smiles.parseSmiles("CC(C)C(C#N)(C(=C)C)");
         ILigand ligand = CIPTool.defineLigand(molecule, new VisitedAtoms(), 3, CIPTool.HYDROGEN);
         Assert.assertTrue(ligand instanceof ImplicitHydrogenLigand);
     }
@@ -281,7 +281,7 @@ public class CIPToolTest extends CDKTestCase {
         String filename = "data/cml/mol28.cml";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         CMLReader reader = new CMLReader(ins);
-        IChemFile file = reader.read(new NNChemFile());
+        IChemFile file = reader.read(new ChemFile());
         IAtomContainer mol = ChemFileManipulator.getAllAtomContainers(file).get(0);
 
         for (IAtom atom : mol.atoms()) {
@@ -313,7 +313,7 @@ public class CIPToolTest extends CDKTestCase {
     @Test
     public void testSteroid() {
         IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
-        IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
         IAtom a1 = builder.newInstance(IAtom.class,"F");
         a1.setFormalCharge(0);
         a1.setPoint3d(new Point3d(7.0124, 2.5853, -0.9016));

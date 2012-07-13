@@ -23,8 +23,8 @@ package org.openscience.cdk.renderer;
 
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
 
@@ -46,7 +46,7 @@ public class AverageBondLengthCalculator {
      */
     public static double calculateAverageBondLength(IReaction reaction) {
 
-        IMoleculeSet reactants = reaction.getReactants();
+        IAtomContainerSet reactants = reaction.getReactants();
         double reactantAverage = 0.0;
         if (reactants != null) {
             reactantAverage =
@@ -54,7 +54,7 @@ public class AverageBondLengthCalculator {
                 reactants.getAtomContainerCount();
         }
 
-        IMoleculeSet products = reaction.getProducts();
+        IAtomContainerSet products = reaction.getProducts();
         double productAverage = 0.0;
         if (products != null) {
             productAverage =
@@ -75,9 +75,9 @@ public class AverageBondLengthCalculator {
      * @param moleculeSet the molecule set to use
      * @return the average bond length
      */
-    public static double calculateAverageBondLength(IMoleculeSet moleculeSet) {
+    public static double calculateAverageBondLength(IAtomContainerSet moleculeSet) {
         double averageBondModelLength = 0.0;
-        for (IAtomContainer atomContainer : moleculeSet.molecules()) {
+        for (IAtomContainer atomContainer : moleculeSet.atomContainers()) {
             averageBondModelLength +=
                 GeometryTools.getBondLengthAverage(atomContainer);
         }
@@ -93,7 +93,7 @@ public class AverageBondLengthCalculator {
     public static double calculateAverageBondLength(IChemModel model) {
 
         // empty models have to have a scale
-        IMoleculeSet moleculeSet = model.getMoleculeSet();
+        IAtomContainerSet moleculeSet = model.getMoleculeSet();
         if (moleculeSet == null) {
             IReactionSet reactionSet = model.getReactionSet();
             if (reactionSet != null) {

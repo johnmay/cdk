@@ -1,6 +1,4 @@
-/* $Revision$ $Author$ $Date$    
- * 
- * Copyright (C) 1997-2009  Egon Willighagen <egonw@users.sf.net>
+/* Copyright (C) 1997-2009,2011  Egon Willighagen <egonw@users.sf.net>
  * 
  * Contact: cdk-devel@lists.sourceforge.net
  * 
@@ -24,27 +22,28 @@
  */
 package org.openscience.cdk.fingerprint;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.BitSet;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscience.cdk.Molecule;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.BitSet;
+
 /**
  * @cdk.module test-standard
  */
-public class GraphOnlyFingerprinterTest extends AbstractFingerprinterTest {
+public class GraphOnlyFingerprinterTest extends AbstractFixedLengthFingerprinterTest {
 
 	private static ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(FingerprinterTest.class);
@@ -55,7 +54,7 @@ public class GraphOnlyFingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testFingerprint() throws Exception {
-		SmilesParser parser = new SmilesParser(NoNotificationChemObjectBuilder.getInstance());
+		SmilesParser parser = new SmilesParser(SilentChemObjectBuilder.getInstance());
 		IFingerprinter printer = new GraphOnlyFingerprinter();
 		
 		BitSet bs1 = printer.getFingerprint(parser.parseSmiles("C=C-C#N"));
@@ -83,15 +82,14 @@ public class GraphOnlyFingerprinterTest extends AbstractFingerprinterTest {
 	 * @throws  Exception
 	 * 
 	 * @cdk.bug 1626894
-	 * 
-	 * @see testExtendedFingerPrint()
+	 *
 	 */
     @Test
     public void testFingerPrint() throws Exception {
     	IFingerprinter printer = new GraphOnlyFingerprinter();
 
-    	Molecule mol1 = createMolecule(molecule_test_2);
-    	Molecule mol2 = createMolecule(ethanolamine);
+    	IAtomContainer mol1 = createMolecule(molecule_test_2);
+    	IAtomContainer mol2 = createMolecule(ethanolamine);
     	Assert.assertTrue("SubGraph does NOT match", UniversalIsomorphismTester.isSubgraph(mol1, mol2));
 
     	BitSet bs1 = printer.getFingerprint((IAtomContainer) mol1.clone());
@@ -103,13 +101,13 @@ public class GraphOnlyFingerprinterTest extends AbstractFingerprinterTest {
     	logger.debug("Subset (with fingerprint) does match");
     }
 
-    private static Molecule createMolecule(String molecule) throws IOException, CDKException {
-    	Molecule structure = null;
+    private static IAtomContainer createMolecule(String molecule) throws IOException, CDKException {
+    	IAtomContainer structure = null;
     	if (molecule != null) {
     		ISimpleChemObjectReader reader = new MDLV2000Reader(new StringReader(molecule));
     		Assert.assertNotNull("Could not create reader", reader);
-    		if (reader.accepts(Molecule.class)) {
-    			structure = (Molecule) reader.read(new Molecule());
+    		if (reader.accepts(AtomContainer.class)) {
+    			structure = reader.read(DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
     		}
     	}
     	return structure;

@@ -25,9 +25,9 @@ import org.junit.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.LonePairElectronChecker;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
@@ -38,7 +38,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 */
 public class PiElectronegativityTest  extends CDKTestCase{
 
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     private LonePairElectronChecker lpcheck = new LonePairElectronChecker();
 	/**
 	 * Constructor of the PiElectronegativityTest.
@@ -76,7 +76,7 @@ public class PiElectronegativityTest  extends CDKTestCase{
     	
     	PiElectronegativity pe = new PiElectronegativity();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
         molecule.addAtom(new Atom("F"));
         molecule.addAtom(new Atom("C"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -106,7 +106,7 @@ public class PiElectronegativityTest  extends CDKTestCase{
     	
     	PiElectronegativity pe = new PiElectronegativity();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(new Atom("F"));
         molecule.addAtom(new Atom("C"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);

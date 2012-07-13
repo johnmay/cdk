@@ -37,18 +37,17 @@ import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.fingerprint.HybridizationFingerprinter;
 import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.io.MDLV2000Writer;
-import org.openscience.cdk.io.iterator.IteratingMDLReader;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.matchers.QueryAtomContainerCreator;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
 import org.openscience.cdk.ringsearch.AllRingsFinder;
 import org.openscience.cdk.ringsearch.RingPartitioner;
 import org.openscience.cdk.ringsearch.SSSRFinder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.RingSetManipulator;
@@ -64,19 +63,18 @@ public class TemplateExtractor {
 
 	static final String usage = "Usage: TemplateExtractor SDFinfile outfile anyAtom=true/false anyBondAnyAtom=true/false";
 	
-	private final static IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private final static IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 
 	public TemplateExtractor() {
 	}
 
 	public void cleanDataSet(String dataFile) {
-		IteratingMDLReader imdl = null;
-		IMoleculeSet som = builder.newInstance(IMoleculeSet.class);
+		IteratingSDFReader imdl = null;
+		IAtomContainerSet som = builder.newInstance(IAtomContainerSet.class);
 		try {
 			System.out.println("Start clean dataset...");
 			BufferedReader fin = new BufferedReader(new FileReader(dataFile));
-			imdl = new IteratingMDLReader(fin, NoNotificationChemObjectBuilder
-					.getInstance());
+			imdl = new IteratingSDFReader(fin, builder);
 			System.out.print("Read File in..");
 		} catch (Exception exc) {
 			System.out.println("Could not read Molecules from file " + dataFile
@@ -89,11 +87,11 @@ public class TemplateExtractor {
 			if (c % 1000 == 0) {
 				System.out.println("...");
 			}
-			IMolecule m = builder.newInstance(IMolecule.class);
-			m = (IMolecule) imdl.next();
+			IAtomContainer m = builder.newInstance(IAtomContainer.class);
+			m = (IAtomContainer) imdl.next();
 			if (m.getAtomCount() > 2) {
 				if (m.getAtom(0).getPoint3d() != null) {
-					som.addMolecule(m);
+					som.addAtomContainer(m);
 				}
 			}
 		}
@@ -103,18 +101,17 @@ public class TemplateExtractor {
 			System.out.println("Could not close Reader due to: "
 					+ exc1.getMessage());
 		}
-		System.out.println(som.getMoleculeCount() + " Templates are read in");
+		System.out.println(som.getAtomContainerCount() + " Templates are read in");
 		writeChemModel(som, dataFile, "_CLEAN");
 	}
 
 	public void ReadNCISdfFileAsTemplate(String dataFile) {
-		IteratingMDLReader imdl = null;
-		IMoleculeSet som = builder.newInstance(IMoleculeSet.class);
+		IteratingSDFReader imdl = null;
+		IAtomContainerSet som = builder.newInstance(IAtomContainerSet.class);
 		try {
 			System.out.println("Start...");
 			BufferedReader fin = new BufferedReader(new FileReader(dataFile));
-			imdl = new IteratingMDLReader(fin, NoNotificationChemObjectBuilder
-					.getInstance());
+			imdl = new IteratingSDFReader(fin, builder);
 			System.out.print("Read File in..");
 		} catch (Exception exc) {
 			System.out.println("Could not read Molecules from file " + dataFile
@@ -122,7 +119,7 @@ public class TemplateExtractor {
 		}
 		System.out.println("READY");
 		while (imdl.hasNext()) {
-			som.addMolecule((IMolecule) imdl.next());
+			som.addAtomContainer((IAtomContainer) imdl.next());
 		}
 		try {
 			imdl.close();
@@ -130,17 +127,17 @@ public class TemplateExtractor {
 			System.out.println("Could not close Reader due to: "
 					+ exc1.getMessage());
 		}
-		System.out.println(som.getMoleculeCount() + " Templates are read in");
+		System.out.println(som.getAtomContainerCount() + " Templates are read in");
 	}
 
 	public void PartitionRingsFromComplexRing(String dataFile) {
-		IteratingMDLReader imdl = null;
-		IMoleculeSet som = builder.newInstance(IMoleculeSet.class);
-		IMolecule m = null;
+		IteratingSDFReader imdl = null;
+		IAtomContainerSet som = builder.newInstance(IAtomContainerSet.class);
+		IAtomContainer m = null;
 		try {
 			System.out.println("Start...");
 			BufferedReader fin = new BufferedReader(new FileReader(dataFile));
-			imdl = new IteratingMDLReader(fin, builder);
+			imdl = new IteratingSDFReader(fin, builder);
 			System.out.print("Read File in..");
 		} catch (Exception exc) {
 			System.out.println("Could not read Molecules from file " + dataFile
@@ -148,12 +145,12 @@ public class TemplateExtractor {
 		}
 		System.out.println("READY");
 		while (imdl.hasNext()) {
-			m = (IMolecule) imdl.next();
+			m = (IAtomContainer) imdl.next();
 			System.out.println("Atoms:" + m.getAtomCount());
 			IRingSet ringSetM = new SSSRFinder(m).findSSSR();
-			// som.addMolecule(m);
+			// som.addAtomContainer(m);
 			for (int i = 0; i < ringSetM.getAtomContainerCount(); i++) {
-				som.addMolecule(builder.newInstance(IMolecule.class, ringSetM.getAtomContainer(i)));
+				som.addAtomContainer(builder.newInstance(IAtomContainer.class, ringSetM.getAtomContainer(i)));
 			}
 		}
 		try {
@@ -162,17 +159,17 @@ public class TemplateExtractor {
 			System.out.println("Could not close Reader due to: "
 					+ exc1.getMessage());
 		}
-		System.out.println(som.getMoleculeCount() + " Templates are read in");
+		System.out.println(som.getAtomContainerCount() + " Templates are read in");
 		writeChemModel(som, dataFile, "_VERSUCH");
 	}
 
 	public void extractUniqueRingSystemsFromFile(String dataFile) {
 		System.out.println("****** EXTRACT UNIQUE RING SYSTEMS ******");
 		System.out.println("From file:" + dataFile);
-		IMolecule m = null;
+		IAtomContainer m = null;
 		// RingPartitioner ringPartitioner=new RingPartitioner();
 		List<IRingSet> ringSystems = null;
-		IteratingMDLReader imdl = null;
+		IteratingSDFReader imdl = null;
 
 		HashMap<String,String> hashRingSystems = new HashMap<String,String>();
 		SmilesGenerator smilesGenerator = new SmilesGenerator();
@@ -199,14 +196,14 @@ public class TemplateExtractor {
 		try {
 			System.out.println("Start...");
 			BufferedReader fin = new BufferedReader(new FileReader(dataFile));
-			imdl = new IteratingMDLReader(fin, builder);
+			imdl = new IteratingSDFReader(fin, builder);
 			System.out.println("Read File in..");
 		} catch (Exception exc) {
 			System.out.println("Could not read Molecules from file " + dataFile
 					+ " due to: " + exc.getMessage());
 		}
 		while (imdl.hasNext()) {
-			m = (IMolecule) imdl.next();
+			m = (IAtomContainer) imdl.next();
 			counterMolecules = counterMolecules + 1;
 			/*
 			 * try{ HueckelAromaticityDetector.detectAromaticity(m);
@@ -235,7 +232,7 @@ public class TemplateExtractor {
 						(ac.getAtom(j)).setSymbol("C");
 					}
 
-					key = smilesGenerator.createSMILES(builder.newInstance(IMolecule.class,ac));
+					key = smilesGenerator.createSMILES(builder.newInstance(IAtomContainer.class,ac));
 					// System.out.println("OrgKey:"+key+" For
 					// Molecule:"+counter);
 					if (hashRingSystems.containsKey(key)) {
@@ -255,7 +252,7 @@ public class TemplateExtractor {
 						try {
 							// mdlw.write(new Molecule
 							// ((AtomContainer)RingSetManipulator.getAllInOneContainer(ringSet)));
-							mdlw.write(builder.newInstance(IMolecule.class,ac));
+							mdlw.write(builder.newInstance(IAtomContainer.class,ac));
 						} catch (Exception emdl) {
 						}
 
@@ -284,7 +281,7 @@ public class TemplateExtractor {
 		 * while (it.hasNext()) { key=(String)it.next();
 		 * ringSmile=(String)HashRingSystems.get(key);
 		 * System.out.println("HashtableSmile:"+ringSmile+" key:"+key); try{
-		 * som.addMolecule(smileParser.parseSmiles(ringSmile)); }catch
+		 * som.addAtomContainer(smileParser.parseSmiles(ringSmile)); }catch
 		 * (Exception ex5){ System.out.println("Error in som.addmolecule due
 		 * to:"+ex5); } }
 		 */
@@ -292,8 +289,8 @@ public class TemplateExtractor {
 		// writeChemModel(som,dataFile,"_TESTTESTTESTTESTTEST");
 	}
 
-	public void writeChemModel(IMoleculeSet som, String file, String endFix) {
-		System.out.println("WRITE Molecules:" + som.getMoleculeCount());
+	public void writeChemModel(IAtomContainerSet som, String file, String endFix) {
+		System.out.println("WRITE Molecules:" + som.getAtomContainerCount());
 		String molfile = file + endFix;
 		try {
 			FileOutputStream fout = new FileOutputStream(molfile);
@@ -309,16 +306,15 @@ public class TemplateExtractor {
 	public void makeCanonicalSmileFromRingSystems(String dataFileIn,
 			String dataFileOut) {
 		System.out.println("Start make SMILES...");
-		IMolecule m = null;
-		IteratingMDLReader imdl = null;
+		IAtomContainer m = null;
+		IteratingSDFReader imdl = null;
 		// QueryAtomContainer query=null;
 		List<String> data = new ArrayList<String>();
 		SmilesGenerator smiles = new SmilesGenerator();
 		try {
 			System.out.println("Start...");
 			BufferedReader fin = new BufferedReader(new FileReader(dataFileIn));
-			imdl = new IteratingMDLReader(fin, NoNotificationChemObjectBuilder
-					.getInstance());
+			imdl = new IteratingSDFReader(fin, builder);
 			// fin.close();
 			System.out.println("Read File in..");
 		} catch (Exception exc) {
@@ -326,7 +322,7 @@ public class TemplateExtractor {
 					+ dataFileIn + " due to: " + exc.getMessage());
 		}
 		while (imdl.hasNext()) {
-			m = (IMolecule) imdl.next();
+			m = (IAtomContainer) imdl.next();
 			/*
 			 * try{ HueckelAromaticityDetector.detectAromaticity(m);
 			 * }catch(Exception ex1){ System.out.println("Could not find
@@ -337,7 +333,7 @@ public class TemplateExtractor {
 			// Molecule(m)));
 			try {
 
-				data.add((String) smiles.createSMILES(builder.newInstance(IMolecule.class,m)));
+				data.add((String) smiles.createSMILES(builder.newInstance(IAtomContainer.class,m)));
 			} catch (Exception exc1) {
 				System.out.println("Could not create smile due to: "
 						+ exc1.getMessage());
@@ -381,15 +377,14 @@ public class TemplateExtractor {
 		IFingerprinter fingerPrinter = new HybridizationFingerprinter(
 		    HybridizationFingerprinter.DEFAULT_SIZE, HybridizationFingerprinter.DEFAULT_SEARCH_DEPTH
 		);
-		IMolecule m = null;
-		IteratingMDLReader imdl=null;
+		IAtomContainer m = null;
+		IteratingSDFReader imdl=null;
 		//QueryAtomContainer query=null;
 		IAtomContainer query = null;
 		List<BitSet> data = new ArrayList<BitSet>();
 		try {
 			System.out.print("Read data file in ...");
-			imdl = new IteratingMDLReader(fin, NoNotificationChemObjectBuilder
-					.getInstance());
+			imdl = new IteratingSDFReader(fin, builder);
 			// fin.close();
 			System.out.println("ready");
 		} catch (Exception exc) {
@@ -400,7 +395,7 @@ public class TemplateExtractor {
 		int fingerprintCounter = 0;
 		System.out.print("Generated Fingerprints: " + fingerprintCounter + "    ");
 		while (imdl.hasNext() && (moleculeCounter<limit || limit==-1)) {
-			m = (IMolecule) imdl.next();
+			m = (IAtomContainer) imdl.next();
 			moleculeCounter++;
             if (anyAtom && !anyAtomAnyBond) {
                 query = QueryAtomContainerCreator.createAnyAtomContainer(m, false);
@@ -421,7 +416,7 @@ public class TemplateExtractor {
 				// store the time
 				String bin = Integer.toString((int)Math.floor(time/10));
 				if (timings.containsKey(bin)) {
-					timings.put(bin, new Integer((((Integer)timings.get(bin)).intValue()) + 1));
+					timings.put(bin, (timings.get(bin)) + 1);
 				} else {
 					timings.put(bin, new Integer(1));
 				}
@@ -495,7 +490,7 @@ public class TemplateExtractor {
 		}
 	}
 
-	public IMolecule removeLoopBonds(IMolecule molecule, int position) {
+	public IAtomContainer removeLoopBonds(IAtomContainer molecule, int position) {
 		for (int i = 0; i < molecule.getBondCount(); i++) {
 			IBond bond = molecule.getBond(i);
 			if (bond.getAtom(0) == bond.getAtom(1)) {

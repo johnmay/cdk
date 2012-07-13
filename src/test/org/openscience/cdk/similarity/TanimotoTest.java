@@ -31,14 +31,17 @@
 package org.openscience.cdk.similarity;
 
 import java.util.BitSet;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.fingerprint.Fingerprinter;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.fingerprint.LingoFingerprinter;
+import org.openscience.cdk.fingerprint.SignatureFingerprinter;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -52,8 +55,8 @@ public class TanimotoTest extends CDKTestCase
 
 	@Test public void testTanimoto1() throws java.lang.Exception
 	{
-		Molecule mol1 = MoleculeFactory.makeIndole();
-		Molecule mol2 = MoleculeFactory.makePyrrole();
+	    IAtomContainer mol1 = MoleculeFactory.makeIndole();
+	    IAtomContainer mol2 = MoleculeFactory.makePyrrole();
 		Fingerprinter fingerprinter = new Fingerprinter();
 		BitSet bs1 = fingerprinter.getFingerprint(mol1);
 		BitSet bs2 = fingerprinter.getFingerprint(mol2);
@@ -64,8 +67,8 @@ public class TanimotoTest extends CDKTestCase
 	@Test
     public void testTanimoto2() throws java.lang.Exception
 	{
-		Molecule mol1 = MoleculeFactory.makeIndole();
-		Molecule mol2 = MoleculeFactory.makeIndole();
+	    IAtomContainer mol1 = MoleculeFactory.makeIndole();
+	    IAtomContainer mol2 = MoleculeFactory.makeIndole();
 		Fingerprinter fingerprinter = new Fingerprinter();
 		BitSet bs1 = fingerprinter.getFingerprint(mol1);
 		BitSet bs2 = fingerprinter.getFingerprint(mol2);
@@ -73,7 +76,18 @@ public class TanimotoTest extends CDKTestCase
 		if (standAlone) System.out.println("Tanimoto: " + tanimoto);
 		if (!standAlone) Assert.assertEquals(1.0, tanimoto, 0.001);
 	}
-	
+
+    @Test public void testExactMatch() throws Exception {
+        IAtomContainer mol1 = MoleculeFactory.makeIndole();
+        IAtomContainer mol2 = MoleculeFactory.makeIndole();
+        LingoFingerprinter fingerprinter = new LingoFingerprinter();
+        Map<String, Integer> feat1 = fingerprinter.getRawFingerprint(mol1);
+        Map<String, Integer> feat2 = fingerprinter.getRawFingerprint(mol2);
+        float tanimoto = Tanimoto.calculate(feat1, feat2);
+        Assert.assertEquals(1.0, tanimoto, 0.001);
+
+    }
+
         @Test public void testTanimoto3() throws java.lang.Exception
         {
             double[] f1 = {1,2,3,4,5,6,7};
@@ -90,10 +104,10 @@ public class TanimotoTest extends CDKTestCase
     		String smiles2 = "O=C(O)C(N)CCC(=O)O";
     		String smiles3 = "O=C(O)C(N)C";
     		String smiles4 = "CC(=O)C(=O)O";
-    		IMolecule molecule1 = sp.parseSmiles(smiles1);
-    		IMolecule molecule2 = sp.parseSmiles(smiles2);
-    		IMolecule molecule3 = sp.parseSmiles(smiles3);
-    		IMolecule molecule4 = sp.parseSmiles(smiles4);
+    		IAtomContainer molecule1 = sp.parseSmiles(smiles1);
+    		IAtomContainer molecule2 = sp.parseSmiles(smiles2);
+    		IAtomContainer molecule3 = sp.parseSmiles(smiles3);
+    		IAtomContainer molecule4 = sp.parseSmiles(smiles4);
     		Fingerprinter fingerprinter = new Fingerprinter(1024, 6);
     		BitSet bs1 = fingerprinter.getFingerprint(molecule1);
     		BitSet bs2 = fingerprinter.getFingerprint(molecule2);
@@ -121,6 +135,26 @@ public class TanimotoTest extends CDKTestCase
     		
     		
     	}
+    	
+    /**
+     * @throws Exception
+     * @cdk.bug 3310138
+     */
+    @Test
+    public void testRawTanimotoBetween0and1() throws Exception {
+        SmilesParser smilesParser
+            = new SmilesParser( SilentChemObjectBuilder.getInstance() );
+        IAtomContainer mol1 = smilesParser.parseSmiles(
+            "Cc1nc(C(=O)NC23CC4CC(CC(C4)C2)C3)c(C)n1C5CCCCC5");
+        IAtomContainer mol2 = smilesParser.parseSmiles(
+            "CS(=O)(=O)Nc1ccc(Cc2onc(n2)c3ccc(cc3)S(=O)(=O)Nc4ccc(CCNC[C@H](O)c5cccnc5)cc4)cc1");
+	    	SignatureFingerprinter fingerprinter = new SignatureFingerprinter(0);
+	    	Map<String, Integer> fp1 = fingerprinter.getRawFingerprint(mol1);
+	    	Map<String, Integer> fp2 = fingerprinter.getRawFingerprint(mol2);
+	    	float tanimoto = Tanimoto.calculate(fp1, fp2);
+	    	Assert.assertTrue( "Tanimoto expected to be between 0 and 1, was:" + tanimoto, 
+	    			           tanimoto > 0 && tanimoto < 1 );
+    }
 
 }
 

@@ -38,7 +38,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -108,7 +108,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
         Assert.assertEquals("[C]", molSig.toCanonicalSignatureString(0));
     }
     
-    public void fullPermutationTest(IMolecule mol) {
+    public void fullPermutationTest(IAtomContainer mol) {
         AtomContainerAtomPermutor permutor = new AtomContainerAtomPermutor(mol);
         String expected = new MoleculeSignature(mol).toCanonicalString();
         int numberOfPermutationsTried = 0;
@@ -124,27 +124,27 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     public String canonicalStringFromSmiles(String smiles)
             throws InvalidSmilesException {
-        IMolecule mol = parser.parseSmiles(smiles);
+        IAtomContainer mol = parser.parseSmiles(smiles);
         MoleculeSignature signature = new MoleculeSignature(mol);
         return signature.toCanonicalString();
     }
     
-    public String canonicalStringFromMolecule(IMolecule molecule) {
+    public String canonicalStringFromMolecule(IAtomContainer molecule) {
         MoleculeSignature signature = new MoleculeSignature(molecule);
         return signature.getGraphSignature();
     }
     
-    public String fullStringFromMolecule(IMolecule molecule) {
+    public String fullStringFromMolecule(IAtomContainer molecule) {
         MoleculeSignature molSig = new MoleculeSignature(molecule);
         return molSig.toFullString();
     }
     
-    public List<String> getAtomicSignatures(IMolecule molecule) {
+    public List<String> getAtomicSignatures(IAtomContainer molecule) {
         MoleculeSignature signature = new MoleculeSignature(molecule);
         return signature.getVertexSignatureStrings();
     }
     
-    public void addHydrogens(IMolecule mol, IAtom atom, int n) {
+    public void addHydrogens(IAtomContainer mol, IAtom atom, int n) {
         for (int i = 0; i < n; i++) {
             IAtom h = builder.newInstance(IAtom.class,"H");
             mol.addAtom(h);
@@ -154,7 +154,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void testEmpty() throws Exception {
-       IMolecule mol = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class); 
+       IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class); 
        MoleculeSignature signature = new MoleculeSignature(mol);
        String signatureString = signature.toCanonicalString();
        String expected = "";
@@ -233,7 +233,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     public void testCubane() {
         String expected = "[C]([C]([C,3]([C,2])[C,1]([C,2]))[C]([C,3][C,0]" +
                           "([C,2]))[C]([C,0][C,1]))";
-        IMolecule mol = AbstractSignatureTest.makeCubane();
+        IAtomContainer mol = AbstractSignatureTest.makeCubane();
         Assert.assertEquals(expected, this.canonicalStringFromMolecule(mol));
     }
     
@@ -246,7 +246,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
         String expectedB =  "[C]([C]([C]([C]([C,1]([C,0])[C,4])[C,5])[C,7]" +
                             "([C,4]([C,3])))[C]([C]([C,3]([C,0])[C,6])[C,7])" +
                             "[C]([C,5]([C]([C,2][C,1]))[C,6]([C,2]([C,0]))))";
-        IMolecule mol = AbstractSignatureTest.makeCage();
+        IAtomContainer mol = AbstractSignatureTest.makeCage();
         String signature = this.canonicalStringFromMolecule(mol);
         Assert.assertEquals(expectedA, signature);
         String fullSignature = fullStringFromMolecule(mol);
@@ -258,7 +258,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     public void testPropellane() {
         String expectedA = "[C]([C]([C,0])[C]([C,0])[C]([C,0])[C,0])";
         String expectedB = "[C]([C]([C,2][C,1][C,0])[C,2]([C,1][C,0]))";
-        IMolecule mol = AbstractSignatureTest.makePropellane();
+        IAtomContainer mol = AbstractSignatureTest.makePropellane();
         String signature = this.canonicalStringFromMolecule(mol);
         Assert.assertEquals(expectedA, signature);
         String fullExpected = "2" + expectedA + " + 3" + expectedB;
@@ -269,14 +269,14 @@ public class MoleculeSignatureTest extends CDKTestCase {
     @Test
     public void testBridgedCycloButane() {
         String expected = "[C]([C]([C,0])[C]([C,0])[C,0])";
-        IMolecule mol = AbstractSignatureTest.makeBridgedCyclobutane();
+        IAtomContainer mol = AbstractSignatureTest.makeBridgedCyclobutane();
         String signature = this.canonicalStringFromMolecule(mol);
         Assert.assertEquals(expected, signature);
     }
     
     @Test
     public void testCyclohexaneWithHydrogens() {
-        IMolecule cyclohexane = MoleculeFactory.makeCyclohexane();
+        IAtomContainer cyclohexane = MoleculeFactory.makeCyclohexane();
         for (int i = 0; i < 6; i++) {
             addHydrogens(cyclohexane, cyclohexane.getAtom(i), 2);
         }
@@ -289,7 +289,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void testBenzeneWithDoubleBonds() {
-        IMolecule benzene = builder.newInstance(IMolecule.class);
+        IAtomContainer benzene = builder.newInstance(IAtomContainer.class);
         AbstractSignatureTest.addCarbons(benzene, 6);
         for (int i = 0; i < 6; i++) {
             AbstractSignatureTest.addHydrogens(benzene, i, 1);
@@ -339,7 +339,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     public void cyclobuteneTest() {
         String expectedA = "[C]([C]([C,0])=[C]([C,0]))";
         String expectedB = "[C]([C]([C,0])[C](=[C,0]))";
-        IMolecule cyclobutene = builder.newInstance(IMolecule.class);
+        IAtomContainer cyclobutene = builder.newInstance(IAtomContainer.class);
         AbstractSignatureTest.addCarbons(cyclobutene, 4);
         cyclobutene.addBond(0, 1, IBond.Order.SINGLE);
         cyclobutene.addBond(0, 2, IBond.Order.SINGLE);
@@ -354,7 +354,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void methyleneCyclopropeneTest() {
-        IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
         AbstractSignatureTest.addCarbons(mol, 4);
         AbstractSignatureTest.addHydrogens(mol, 1, 2);
         AbstractSignatureTest.addHydrogens(mol, 2, 1);
@@ -378,7 +378,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void fusedSquareMultipleBondTest() {
-        IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
         String expected = "[C]([C]([C,1])[C]([C,0])[C](=[C,1])[C](=[C,0]))";
         AbstractSignatureTest.addCarbons(mol, 7);
         mol.addBond(0, 1, IBond.Order.SINGLE);
@@ -407,7 +407,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     @Test
     public void methylFerroceneTest() throws Exception {
         String smiles = "CC12C3C4C5C1[Fe]23456789C%10C6C7C8C9%10";
-        IMolecule mol = parser.parseSmiles(smiles);
+        IAtomContainer mol = parser.parseSmiles(smiles);
         MoleculeSignature molSig = new MoleculeSignature(mol);
         int feIndex = findFirstAtomIndexForSymbol(mol, "Fe");
         String sigForIron = molSig.signatureStringForVertex(feIndex);
@@ -425,7 +425,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void cycleWheelTest() {
-        IMolecule mol = AbstractSignatureTest.makeCycleWheel(3, 3);
+        IAtomContainer mol = AbstractSignatureTest.makeCycleWheel(3, 3);
         String expected = "[C]([C]([C]([C,2])[C,2])" +
         		          "[C]([C]([C,1])[C,1])" +
         		          "[C]([C]([C,0])[C,0]))";
@@ -448,7 +448,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
         		          "[C]([C]([C,0])))))";
         int phosphateCount = 3;
         int ringCount = 3;
-        IMolecule ttpr = 
+        IAtomContainer ttpr = 
            AbstractSignatureTest.makeRhLikeStructure(phosphateCount, ringCount);
         MoleculeSignature molSig = new MoleculeSignature(ttpr);
         String centralSignature = molSig.signatureStringForVertex(0);
@@ -457,7 +457,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void napthaleneSkeletonHeightTest() {
-        IMolecule napthalene = builder.newInstance(IMolecule.class);
+        IAtomContainer napthalene = builder.newInstance(IAtomContainer.class);
         for (int i = 0; i < 10; i++) { 
             napthalene.addAtom(builder.newInstance(IAtom.class,"C")); 
         }
@@ -492,7 +492,7 @@ public class MoleculeSignatureTest extends CDKTestCase {
     
     @Test
     public void napthaleneWithDoubleBondsAndHydrogenHeightTest() {
-        IMolecule napthalene = builder.newInstance(IMolecule.class);
+        IAtomContainer napthalene = builder.newInstance(IAtomContainer.class);
         for (int i = 0; i < 10; i++) { 
             napthalene.addAtom(builder.newInstance(IAtom.class,"C")); 
         }

@@ -29,12 +29,12 @@ import org.junit.Test;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
 import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.LonePairElectronChecker;
 
@@ -46,7 +46,7 @@ import org.openscience.cdk.tools.LonePairElectronChecker;
 public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 
 	private final static IChemObjectBuilder builder =
-	    NoNotificationChemObjectBuilder.getInstance();
+	    SilentChemObjectBuilder.getInstance();
     LonePairElectronChecker lpcheck = new LonePairElectronChecker();
 	
     /**
@@ -70,7 +70,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		double [] testResult={-0.2527,0.0795,0.0577,0.0577,0.0577};/* from Petra online: http://www2.chemie.uni-erlangen.de/services/petra/smiles.phtml*/
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		 
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
         molecule.addAtom(builder.newInstance(IAtom.class,"F"));
         molecule.addAtom(builder.newInstance(IAtom.class,"C"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -94,7 +94,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		
 		SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-		IMolecule mol = sp.parseSmiles("F-C=C");
+		IAtomContainer mol = sp.parseSmiles("F-C=C");
 
 		addExplicitHydrogens(mol);
 		lpcheck.saturate(mol);
@@ -115,7 +115,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		double [] testResult={0.2672,-0.3877,-0.2365,0.1367,0.2203};/* from Petra online: http://www2.chemie.uni-erlangen.de/services/petra/smiles.phtml*/
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addAtom(builder.newInstance(IAtom.class,"O"));
 		molecule.addBond(0, 1, IBond.Order.DOUBLE);
@@ -141,7 +141,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		double [] testResult={-0.1785,0.1227,-0.0373,-0.0598,-0.0683};/* from Petra online: http://www2.chemie.uni-erlangen.de/services/petra/smiles.phtml*/
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		 molecule.addAtom(builder.newInstance(IAtom.class,"F"));
 		 molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		 molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -176,7 +176,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		double [] testResult={-0.1211,0.0314,-0.3121,0.0429,0.056,0.056,0.0885,0.056,0.056,0.056};/* from Petra online: http://www2.chemie.uni-erlangen.de/services/petra/smiles.phtml*/
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addBond(0, 1, IBond.Order.DOUBLE);
@@ -204,7 +204,7 @@ public class PartialTChargePEOEDescriptorTest extends AtomicDescriptorTest {
 		double [] testResult={-0.1331,-0.0678,-0.0803,0.0385,-0.2822,0.0429,0.0541,0.0541,0.0619,0.0644,0.0891,0.0528,0.0528,0.0528,0.0528};/* from Petra online: http://www2.chemie.uni-erlangen.de/services/petra/smiles.phtml*/
 		IAtomicDescriptor descriptor = new PartialTChargePEOEDescriptor();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addBond(0, 1, IBond.Order.DOUBLE);

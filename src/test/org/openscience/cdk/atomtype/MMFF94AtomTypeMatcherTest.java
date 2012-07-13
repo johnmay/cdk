@@ -30,18 +30,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.config.AtomTypeFactory;
 import org.openscience.cdk.config.Elements;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.nonotify.NNMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.AtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.AtomTypeTools;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -60,7 +59,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	    LoggingToolFactory.createLoggingTool(MMFF94AtomTypeMatcherTest.class);
 	private final IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
 	
-	private static IMolecule testMolecule = null;
+	private static IAtomContainer testMolecule = null;
 	
     private static Map<String, Integer> testedAtomTypes = new HashMap<String, Integer>();
 
@@ -71,7 +70,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
             MMFF94AtomTypeMatcher atm= new MMFF94AtomTypeMatcher();
             InputStream ins = MMFF94AtomTypeMatcherTest.class.getClassLoader().getResourceAsStream("data/mdl/mmff94AtomTypeTest_molecule.mol");
             MDLV2000Reader mdl=new MDLV2000Reader(new InputStreamReader(ins));
-            testMolecule = (IMolecule)mdl.read(new NNMolecule());
+            testMolecule = mdl.read(new AtomContainer());
            
             att.assignAtomTypePropertiesToAtom(testMolecule);
             for (int i=0;i<testMolecule.getAtomCount();i++){
@@ -91,7 +90,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
     }
     
     @Test public void testFindMatchingAtomType_IAtomContainer() throws Exception {
-        IMolecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         IAtom atom = new Atom("C");
         final IAtomType.Hybridization thisHybridization = IAtomType.Hybridization.SP3;
         atom.setHybridization(thisHybridization);
@@ -151,7 +150,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 
 //		logger.debug("**** START ATOMTYPE Methanol TEST ******");
 		//System.out.println("**** START ATOMTYPE Methanol TEST ******");  
-        IMolecule mol = builder.newInstance(IMolecule.class);
+	    IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 		IAtom oxygen = builder.newInstance(IAtom.class,Elements.OXYGEN);
 		// making sure the order matches the test results
@@ -182,7 +181,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Methylamine() throws Exception {
 		//System.out.println("**** START ATOMTYPE Methylamine TEST ******");	
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 		IAtom nitrogen = builder.newInstance(IAtom.class,Elements.NITROGEN);
 		// making sure the order matches the test results
@@ -212,7 +211,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Ethoxyethane() throws Exception {
 		//System.out.println("**** START ATOMTYPE Ethoxyethane TEST ******");	   
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 		IAtom oxygen = builder.newInstance(IAtom.class,Elements.OXYGEN);
 		IAtom carbon2 = builder.newInstance(IAtom.class,Elements.CARBON);
@@ -245,7 +244,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Methanethiol() throws Exception {
 		//System.out.println("**** START ATOMTYPE Methanethiol TEST ******");
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 		IAtom sulfur = builder.newInstance(IAtom.class,Elements.SULFUR);
 		// making sure the order matches the test results
@@ -275,7 +274,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Chloromethane() throws Exception {
 		//System.out.println("**** START ATOMTYPE Chlormethane TEST ******");
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 		IAtom chlorine = builder.newInstance(IAtom.class,Elements.CHLORINE);
 		// making sure the order matches the test results
@@ -305,7 +304,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Benzene() throws Exception {
 		//System.out.println("**** START ATOMTYPE Benzene TEST ******");
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		for (int i=0; i<6; i++) {
 			IAtom carbon = builder.newInstance(IAtom.class,Elements.CARBON);
 			carbon.setFlag(CDKConstants.ISAROMATIC, true);
@@ -356,7 +355,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
 	 */
 	@Test public void testFindMatchingAtomType_IAtomContainer_IAtom_Water() throws Exception {
 		//System.out.println("**** START ATOMTYPE Water TEST ******");
-		IMolecule mol = builder.newInstance(IMolecule.class);
+		IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		IAtom oxygen = builder.newInstance(IAtom.class,Elements.OXYGEN);
 		// making sure the order matches the test results
 		mol.addAtom(oxygen);
@@ -386,7 +385,7 @@ public class MMFF94AtomTypeMatcherTest extends AbstractAtomTypeTest {
     @Test public void countTestedAtomTypes() {
     	AtomTypeFactory factory = AtomTypeFactory.getInstance(
     		"org/openscience/cdk/config/data/mmff94_atomtypes.xml",
-            NoNotificationChemObjectBuilder.getInstance()
+            SilentChemObjectBuilder.getInstance()
         );
     	
    	    IAtomType[] expectedTypes = factory.getAllAtomTypes();

@@ -25,12 +25,11 @@ import org.openscience.cdk.config.AtomTypeFactory;
 import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IElement;
 import org.openscience.cdk.interfaces.IIsotope;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.tools.ILoggingTool;
@@ -68,7 +67,7 @@ public class BasicValidator extends AbstractValidator {
     public ValidationReport validateIsotope(IIsotope subject) {
         return validateIsotopeExistence(subject);
     }
-    public ValidationReport validateMolecule(IMolecule subject) {
+    public ValidationReport validateMolecule(IAtomContainer subject) {
         ValidationReport report = new ValidationReport();
         ValidationTest emptyMolecule = new ValidationTest(subject,
             "Molecule does not contain any atom"
@@ -100,14 +99,14 @@ public class BasicValidator extends AbstractValidator {
     public ValidationReport validateReaction(IReaction subject) {
         ValidationReport report = new ValidationReport();
         IAtomContainer container1 = subject.getBuilder().newInstance(IAtomContainer.class);
-        IMoleculeSet reactants = subject.getReactants();
+        IAtomContainerSet reactants = subject.getReactants();
         for (int i=0; i<reactants.getAtomContainerCount(); i++) {
-            container1.add(reactants.getMolecule(i));
+            container1.add(reactants.getAtomContainer(i));
         }
         IAtomContainer container2 = subject.getBuilder().newInstance(IAtomContainer.class);
-        IMoleculeSet products = subject.getProducts();
+        IAtomContainerSet products = subject.getProducts();
         for (int i=0; i<products.getAtomContainerCount(); i++) {
-            container2.add(products.getMolecule(i));
+            container2.add(products.getAtomContainer(i));
         }
         report.addReport(validateAtomCountConservation(subject, container1, container2));
         report.addReport(validateChargeConservation(subject, container1, container2));
@@ -299,7 +298,7 @@ public class BasicValidator extends AbstractValidator {
     
     // the Molecule tests
 
-    private ValidationReport validateBondOrderSum(IAtom atom, IMolecule molecule) {
+    private ValidationReport validateBondOrderSum(IAtom atom, IAtomContainer molecule) {
         ValidationReport report = new ValidationReport();
         ValidationTest checkBondSum = new ValidationTest(atom,
             "The atom's total bond order is too high."

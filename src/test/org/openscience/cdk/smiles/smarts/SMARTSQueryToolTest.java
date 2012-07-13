@@ -34,8 +34,8 @@ import org.openscience.cdk.config.Elements;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.templates.MoleculeFactory;
@@ -53,7 +53,7 @@ public class SMARTSQueryToolTest extends CDKTestCase {
      * @throws CDKException
      * @cdk.bug 2788357
      */
-    @Test(expected = CDKException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testLexicalError() throws Exception {
         SMARTSQueryTool sqt = new SMARTSQueryTool("Epoxide");
     }
@@ -175,7 +175,7 @@ public class SMARTSQueryToolTest extends CDKTestCase {
     @Test
     public void testIndoleAgainstItself() throws Exception {
 
-        IMolecule indole = MoleculeFactory.makeIndole();
+        IAtomContainer indole = MoleculeFactory.makeIndole();
 
         SmilesGenerator generator = new SmilesGenerator();
         generator.setUseAromaticityFlag(true);
@@ -193,8 +193,8 @@ public class SMARTSQueryToolTest extends CDKTestCase {
      */
     @Test
     public void testMethane() throws Exception {
-        IMolecule methane =
-             NoNotificationChemObjectBuilder.getInstance().newInstance(IMolecule.class);
+        IAtomContainer methane =
+             SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
         IAtom carbon = methane.getBuilder().newInstance(IAtom.class,Elements.CARBON);
         methane.addAtom(carbon);
 

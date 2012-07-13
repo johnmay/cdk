@@ -28,29 +28,27 @@
  */
 package org.openscience.cdk.io;
 
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.annotations.TestClass;
-import org.openscience.cdk.annotations.TestMethod;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IChemObject;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
-import org.openscience.cdk.io.formats.IResourceFormat;
-import org.openscience.cdk.io.formats.SMILESFormat;
-import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.tools.ILoggingTool;
-import org.openscience.cdk.tools.LoggingToolFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+
+import org.openscience.cdk.annotations.TestClass;
+import org.openscience.cdk.annotations.TestMethod;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IChemFile;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemObject;
+import org.openscience.cdk.interfaces.IChemSequence;
+import org.openscience.cdk.io.formats.IResourceFormat;
+import org.openscience.cdk.io.formats.SMILESFormat;
+import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.ILoggingTool;
+import org.openscience.cdk.tools.LoggingToolFactory;
 
 /**
  * This Reader reads files which has one SMILES string on each
@@ -78,33 +76,20 @@ public class SMILESReader extends DefaultChemObjectReader {
     private static ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(SMILESReader.class);
 
-    /* 
-     * Construct a new reader from a Reader type object.
-     *
-     * By default the {@link DefaultChemObjectBuilder} is used.
-     *
-     * @param input reader from which input is read
-     */
-    public SMILESReader(Reader input) {
-        this(input, DefaultChemObjectBuilder.getInstance());
-    }
-
     /**
      * Construct a new reader from a Reader and a specified builder object.
      *
      * @param input   The Reader object from which to read structures
-     * @param builder the builder
      */
-    public SMILESReader(Reader input, IChemObjectBuilder builder) {
-        this.input = new BufferedReader(input);
-        sp = new SmilesParser(builder);
+    public SMILESReader(Reader input) {
+        this.input = new BufferedReader(input);   
     }
 
 
     public SMILESReader(InputStream input) {
         this(new InputStreamReader(input));
     }
-    
+
     public SMILESReader() {
         this(new StringReader(""));
     }
@@ -133,7 +118,7 @@ public class SMILESReader extends DefaultChemObjectReader {
 		Class[] interfaces = classObject.getInterfaces();
         for (Class anInterface : interfaces) {
             if (IChemFile.class.equals(anInterface)) return true;
-            if (IMoleculeSet.class.equals(anInterface)) return true;
+            if (IAtomContainerSet.class.equals(anInterface)) return true;
         }
         Class superClass = classObject.getSuperclass();
         if (superClass != null) return this.accepts(superClass);
@@ -150,14 +135,16 @@ public class SMILESReader extends DefaultChemObjectReader {
      */
     @TestMethod("testReading,testReadingSmiFile_1,testReadingSmiFile_2,testReadingSmiFile_3")
     public <T extends IChemObject> T read(T object) throws CDKException {
-        if (object instanceof IMoleculeSet) {
-            return (T)readMoleculeSet((IMoleculeSet)object);
+        sp = new SmilesParser(object.getBuilder());
+
+        if (object instanceof IAtomContainerSet) {
+            return (T) readAtomContainerSet((IAtomContainerSet) object);
         } else if (object instanceof IChemFile) {
             IChemFile file = (IChemFile)object;
             IChemSequence sequence = file.getBuilder().newInstance(IChemSequence.class);
             IChemModel chemModel = file.getBuilder().newInstance(IChemModel.class);
-            chemModel.setMoleculeSet(readMoleculeSet(
-            	file.getBuilder().newInstance(IMoleculeSet.class)
+            chemModel.setMoleculeSet(readAtomContainerSet(
+                    file.getBuilder().newInstance(IAtomContainerSet.class)
             ));
             sequence.addChemModel(chemModel);
             file.addChemSequence(sequence);
@@ -176,7 +163,7 @@ public class SMILESReader extends DefaultChemObjectReader {
      * @param som The set of molecules that came fron the file
      * @return A ChemFile containing the data parsed from input.
      */
-    private IMoleculeSet readMoleculeSet(IMoleculeSet som) {
+    private IAtomContainerSet readAtomContainerSet(IAtomContainerSet som) {
         try {
             String line = input.readLine().trim();
             while (line != null) {
@@ -192,8 +179,8 @@ public class SMILESReader extends DefaultChemObjectReader {
                 logger.debug("Line contains SMILES and name: ", SMILES, " + " , name);
 
                 try {
-                    IMolecule molecule = sp.parseSmiles(SMILES);
-                    som.addMolecule(molecule);
+                    IAtomContainer molecule = sp.parseSmiles(SMILES);
+                    som.addAtomContainer(molecule);
                     if (name != null) {
                         molecule.setProperty("SMIdbNAME", name);
                     }

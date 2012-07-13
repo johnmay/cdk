@@ -41,12 +41,12 @@ import org.openscience.cdk.graph.invariant.CanonicalLabeler;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IIsotope;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.ringsearch.SSSRFinder;
+import org.openscience.cdk.smiles.InvPair;
 
 /**
  * Generates HOSE codes {@cdk.cite BRE78}.
@@ -194,7 +194,7 @@ public class HOSECodeGenerator implements java.io.Serializable
 	 *@param  ringsize  Shall the center code have the ring size in it? Only use if you want to have the hose code later, else say false.
 	 *@return An array of {@link List}. The list at i-1 contains the atoms at sphere i as TreeNodes.
 	 **/
-	public List<IAtom>[] getSpheres(IMolecule ac, IAtom root, int noOfSpheres, boolean ringsize) throws CDKException
+	public List<IAtom>[] getSpheres(IAtomContainer ac, IAtom root, int noOfSpheres, boolean ringsize) throws CDKException
 	{
 		ensureIsotopeFactory(ac.getBuilder());
 		centerCode = "";
@@ -740,8 +740,8 @@ public class HOSECodeGenerator implements java.io.Serializable
     public int compare(TreeNode obj1, TreeNode obj2) {
     	if(obj1==null || obj2==null || ((TreeNode) obj1).getAtom()==null || ((TreeNode) obj2).getAtom()==null)
     		return 0;
-    	Long label1 = (Long)((TreeNode) obj1).getAtom().getProperty("CanonicalLable");
-    	Long label2 = (Long)((TreeNode) obj2).getAtom().getProperty("CanonicalLable");
+    	Long label1 = (Long)((TreeNode) obj1).getAtom().getProperty(InvPair.CANONICAL_LABEL);
+    	Long label2 = (Long)((TreeNode) obj2).getAtom().getProperty(InvPair.CANONICAL_LABEL);
     	if(label1==null || label2==null)
     		return 0;
     	if (label1.intValue() < label2.intValue()) {

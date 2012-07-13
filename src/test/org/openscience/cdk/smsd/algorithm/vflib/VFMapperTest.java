@@ -49,11 +49,13 @@ package org.openscience.cdk.smsd.algorithm.vflib;
 
 import java.util.List;
 import java.util.Map;
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.smsd.algorithm.vflib.interfaces.IMapper;
 import org.openscience.cdk.smsd.algorithm.vflib.interfaces.INode;
 import org.openscience.cdk.smsd.algorithm.vflib.map.VFMapper;
@@ -68,19 +70,19 @@ import org.openscience.cdk.smsd.algorithm.vflib.map.VFMapper;
  */
 public class VFMapperTest {
 
-    private IMolecule hexane;
-    private IMolecule benzene;
-    private IMolecule pyridine;
-    private IMolecule toluene4;
-    private IMolecule pyridazine;
-    private IMolecule naphthalene;
-    private IMolecule chlorobenzene;
-    private IMolecule chloroisoquinoline4;
-    private IMolecule toluene;
-    private IMolecule phenol;
-    private IMolecule acetone;
-    private IMolecule propane;
-    private IMolecule cyclopropane;
+    private IAtomContainer hexane;
+    private IAtomContainer benzene;
+    private IAtomContainer pyridine;
+    private IAtomContainer toluene4;
+    private IAtomContainer pyridazine;
+    private IAtomContainer naphthalene;
+    private IAtomContainer chlorobenzene;
+    private IAtomContainer chloroisoquinoline4;
+    private IAtomContainer toluene;
+    private IAtomContainer phenol;
+    private IAtomContainer acetone;
+    private IAtomContainer propane;
+    private IAtomContainer cyclopropane;
 
     public VFMapperTest(){
 
@@ -248,7 +250,7 @@ public class VFMapperTest {
     }
 //    @Test
 //    public void testItMapsBlockedPropaneOntoPropane() throws CDKException {
-//        IMolecule blockedPropane = Molecules.createPropane();
+//        IAtomContainer blockedPropane = Molecules.createPropane();
 //        IAtom atom = blockedPropane.getBuilder().newInstance(IAtom.class, "H");
 //        blockedPropane.addAtom(atom);
 //        IBond bond = blockedPropane.getBuilder().newInstance(IBond.class, atom, blockedPropane.getAtom(1), IBond.Order.SINGLE);
@@ -292,7 +294,7 @@ public class VFMapperTest {
 //  }
 //    @Test
 //    public void testItMapsPropaneToAcetone() throws CDKException {
-//        IMolecule mol = Molecules.createPropane();
+//        IAtomContainer mol = Molecules.createPropane();
 //        IQuery querComp = QueryCompiler.compile(mol, true);
 //        IMapper mapper = new VFMapper(querComp);
 //        assertTrue(mapper.hasMap(Molecules.createAcetone()));
@@ -300,7 +302,7 @@ public class VFMapperTest {
 //
 //    @Test
 //    public void testDoesntMapImineToAmine() throws CDKException {
-//        IMolecule mol = Molecules.createSimpleImine();
+//        IAtomContainer mol = Molecules.createSimpleImine();
 //        IQuery querComp = QueryCompiler.compile(mol, true);
 //        IMapper mapper = new VFMapper(querComp);
 //        Map<INode, IAtom> map = mapper.getFirstMap(Molecules.createSimpleAmine());

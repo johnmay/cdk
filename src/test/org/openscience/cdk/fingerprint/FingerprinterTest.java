@@ -1,6 +1,4 @@
-/* $Revision$ $Author$ $Date$    
- * 
- * Copyright (C) 1997-2007  Egon Willighagen <egonw@users.sf.net>
+/* Copyright (C) 1997-2007,2011  Egon Willighagen <egonw@users.sf.net>
  * 
  * Contact: cdk-devel@lists.sourceforge.net
  * 
@@ -24,11 +22,15 @@
  */
 package org.openscience.cdk.fingerprint;
 
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.BitSet;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.Molecule;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.graph.AtomContainerAtomPermutor;
@@ -36,7 +38,6 @@ import org.openscience.cdk.graph.AtomContainerBondPermutor;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLRXNV2000Reader;
@@ -46,14 +47,10 @@ import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.util.BitSet;
-
 /**
  * @cdk.module test-standard
  */
-public class FingerprinterTest extends AbstractFingerprinterTest {
+public class FingerprinterTest extends AbstractFixedLengthFingerprinterTest {
 
 	boolean standAlone = false;
 	private static ILoggingTool logger =
@@ -64,8 +61,8 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 	}
 
 	@Test public void testRegression() throws Exception {
-		IMolecule mol1 = MoleculeFactory.makeIndole();
-		IMolecule mol2 = MoleculeFactory.makePyrrole();
+	    IAtomContainer mol1 = MoleculeFactory.makeIndole();
+	    IAtomContainer mol2 = MoleculeFactory.makePyrrole();
 		Fingerprinter fingerprinter = new Fingerprinter();
 		BitSet bs1 = fingerprinter.getFingerprint(mol1);
 		Assert.assertEquals("Seems the fingerprint code has changed. This will cause a number of other tests to fail too!", 33, bs1.cardinality());
@@ -89,7 +86,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 	{
 		Fingerprinter fingerprinter = new Fingerprinter();
 
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
 		Assert.assertNotNull(bs);
 		Assert.assertEquals(fingerprinter.getSize(), bs.size());
@@ -100,9 +97,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		Fingerprinter fingerprinter = new Fingerprinter();
 		Assert.assertNotNull(fingerprinter);
 
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 	}
@@ -112,9 +109,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		Fingerprinter fingerprinter = new Fingerprinter(512);
 		Assert.assertNotNull(fingerprinter);
 
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 	}
@@ -124,9 +121,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		Fingerprinter fingerprinter = new Fingerprinter(1024,7);
 		Assert.assertNotNull(fingerprinter);
 
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 	}
@@ -134,7 +131,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
   @Test public void testFingerprinterBitSetSize() throws Exception {
     Fingerprinter fingerprinter = new Fingerprinter(1024,7);
     Assert.assertNotNull(fingerprinter);
-    Molecule mol = MoleculeFactory.makeIndole();
+    IAtomContainer mol = MoleculeFactory.makeIndole();
     BitSet bs = fingerprinter.getFingerprint(mol);
     Assert.assertEquals(994, bs.length()); // highest set bit
     Assert.assertEquals(1024, bs.size()); // actual bit set size
@@ -183,8 +180,8 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
      */
     @Test
     public void testBug2819557() throws CDKException {
-        Molecule butane = makeButane();
-        Molecule propylAmine = makePropylAmine();
+        IAtomContainer butane = makeButane();
+        IAtomContainer propylAmine = makePropylAmine();
 
         Fingerprinter fp = new Fingerprinter();
         BitSet b1 = fp.getFingerprint(butane);
@@ -195,7 +192,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testBondPermutation() throws CDKException {
-        IMolecule pamine = makePropylAmine();
+        IAtomContainer pamine = makePropylAmine();
         Fingerprinter fp = new Fingerprinter();
         BitSet bs1 = fp.getFingerprint(pamine);
 
@@ -209,7 +206,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testAtomPermutation() throws CDKException {
-        IMolecule pamine = makePropylAmine();
+        IAtomContainer pamine = makePropylAmine();
         Fingerprinter fp = new Fingerprinter();
         BitSet bs1 = fp.getFingerprint(pamine);
 
@@ -223,7 +220,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testBondPermutation2() throws CDKException {
-        IMolecule pamine = MoleculeFactory.makeCyclopentane();
+        IAtomContainer pamine = MoleculeFactory.makeCyclopentane();
         Fingerprinter fp = new Fingerprinter();
         BitSet bs1 = fp.getFingerprint(pamine);
 
@@ -237,7 +234,7 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testAtomPermutation2() throws CDKException {
-        IMolecule pamine = MoleculeFactory.makeCyclopentane();
+        IAtomContainer pamine = MoleculeFactory.makeCyclopentane();
         Fingerprinter fp = new Fingerprinter();
         BitSet bs1 = fp.getFingerprint(pamine);
 
@@ -249,9 +246,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
         }
     }
 
-    public static Molecule makeFragment1()
+    public static IAtomContainer makeFragment1()
 	{
-		Molecule mol = new Molecule();
+		IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 		mol.addAtom(new Atom("C")); // 2
@@ -270,9 +267,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 	}
 
 
-	public static Molecule makeFragment4()
+	public static IAtomContainer makeFragment4()
 	{
-		Molecule mol = new Molecule();
+		IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 
@@ -280,9 +277,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		return mol;
 	}
 
-	public static Molecule makeFragment2()
+	public static IAtomContainer makeFragment2()
 	{
-		Molecule mol = new Molecule();
+		IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 		mol.addAtom(new Atom("C")); // 2
@@ -301,9 +298,9 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		return mol;
 	}
 
-	public static Molecule makeFragment3()
+	public static IAtomContainer makeFragment3()
 	{
-		Molecule mol = new Molecule();
+		IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 		mol.addAtom(new Atom("C")); // 2
@@ -321,8 +318,8 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		return mol;
 	}
 
-    public static Molecule makeButane() {
-        Molecule mol = new Molecule();
+    public static IAtomContainer makeButane() {
+        IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 		mol.addAtom(new Atom("C")); // 2
@@ -335,8 +332,8 @@ public class FingerprinterTest extends AbstractFingerprinterTest {
 		return mol;
     }
 
-    public static Molecule makePropylAmine() {
-        Molecule mol = new Molecule();
+    public static IAtomContainer makePropylAmine() {
+        IAtomContainer mol = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
 		mol.addAtom(new Atom("C")); // 0
 		mol.addAtom(new Atom("C")); // 1
 		mol.addAtom(new Atom("C")); // 2

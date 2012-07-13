@@ -24,10 +24,6 @@
 package org.openscience.cdk.reaction.type;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.CDKConstants;
@@ -35,19 +31,23 @@ import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IReactionSet;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
 import org.openscience.cdk.reaction.IReactionProcess;
 import org.openscience.cdk.reaction.ReactionProcessTest;
 import org.openscience.cdk.reaction.type.parameters.IParameterReact;
 import org.openscience.cdk.reaction.type.parameters.SetReactionCenter;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.LonePairElectronChecker;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.ReactionManipulator;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * TestSuite that runs a test for the ElectronImpactPDBReactionTest.
@@ -58,7 +58,7 @@ import org.openscience.cdk.tools.manipulator.ReactionManipulator;
 public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 
 	private final LonePairElectronChecker lpcheck = new LonePairElectronChecker();
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 	/**
 	 *  The JUnit setup method
 	 */
@@ -81,9 +81,9 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 *
 	 *@return    Description of the Return Value
 	 */
-	@Test public void testInitiate_IMoleculeSet_IMoleculeSet() throws Exception {
+	@Test public void testInitiate_IAtomContainerSet_IAtomContainerSet() throws Exception {
 		/* ionize >C=C< , set the reactive center*/
-		IMolecule reactant = builder.newInstance(IMolecule.class);//Smiles("C=CCC(=O)CC")
+		IAtomContainer reactant = builder.newInstance(IAtomContainer.class);//Smiles("C=CCC(=O)CC")
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
@@ -113,8 +113,8 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 			}
 		}
 		
-		IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
-		setOfReactants.addMolecule(reactant);
+		IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
+		setOfReactants.addAtomContainer(reactant);
 
 		/* initiate */
 	    AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(reactant);
@@ -130,13 +130,13 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
         
         Assert.assertEquals(2, setOfReactions.getReactionCount());
 
-        IMolecule molecule = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer molecule = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
           
         Assert.assertEquals(1, molecule.getAtom(0).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(1)));
         Assert.assertEquals(1, molecule.getSingleElectronCount());
 
-        molecule = setOfReactions.getReaction(1).getProducts().getMolecule(0);
+        molecule = setOfReactions.getReaction(1).getProducts().getAtomContainer(0);
         Assert.assertEquals(1, molecule.getAtom(1).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(0)));
         Assert.assertEquals(1, molecule.getSingleElectronCount());
@@ -153,7 +153,7 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 */
 	@Test public void testAutomatic_Set_Active_Bond() throws Exception {
 		/* ionize all possible double bonds */
-		IMolecule reactant = builder.newInstance(IMolecule.class);//miles("C=CC")
+		IAtomContainer reactant = builder.newInstance(IAtomContainer.class);//miles("C=CC")
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
@@ -161,8 +161,8 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 		reactant.addBond(1, 2, IBond.Order.SINGLE);
 		addExplicitHydrogens(reactant);
 		
-		IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
-		setOfReactants.addMolecule(reactant);
+		IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
+		setOfReactants.addAtomContainer(reactant);
 
 		/* initiate */
 	    AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(reactant);
@@ -174,11 +174,11 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 		Assert.assertEquals(2, setOfReactions.getReactionCount());
 
         
-        IMolecule molecule = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer molecule = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
         Assert.assertEquals(1, molecule.getAtom(0).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(1)));
 
-        molecule = setOfReactions.getReaction(1).getProducts().getMolecule(0);
+        molecule = setOfReactions.getReaction(1).getProducts().getAtomContainer(0);
         Assert.assertEquals(1, molecule.getAtom(1).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(0)));
 		
@@ -192,7 +192,7 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 */
 	@Test public void testAutomatic_Set_Active_Bond2() throws Exception {
 		/* ionize >C=C< , set the reactive center*/
-		IMolecule reactant = builder.newInstance(IMolecule.class);//Smiles("C=CCC(=O)CC")
+		IAtomContainer reactant = builder.newInstance(IAtomContainer.class);//Smiles("C=CCC(=O)CC")
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
 		reactant.addAtom(builder.newInstance(IAtom.class,"C"));
@@ -208,8 +208,8 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 		reactant.addBond(5, 6, IBond.Order.SINGLE);
 		addExplicitHydrogens(reactant);
 			
-		IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
-		setOfReactants.addMolecule(reactant);
+		IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
+		setOfReactants.addAtomContainer(reactant);
 
 		/* initiate */
 	    AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(reactant);
@@ -225,11 +225,11 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
         
         Assert.assertEquals(3, setOfReactions.getReactionCount());
         
-        IMolecule molecule = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer molecule = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
         Assert.assertEquals(1, molecule.getAtom(0).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(1)));
 
-        molecule = setOfReactions.getReaction(1).getProducts().getMolecule(0);
+        molecule = setOfReactions.getReaction(1).getProducts().getAtomContainer(0);
         Assert.assertEquals(1, molecule.getAtom(1).getFormalCharge().intValue());
         Assert.assertEquals(1, molecule.getConnectedSingleElectronsCount(molecule.getAtom(0)));
         
@@ -246,8 +246,8 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 */
 	@Test public void testCDKConstants_REACTIVE_CENTER() throws Exception {
 		IReactionProcess type  = new ElectronImpactPDBReaction();
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 		
 		/*manually put the reactive center*/
 		molecule.getAtom(0).setFlag(CDKConstants.REACTIVE_CENTER,true);
@@ -268,7 +268,7 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
         Assert.assertEquals(2, setOfReactions.getReactionCount());
         Assert.assertEquals(1, setOfReactions.getReaction(0).getProductCount());
 
-        IMolecule reactant = setOfReactions.getReaction(0).getReactants().getMolecule(0);
+        IAtomContainer reactant = setOfReactions.getReaction(0).getReactants().getAtomContainer(0);
 		Assert.assertTrue(molecule.getAtom(0).getFlag(CDKConstants.REACTIVE_CENTER));
 		Assert.assertTrue(reactant.getAtom(0).getFlag(CDKConstants.REACTIVE_CENTER));
 		Assert.assertTrue(molecule.getAtom(1).getFlag(CDKConstants.REACTIVE_CENTER));
@@ -287,8 +287,8 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 */
 	@Test public void testMapping() throws Exception {
 		IReactionProcess type  = new ElectronImpactPDBReaction();
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 		
 		/*automatic search of the center active*/
         List<IParameterReact> paramList = new ArrayList<IParameterReact>();
@@ -300,7 +300,7 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
         /* initiate */
 		IReactionSet setOfReactions = type.initiate(setOfReactants, null);
         
-        IMolecule product = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
 
         Assert.assertEquals(9,setOfReactions.getReaction(0).getMappingCount());
         IAtom mappedProductA1 = (IAtom)ReactionManipulator.getMappedChemObject(setOfReactions.getReaction(0), molecule.getAtom(0));
@@ -309,12 +309,12 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
         Assert.assertEquals(mappedProductA2, product.getAtom(1));
  	}
 	/**
-	 * Test to recognize if a IMolecule matcher correctly the CDKAtomTypes.
+	 * Test to recognize if a IAtomContainer matcher correctly the CDKAtomTypes.
 	 * 
-	 * @param molecule          The IMolecule to analyze
+	 * @param molecule          The IAtomContainer to analyze
 	 * @throws CDKException
 	 */
-	private void makeSureAtomTypesAreRecognized(IMolecule molecule) throws Exception {
+	private void makeSureAtomTypesAreRecognized(IAtomContainer molecule) throws Exception {
 
 		Iterator<IAtom> atoms = molecule.atoms().iterator();
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(molecule.getBuilder());
@@ -330,12 +330,12 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	/**
 	 * Get the example set of molecules.
 	 * 
-	 * @return The IMoleculeSet
+	 * @return The IAtomContainerSet
 	 */
-	private IMoleculeSet getExampleReactants() {
-		IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
+	private IAtomContainerSet getExampleReactants() {
+		IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
 
-		IMolecule molecule = builder.newInstance(IMolecule.class);//miles("C=CC")
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);//miles("C=CC")
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
 		molecule.addAtom(builder.newInstance(IAtom.class,"C"));
@@ -360,7 +360,7 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 		} catch (CDKException e) {
 			e.printStackTrace();
 		}
-		setOfReactants.addMolecule(molecule);
+		setOfReactants.addAtomContainer(molecule);
 		
 		return setOfReactants;
 	}
@@ -368,12 +368,12 @@ public class ElectronImpactPDBReactionTest extends ReactionProcessTest {
 	 * Get the expected set of molecules.
 	 * TODO:reaction. Set the products
 	 * 
-	 * @return The IMoleculeSet
+	 * @return The IAtomContainerSet
 	 */
-	private IMoleculeSet getExpectedProducts() {
-		IMoleculeSet setOfProducts = builder.newInstance(IMoleculeSet.class);
+	private IAtomContainerSet getExpectedProducts() {
+		IAtomContainerSet setOfProducts = builder.newInstance(IAtomContainerSet.class);
 
-        setOfProducts.addMolecule(null);
+        setOfProducts.addAtomContainer(null);
 		return setOfProducts;
 	}
 }

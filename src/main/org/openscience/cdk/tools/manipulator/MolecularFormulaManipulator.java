@@ -266,7 +266,11 @@ public class MolecularFormulaManipulator {
 		return isotopesList;
 	}
 
+	/**
+	 * @deprecated  Use {@link #getString()}
+	 */
 	@TestMethod("testGetHillString_IMolecularFormula")
+	@Deprecated 
 	public static String getHillString(IMolecularFormula formula) {
 		StringBuffer hillString = new StringBuffer();
 
@@ -304,9 +308,9 @@ public class MolecularFormulaManipulator {
 	}
 
 	/**
-	 * Returns the string representation of the molecule formula with
-	 * numbers wrapped in &lt;sub&gt;&lt;/sub&gt; tags.
-	 * Useful for displaying formulae in Swing components or on the web.
+	 * Returns the string representation of the molecule formula based on Hill
+	 * System with numbers wrapped in &lt;sub&gt;&lt;/sub&gt; tags. Useful for
+	 * displaying formulae in Swing components or on the web.
 	 * 
 	 *
 	 * @param   formula  The IMolecularFormula object
@@ -320,11 +324,11 @@ public class MolecularFormulaManipulator {
 	}
 
 	/**
-	 * Returns the string representation of the molecule formula with
-	 * numbers wrapped in &lt;sub&gt;&lt;/sub&gt; tags and the isotope
-	 * of each Element in &lt;sup&gt;&lt;/sup&gt; tags and the total
-	 * charge of IMolecularFormula in &lt;sup&gt;&lt;/sup&gt; tags.
-	 * Useful for displaying formulae in Swing components or on the web.
+	 * Returns the string representation of the molecule formula based on Hill
+	 * System with numbers wrapped in &lt;sub&gt;&lt;/sub&gt; tags and the
+	 * isotope of each Element in &lt;sup&gt;&lt;/sup&gt; tags and the total
+	 * charge of IMolecularFormula in &lt;sup&gt;&lt;/sup&gt; tags. Useful for
+	 * displaying formulae in Swing components or on the web.
 	 * 
 	 *
 	 * @param   formula  The IMolecularFormula object
@@ -336,8 +340,33 @@ public class MolecularFormulaManipulator {
 	 */
 	@TestMethod("testGetHTML_IMolecularFormula_boolean_boolean")
 	public static String getHTML(IMolecularFormula formula, boolean chargeB, boolean isotopeB) {
+		String[] orderElements;
+		if (containsElement(formula, formula.getBuilder().newInstance(IElement.class,"C")))
+			orderElements = generateOrderEle_Hill_WithCarbons();
+		else
+			orderElements = generateOrderEle_Hill_NoCarbons();
+		return getHTML(formula, orderElements, chargeB, isotopeB);
+	}
+	
+	/**
+	 * Returns the string representation of the molecule formula with numbers 
+	 * wrapped in &lt;sub&gt;&lt;/sub&gt; tags and the isotope of each Element
+	 * in &lt;sup&gt;&lt;/sup&gt; tags and the total charge of IMolecularFormula
+	 * in &lt;sup&gt;&lt;/sup&gt; tags. Useful for displaying formulae in Swing
+	 * components or on the web.
+	 * 
+	 *
+	 * @param   formula  The IMolecularFormula object
+	 * @param   orderElements The order of Elements
+	 * @param   chargeB  True, If it has to show the charge
+	 * @param   isotopeB True, If it has to show the Isotope mass
+	 * @return           A HTML representation of the molecular formula
+	 * @see              #getHTML(IMolecularFormula)
+	 * 
+	 */
+	@TestMethod("testGetHTML_IMolecularFormula_arrayString_boolean_boolean")
+	public static String getHTML(IMolecularFormula formula, String[] orderElements, boolean chargeB, boolean isotopeB) {
 		String htmlString = "";
-		String[] orderElements = generateOrderEle();
 		for (String orderElement : orderElements) {
 			IElement element = formula.getBuilder().newInstance(IElement.class,orderElement);
 			if (containsElement(formula, element)) {
@@ -752,17 +781,25 @@ public class MolecularFormulaManipulator {
 	 * @see                      #getMolecularFormula(IAtomContainer)
 	 */
 	@TestMethod("testGetMolecularFormula_IAtomContainer_IMolecularFormula")
-	public static IMolecularFormula getMolecularFormula(IAtomContainer atomContainer, IMolecularFormula formula) {
-		int charge = 0;
-		for (IAtom iAtom : atomContainer.atoms()) {
-			formula.addIsotope(iAtom);
-			charge += iAtom.getFormalCharge();
-		}
-		formula.setCharge(charge);
-		return formula;
-	}
+    public static IMolecularFormula getMolecularFormula(IAtomContainer atomContainer, IMolecularFormula formula) {
+        int charge = 0;
+        IAtom hAtom = null;
+        for (IAtom iAtom : atomContainer.atoms()) {
+            formula.addIsotope(iAtom);
+            charge += iAtom.getFormalCharge();
 
-	/**
+            if (iAtom.getImplicitHydrogenCount() != null &&
+                    (iAtom.getImplicitHydrogenCount() > 0)) {
+                if (hAtom == null) hAtom =
+                        atomContainer.getBuilder().newInstance(IAtom.class, "H");
+                formula.addIsotope(hAtom, iAtom.getImplicitHydrogenCount());
+            }
+        }
+        formula.setCharge(charge);
+        return formula;
+    }
+
+    /**
 	 * Method that actually does the work of convert the IMolecularFormula
 	 * to IAtomContainer.
 	 * <p> The hydrogens must be implicit.
@@ -800,6 +837,19 @@ public class MolecularFormulaManipulator {
 		return atomContainer;
 	}
 
+	/**
+	 * Converts a formula string (like "C2H4") into an atom container with atoms
+	 * but no bonds.
+	 * 
+	 * @param formulaString the formula to convert
+	 * @param builder a chem object builder
+	 * @return atoms wrapped in an atom container
+	 */
+	@TestMethod("testGetAtomContainer_String_IChemObjectBuilder")
+	public static IAtomContainer getAtomContainer(String formulaString, IChemObjectBuilder builder) {
+	    return MolecularFormulaManipulator.getAtomContainer(
+	            MolecularFormulaManipulator.getMolecularFormula(formulaString, builder));
+	}
 	/**
 	 * Returns the Elements ordered according to (approximate) probability of occurrence.
 	 * 

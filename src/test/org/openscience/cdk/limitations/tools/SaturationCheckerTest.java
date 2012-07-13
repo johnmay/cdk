@@ -27,11 +27,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
@@ -62,7 +63,7 @@ public class SaturationCheckerTest extends CDKTestCase {
      * Tests the method saturate().
      */
     @Test public void testSaturate_WithNitrate() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom a1 = new Atom("O");
         mol.addAtom(a1);
         Atom a2 = new Atom("N");
@@ -136,7 +137,7 @@ public class SaturationCheckerTest extends CDKTestCase {
      * Tests the method saturate().
      */
     @Test public void testSaturation_S4AtomType() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom a1 = new Atom("N");
         mol.addAtom(a1);
         Atom a2 = new Atom("H");
@@ -242,7 +243,7 @@ public class SaturationCheckerTest extends CDKTestCase {
      * Tests the method saturate().
      */
     @Test public void testSaturate_NumberingProblem() throws Exception {
-        Molecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         Atom a1 = new Atom("C");
         mol.addAtom(a1);
         Atom a2 = new Atom("C");
@@ -292,7 +293,7 @@ public class SaturationCheckerTest extends CDKTestCase {
      */
 	@Test public void testIsSaturated_Proton() throws Exception {
 		// test H+
-		Molecule m = new Molecule();
+	    IAtomContainer m = new AtomContainer();
 		Atom h = new Atom("H");
         h.setFormalCharge(+1);
 		m.addAtom(h);
@@ -300,7 +301,7 @@ public class SaturationCheckerTest extends CDKTestCase {
 	}
     
     @Test public void testCalculateMissingHydrogens_Aromatic() throws Exception{
-	    Molecule pyrrole = MoleculeFactory.makePyrrole();
+        IAtomContainer pyrrole = MoleculeFactory.makePyrrole();
 	    IAtom n = pyrrole.getAtom(1);
 	    IRingSet rs = (new SSSRFinder(pyrrole)).findSSSR();
 	    IRing ring = (IRing) rs.getAtomContainer(0);

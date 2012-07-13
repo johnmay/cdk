@@ -28,20 +28,12 @@
  */
 package org.openscience.cdk.io;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemObject;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.formats.SMILESFormat;
 import org.openscience.cdk.io.setting.BooleanIOSetting;
@@ -49,6 +41,14 @@ import org.openscience.cdk.io.setting.IOSetting;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
+
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * Writes the SMILES strings to a plain text file.
@@ -131,8 +131,8 @@ public class SMILESWriter extends DefaultChemObjectWriter {
     public boolean accepts(Class classObject) {
 		Class[] interfaces = classObject.getInterfaces();
 		for (int i=0; i<interfaces.length; i++) {
-			if (IMoleculeSet.class.equals(interfaces[i])) return true;
-			if (IMolecule.class.equals(interfaces[i])) return true;
+			if (IAtomContainerSet.class.equals(interfaces[i])) return true;
+			if (IAtomContainer.class.equals(interfaces[i])) return true;
 		}
         Class superClass = classObject.getSuperclass();
         if (superClass != null) return this.accepts(superClass);
@@ -145,10 +145,10 @@ public class SMILESWriter extends DefaultChemObjectWriter {
      * @param   object  IChemObject of which the data is outputted.
      */
 	public void write(IChemObject object) throws CDKException {
-		if (object instanceof IMoleculeSet) {
-		    writeMoleculeSet((IMoleculeSet)object);
-		} else if (object instanceof IMolecule) {
-		    writeMolecule((IMolecule)object);
+		if (object instanceof IAtomContainerSet) {
+		    writeAtomContainerSet((IAtomContainerSet) object);
+		} else if (object instanceof IAtomContainer) {
+		    writeAtomContainer((IAtomContainer) object);
 		} else {
 		    throw new CDKException("Only supported is writing of ChemFile and Molecule objects.");
 		}
@@ -159,12 +159,12 @@ public class SMILESWriter extends DefaultChemObjectWriter {
 	 *
 	 * @param   som  MoleculeSet that is written to an OutputStream
 	 */
-	public void  writeMoleculeSet(IMoleculeSet som)
+	public void writeAtomContainerSet(IAtomContainerSet som)
 	{
-		writeMolecule(som.getMolecule(0));
-		for (int i = 1; i <= som.getMoleculeCount() - 1; i++) {
+		writeAtomContainer(som.getAtomContainer(0));
+		for (int i = 1; i <= som.getAtomContainerCount() - 1; i++) {
 			try {
-				writeMolecule(som.getMolecule(i));
+				writeAtomContainer(som.getAtomContainer(i));
 			} catch (Exception exc) {
 			}
 		}
@@ -175,7 +175,7 @@ public class SMILESWriter extends DefaultChemObjectWriter {
      *
      * @param   molecule  Molecule of which the data is outputted.
      */
-    public void writeMolecule(IMolecule molecule) {
+    public void writeAtomContainer(IAtomContainer molecule) {
         SmilesGenerator sg = new SmilesGenerator();
         sg.setUseAromaticityFlag(useAromaticityFlag.isSet());
         String smiles = "";
@@ -193,21 +193,16 @@ public class SMILESWriter extends DefaultChemObjectWriter {
     }
 
     private void initIOSettings() {
-        useAromaticityFlag = new BooleanIOSetting(
+        useAromaticityFlag = addSetting(new BooleanIOSetting(
             "UseAromaticity",
-            IOSetting.LOW,
+            IOSetting.Importance.LOW,
             "Should aromaticity information be stored in the SMILES?",
             "false"
-        );
+        ));
     }
 
     public void customizeJob() {
         fireIOSettingQuestion(useAromaticityFlag);
     }
 
-    public IOSetting[] getIOSettings() {
-        IOSetting[] settings = new IOSetting[1];
-        settings[0] = useAromaticityFlag;
-        return settings;
-    }
 }

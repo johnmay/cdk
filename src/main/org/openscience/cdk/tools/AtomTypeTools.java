@@ -27,7 +27,7 @@ package org.openscience.cdk.tools;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.ringsearch.SSSRFinder;
@@ -58,7 +58,7 @@ public class AtomTypeTools {
 		hcg = new HOSECodeGenerator();
 	}
 	
-	public IRingSet assignAtomTypePropertiesToAtom(IMolecule molecule) throws Exception{
+	public IRingSet assignAtomTypePropertiesToAtom(IAtomContainer molecule) throws Exception{
 		return assignAtomTypePropertiesToAtom(molecule, true);
 	}
 	
@@ -78,7 +78,7 @@ public class AtomTypeTools {
 	 *@return                sssrf ringSetofTheMolecule
 	 *@exception  Exception  Description of the Exception
 	 */
-	public IRingSet assignAtomTypePropertiesToAtom(IMolecule molecule, boolean aromaticity) throws Exception{
+	public IRingSet assignAtomTypePropertiesToAtom(IAtomContainer molecule, boolean aromaticity) throws Exception{
         SmilesGenerator sg = new SmilesGenerator();
 
 		//logger.debug("assignAtomTypePropertiesToAtom Start ...");
@@ -108,7 +108,7 @@ public class AtomTypeTools {
 				IRing sring = (IRing) ringSetA.getAtomContainer(ringSetA.getAtomContainerCount()-1);
 				atom2.setProperty(CDKConstants.PART_OF_RING_OF_SIZE, Integer.valueOf(sring.getRingSize()));
 				atom2.setProperty(CDKConstants.CHEMICAL_GROUP_CONSTANT, Integer.valueOf(ringSystemClassifier(
-						sring, sg.createSMILES(atom2.getBuilder().newInstance(IMolecule.class,sring)))
+						sring, sg.createSMILES(atom2.getBuilder().newInstance(IAtomContainer.class,sring)))
 				));
 				atom2.setFlag(CDKConstants.ISINRING, true);
 				atom2.setFlag(CDKConstants.ISALIPHATIC, false);

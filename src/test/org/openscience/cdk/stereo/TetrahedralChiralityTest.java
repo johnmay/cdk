@@ -26,25 +26,25 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond.Order;
 import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
 
 /**
- * @cdk.module test-data
+ * @cdk.module test-core
  */
 public class TetrahedralChiralityTest extends CDKTestCase {
 
-    private static IMolecule molecule;
+    private static IAtomContainer molecule;
     private static IAtom[] ligands;
 
     @BeforeClass
     public static void setup() throws Exception {
-        molecule = new Molecule();
+        molecule = new AtomContainer();
         molecule.addAtom(new Atom("Cl"));
         molecule.addAtom(new Atom("C"));
         molecule.addAtom(new Atom("Br"));
@@ -71,10 +71,12 @@ public class TetrahedralChiralityTest extends CDKTestCase {
     }
 
     @Test
-    public void testGetBuilder() {
+    public void testBuilder() {
         TetrahedralChirality chirality = new TetrahedralChirality(
             molecule.getAtom(1), ligands, Stereo.CLOCKWISE
         );
+        Assert.assertNull(chirality.getBuilder());
+        chirality.setBuilder(DefaultChemObjectBuilder.getInstance());
         Assert.assertEquals(
             DefaultChemObjectBuilder.getInstance(),
             chirality.getBuilder()

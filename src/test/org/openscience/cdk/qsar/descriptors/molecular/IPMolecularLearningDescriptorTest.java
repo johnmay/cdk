@@ -26,13 +26,13 @@ import org.junit.Test;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IBond.Order;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.LonePairElectronChecker;
@@ -46,7 +46,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 	
 	private SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     private LonePairElectronChecker lpcheck = new LonePairElectronChecker();
 	/**
 	 *  Constructor for the IPMolecularLearningDescriptorTest object
@@ -74,7 +74,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 	 */
     @Test public void testIPDescriptor0() throws Exception{
         
-    	IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
 		mol.addAtom(builder.newInstance(IAtom.class,"C"));
 		mol.addAtom(builder.newInstance(IAtom.class,"C"));
 		mol.addBond(0, 1, IBond.Order.SINGLE);
@@ -104,7 +104,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 	 */
     @Test public void testIPDescriptor_1() throws Exception{
         
-		IMolecule mol = sp.parseSmiles("C-Cl");
+		IAtomContainer mol = sp.parseSmiles("C-Cl");
 
 		addExplicitHydrogens(mol);
 		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -121,7 +121,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 	 */
     @Test public void testIPDescriptor_2() throws Exception{
         
-		IMolecule mol = sp.parseSmiles("COCCCC=O");
+		IAtomContainer mol = sp.parseSmiles("COCCCC=O");
 
 		addExplicitHydrogens(mol);
 		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -140,7 +140,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 	 */
     @Test public void testIPDescriptor_3() throws Exception{
         
-		IMolecule mol = sp.parseSmiles("C=CCCC(=O)C");
+		IAtomContainer mol = sp.parseSmiles("C=CCCC(=O)C");
 		
 		addExplicitHydrogens(mol);
 		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -162,7 +162,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 //     * @throws java.lang.Exception
 //     */
 //    @Test public void testIPDescriptorReaction() throws ClassNotFoundException, CDKException, java.lang.Exception{
-//    	IMolecule mol = sp.parseSmiles("C-Cl");
+//    	IAtomContainer mol = sp.parseSmiles("C-Cl");
 //
 //		addExplicitHydrogens(mol);
 //		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -185,7 +185,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 //     * @throws java.lang.Exception
 //     */
 //    @Test public void testIPDescriptorReaction2() throws ClassNotFoundException, CDKException, java.lang.Exception{
-//    	IMolecule mol = sp.parseSmiles("CCCC");
+//    	IAtomContainer mol = sp.parseSmiles("CCCC");
 //
 //		addExplicitHydrogens(mol);
 //		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -205,7 +205,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 //     * @throws java.lang.Exception
 //     */
 //    @Test public void testIPDescriptorReaction3() throws ClassNotFoundException, CDKException, java.lang.Exception{
-//    	IMolecule mol = sp.parseSmiles("CCC#CCCO");
+//    	IAtomContainer mol = sp.parseSmiles("CCC#CCCO");
 //
 //		addExplicitHydrogens(mol);
 //		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -225,7 +225,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
 //     * @throws java.lang.Exception
 //     */
 //    @Test public void testIPDescriptorReaction4() throws ClassNotFoundException, CDKException, java.lang.Exception{
-//    	IMolecule mol = sp.parseSmiles("CCCCC=CO");
+//    	IAtomContainer mol = sp.parseSmiles("CCCCC=CO");
 //
 //		addExplicitHydrogens(mol);
 //		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -248,7 +248,7 @@ public class IPMolecularLearningDescriptorTest extends MolecularDescriptorTest {
      */
     @Test
     public void testBug_2787332_triclosan() throws Exception {
-    	IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
     	mol.addAtom(builder.newInstance(IAtom.class,"C"));//0
     	mol.addAtom(builder.newInstance(IAtom.class,"C"));//1
     	mol.addAtom(builder.newInstance(IAtom.class,"C"));//2

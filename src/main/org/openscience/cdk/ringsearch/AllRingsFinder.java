@@ -37,7 +37,6 @@ import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.tools.ILoggingTool;
@@ -130,10 +129,10 @@ public class AllRingsFinder
         startTime = System.currentTimeMillis();
         SpanningTree spanningTree = new SpanningTree(atomContainer);
         IAtomContainer ringSystems = spanningTree.getCyclicFragmentsContainer();
-        Iterator separateRingSystem = ConnectivityChecker.partitionIntoMolecules(ringSystems).molecules().iterator();
+        Iterator<IAtomContainer> separateRingSystem = ConnectivityChecker.partitionIntoMolecules(ringSystems).atomContainers().iterator();
         IRingSet resultSet = atomContainer.getBuilder().newInstance(IRingSet.class);
         while (separateRingSystem.hasNext()) {
-            resultSet.add(findAllRingsInIsolatedRingSystem((IMolecule)separateRingSystem.next(), maxRingSize));
+            resultSet.add(findAllRingsInIsolatedRingSystem((IAtomContainer)separateRingSystem.next(), maxRingSize));
         }
         return resultSet;
   }
@@ -355,9 +354,9 @@ public class AllRingsFinder
 	{
 		Path path;
 
-        Iterator bonds = ac.bonds().iterator();
+        Iterator<IBond> bonds = ac.bonds().iterator();
         while (bonds.hasNext()) {
-            IBond bond = (IBond) bonds.next();                    
+            IBond bond = bonds.next();                    
 			path = new Path(bond.getAtom(0), bond.getAtom(1));
 			paths.add(path);
 			if(logger!=null)

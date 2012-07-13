@@ -25,19 +25,15 @@
 package org.openscience.cdk.reaction.type;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.interfaces.IRing;
@@ -54,6 +50,10 @@ import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * <p>
  * This reaction could be represented as [A*]-(C)_5-C6[R] => A([R])-(C_5)-[C6*]. Due to 
@@ -61,8 +61,8 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
  * <p>It is processed by the RadicalSiteRearrangementMechanism class</p>
  * 
  * <pre>
- *  IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newMoleculeSet();
- *  setOfReactants.addMolecule(new Molecule());
+ *  IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newAtomContainerSet();
+ *  setOfReactants.addAtomContainer(new AtomContainer());
  *  IReactionProcess type = new RadicalSiteRrGammaReaction();
  *  Object[] params = {Boolean.FALSE};
     type.setParameters(params);
@@ -116,17 +116,18 @@ public class RadicalSiteRrGammaReaction extends ReactionEngine implements IReact
 	 *  It is needed to call the addExplicitHydrogensToSatisfyValency
 	 *  from the class tools.HydrogenAdder.
 	 *
-	 *@param  reactants         reactants of the reaction.
-	 *@param  agents            agents of the reaction (Must be in this case null).
-	 *
+     *
 	 *@exception  CDKException  Description of the Exception
-	 */
-    @TestMethod("testInitiate_IMoleculeSet_IMoleculeSet")
-	public IReactionSet initiate(IMoleculeSet reactants, IMoleculeSet agents) throws CDKException{
+
+     * @param  reactants         reactants of the reaction.
+    * @param  agents            agents of the reaction (Must be in this case null).
+     */
+    @TestMethod("testInitiate_IAtomContainerSet_IAtomContainerSet")
+	public IReactionSet initiate(IAtomContainerSet reactants, IAtomContainerSet agents) throws CDKException{
 
 		logger.debug("initiate reaction: RadicalSiteRrGammaReaction");
 		
-		if (reactants.getMoleculeCount() != 1) {
+		if (reactants.getAtomContainerCount() != 1) {
 			throw new CDKException("RadicalSiteRrGammaReaction only expects one reactant");
 		}
 		if (agents != null) {
@@ -134,12 +135,12 @@ public class RadicalSiteRrGammaReaction extends ReactionEngine implements IReact
 		}
 		
 		IReactionSet setOfReactions = reactants.getBuilder().newInstance(IReactionSet.class);
-		IMolecule reactant = reactants.getMolecule(0);
+		IAtomContainer reactant = reactants.getAtomContainer(0);
 
 		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(reactant);
 		CDKHueckelAromaticityDetector.detectAromaticity(reactant);
 		AllRingsFinder arf = new AllRingsFinder();
-		IRingSet ringSet = arf.findAllRings((IMolecule) reactant);
+		IRingSet ringSet = arf.findAllRings(reactant);
 		for (int ir = 0; ir < ringSet.getAtomContainerCount(); ir++) {
 			IRing ring = (IRing)ringSet.getAtomContainer(ir);
 			for (int jr = 0; jr < ring.getAtomCount(); jr++) {
@@ -159,10 +160,10 @@ public class RadicalSiteRrGammaReaction extends ReactionEngine implements IReact
 			if(atomi.getFlag(CDKConstants.REACTIVE_CENTER)
 					&& reactant.getConnectedSingleElectronsCount(atomi) == 1) {
 
-				hcg.getSpheres((IMolecule) reactant, atomi, 4, true);
+				hcg.getSpheres(reactant, atomi, 4, true);
 				List<IAtom> atom1s = hcg.getNodesInSphere(4);
 				
-				hcg.getSpheres((IMolecule) reactant, atomi, 5, true);
+				hcg.getSpheres(reactant, atomi, 5, true);
 				Iterator<IAtom> atomls = hcg.getNodesInSphere(5).iterator();
 				while(atomls.hasNext()){
 					IAtom atoml = atomls.next();
@@ -186,8 +187,8 @@ public class RadicalSiteRrGammaReaction extends ReactionEngine implements IReact
 				            	ArrayList<IBond> bondList = new ArrayList<IBond>();
 				            	bondList.add(reactant.getBond(atomR, atoml));
 
-								IMoleculeSet moleculeSet = reactant.getBuilder().newInstance(IMoleculeSet.class);
-								moleculeSet.addMolecule(reactant);
+								IAtomContainerSet moleculeSet = reactant.getBuilder().newInstance(IAtomContainerSet.class);
+								moleculeSet.addAtomContainer(reactant);
 								IReaction reaction = mechanism.initiate(moleculeSet, atomList, bondList);
 								if(reaction == null)
 									continue;
@@ -215,17 +216,17 @@ public class RadicalSiteRrGammaReaction extends ReactionEngine implements IReact
 	 * @param reactant The molecule to set the activity
 	 * @throws CDKException 
 	 */
-	private void setActiveCenters(IMolecule reactant) throws CDKException {
+	private void setActiveCenters(IAtomContainer reactant) throws CDKException {
 		HOSECodeGenerator hcg = new HOSECodeGenerator();
 		Iterator<IAtom> atomis = reactant.atoms().iterator();
 		while(atomis.hasNext()){
 			IAtom  atomi = atomis.next();
 			if(reactant.getConnectedSingleElectronsCount(atomi) == 1) {
 				
-				hcg.getSpheres((IMolecule) reactant, atomi, 4, true);
+				hcg.getSpheres(reactant, atomi, 4, true);
 				List<IAtom> atom1s = hcg.getNodesInSphere(4);
 				
-				hcg.getSpheres((IMolecule) reactant, atomi, 5, true);
+				hcg.getSpheres(reactant, atomi, 5, true);
 				Iterator<IAtom> atomls = hcg.getNodesInSphere(5).iterator();
 				while(atomls.hasNext()){
 					IAtom atoml = atomls.next();

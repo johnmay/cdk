@@ -30,11 +30,11 @@ import nu.xom.Element;
 
 import org.junit.Assert;
 import org.openscience.cdk.CDKTestCase;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.io.CMLReader;
@@ -61,12 +61,12 @@ public class CMLRoundTripTool extends CDKTestCase {
      *
      * @see org.openscience.cdk.CMLFragmentsTest
      */
-    public static IMolecule roundTripMolecule(Convertor convertor, IMolecule mol) throws Exception {
+    public static IAtomContainer roundTripMolecule(Convertor convertor, IAtomContainer mol) throws Exception {
         String cmlString = "<!-- failed -->";
-        Element cmlDOM = convertor.cdkMoleculeToCMLMolecule(mol);
+        Element cmlDOM = convertor.cdkAtomContainerToCMLMolecule(mol);
         cmlString = cmlDOM.toXML();
         
-        IMolecule roundTrippedMol = null;
+        IAtomContainer roundTrippedMol = null;
         logger.debug("CML string: ", cmlString);
         CMLReader reader = new CMLReader(new ByteArrayInputStream(cmlString.getBytes()));
 
@@ -78,10 +78,10 @@ public class CMLRoundTripTool extends CDKTestCase {
         Assert.assertEquals(1, sequence.getChemModelCount());
         IChemModel chemModel = sequence.getChemModel(0);
         Assert.assertNotNull(chemModel);
-        IMoleculeSet moleculeSet = chemModel.getMoleculeSet();
+        IAtomContainerSet moleculeSet = chemModel.getMoleculeSet();
         Assert.assertNotNull(moleculeSet);
-        Assert.assertEquals(1, moleculeSet.getMoleculeCount());
-        roundTrippedMol = moleculeSet.getMolecule(0);
+        Assert.assertEquals(1, moleculeSet.getAtomContainerCount());
+        roundTrippedMol = moleculeSet.getAtomContainer(0);
         Assert.assertNotNull(roundTrippedMol);
         
         return roundTrippedMol;

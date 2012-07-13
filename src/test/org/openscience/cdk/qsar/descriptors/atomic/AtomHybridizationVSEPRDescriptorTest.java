@@ -28,13 +28,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Bond;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.LonePairElectronChecker;
@@ -63,7 +63,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //O=CC
-        Molecule molecule = new Molecule();
+        IAtomContainer molecule = new AtomContainer();
         Atom O1 = new Atom("O");
         Atom c2 = new Atom("C");
         c2.setImplicitHydrogenCount(1);
@@ -92,7 +92,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //[O+]#CC
-        Molecule molecule = new Molecule();
+        IAtomContainer molecule = new AtomContainer();
         Atom O1 = new Atom("O");
         O1.setFormalCharge(1);
         Atom c2 = new Atom("C");
@@ -121,7 +121,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //[C+]CC
-        Molecule molecule = new Molecule();
+    	IAtomContainer molecule = new AtomContainer();
         Atom c1 = new Atom("C");
         c1.setFormalCharge(1);
         c1.setImplicitHydrogenCount(2);
@@ -152,7 +152,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //SO3
-        Molecule molecule = new Molecule();
+    	IAtomContainer molecule = new AtomContainer();
         Atom S1 = new Atom("S");
         Atom O2 = new Atom("O");
         Atom O3 = new Atom("O");
@@ -184,7 +184,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //XeF4
-        Molecule molecule = new Molecule();
+    	IAtomContainer molecule = new AtomContainer();
         Atom Xe1 = new Atom("Xe");
         Atom F2 = new Atom("F");
         Atom F3 = new Atom("F");
@@ -220,7 +220,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
 
         //IF2-
-        Molecule molecule = new Molecule();
+    	IAtomContainer molecule = new AtomContainer();
         Atom I1 = new Atom("I");
         I1.setFormalCharge(-1);
         Atom F2 = new Atom("F");
@@ -252,7 +252,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
         
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-		IMolecule mol = sp.parseSmiles("F-C=C");
+		IAtomContainer mol = sp.parseSmiles("F-C=C");
 
 		assertAtomTypesPerceived(mol);
         addExplicitHydrogens(mol);
@@ -280,7 +280,7 @@ public class AtomHybridizationVSEPRDescriptorTest extends AtomicDescriptorTest {
     	AtomHybridizationVSEPRDescriptor descriptor  = new AtomHybridizationVSEPRDescriptor();
         
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-		IMolecule mol = sp.parseSmiles("[F+]=C-[C-]");
+		IAtomContainer mol = sp.parseSmiles("[F+]=C-[C-]");
 
 		assertAtomTypesPerceived(mol);
 		addImplicitHydrogens(mol);

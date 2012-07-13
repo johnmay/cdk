@@ -1,20 +1,24 @@
 package org.openscience.cdk.qsar.descriptors.atomic;
 
+import java.io.InputStream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.interfaces.*;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.IDescriptorResult;
-
-import java.io.InputStream;
 
 /**
  * @cdk.module test-qsaratomic
@@ -38,8 +42,8 @@ public class RDFProtonDescriptor_G3RTest extends AtomicDescriptorTest {
 		ChemFile chemFile = (ChemFile)reader.read((ChemObject)new ChemFile());
 		IChemSequence seq = chemFile.getChemSequence(0);
 		IChemModel model = seq.getChemModel(0);
-		IMoleculeSet som = model.getMoleculeSet();
-		IMolecule mol = som.getMolecule(0);
+		IAtomContainerSet som = model.getMoleculeSet();
+		IAtomContainer mol = som.getAtomContainer(0);
 
 		for (int i=0; i < mol.getAtomCount(); i++) {
 //			System.out.println("Atom: " + mol.getAtom(i).getSymbol());
@@ -57,7 +61,7 @@ public class RDFProtonDescriptor_G3RTest extends AtomicDescriptorTest {
 
 	  @Test
     public void testReturnsNaNForNonHydrogen() throws Exception {
-	      IMolecule mol = new Molecule();
+	      IAtomContainer mol = new AtomContainer();
 	      IAtom atom = new Atom("O");
 	      mol.addAtom(atom);
 	      DescriptorValue dv = descriptor.calculate(atom,mol );

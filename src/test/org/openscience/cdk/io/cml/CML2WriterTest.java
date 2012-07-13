@@ -37,35 +37,34 @@ import org.junit.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.ReactionScheme;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.config.Elements;
 import org.openscience.cdk.formula.MolecularFormula;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.ICrystal;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.interfaces.IMolecularFormula;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IPDBAtom;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionScheme;
 import org.openscience.cdk.io.CMLWriter;
 import org.openscience.cdk.libio.cml.PDBAtomCustomizer;
 import org.openscience.cdk.libio.cml.QSARCustomizer;
-import org.openscience.cdk.nonotify.NNAtom;
-import org.openscience.cdk.nonotify.NNChemModel;
-import org.openscience.cdk.nonotify.NNCrystal;
-import org.openscience.cdk.nonotify.NNMolecule;
-import org.openscience.cdk.nonotify.NNMoleculeSet;
-import org.openscience.cdk.nonotify.NNPDBAtom;
-import org.openscience.cdk.nonotify.NNReaction;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.silent.AtomContainer;
+import org.openscience.cdk.silent.AtomContainerSet;
+import org.openscience.cdk.silent.ChemModel;
+import org.openscience.cdk.silent.Crystal;
+import org.openscience.cdk.silent.PDBAtom;
+import org.openscience.cdk.silent.Reaction;
 import org.openscience.cdk.templates.MoleculeFactory;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -84,7 +83,7 @@ public class CML2WriterTest extends CDKTestCase {
 
     @Test public void testCMLWriterBenzene() throws Exception {
 		StringWriter writer = new StringWriter();
-        IMolecule molecule = MoleculeFactory.makeBenzene();
+		IAtomContainer molecule = MoleculeFactory.makeBenzene();
         CDKHueckelAromaticityDetector.detectAromaticity(molecule);
         CMLWriter cmlWriter = new CMLWriter(writer);
         
@@ -102,7 +101,7 @@ public class CML2WriterTest extends CDKTestCase {
 	 */
 	@Test public void testHydrogenCount() throws Exception {
 		StringWriter writer = new StringWriter();
-		IMolecule molecule = new NNMolecule(); // methane
+		IAtomContainer molecule = new AtomContainer(); // methane
 		molecule.addAtom(molecule.getBuilder().newInstance(IAtom.class,Elements.CARBON));
 		molecule.getAtom(0).setImplicitHydrogenCount(4);
         CMLWriter cmlWriter = new CMLWriter(writer);
@@ -116,7 +115,7 @@ public class CML2WriterTest extends CDKTestCase {
 
 	@Test public void testNullFormalCharge() throws Exception {
 	    StringWriter writer = new StringWriter();
-	    IMolecule molecule = new NNMolecule(); // methane
+	    IAtomContainer molecule = new AtomContainer(); // methane
 	    molecule.addAtom(molecule.getBuilder().newInstance(IAtom.class,Elements.CARBON));
 	    molecule.getAtom(0).setFormalCharge(null);
 	    CMLWriter cmlWriter = new CMLWriter(writer);
@@ -134,7 +133,7 @@ public class CML2WriterTest extends CDKTestCase {
    */
 	@Test public void testMassNumber() throws Exception {
 	    StringWriter writer = new StringWriter();
-	    Molecule mol = new Molecule();
+	    IAtomContainer mol = new AtomContainer();
 	    Atom atom = new Atom("C");
 	    atom.setMassNumber( new Integer(12) );
 	    mol.addAtom( atom );
@@ -154,7 +153,7 @@ public class CML2WriterTest extends CDKTestCase {
 	 */
 	@Test public void testHydrogenCount_2() throws Exception {
 		StringWriter writer = new StringWriter();
-		IMolecule molecule = new NNMolecule(); // methane
+		IAtomContainer molecule = new AtomContainer(); // methane
 		molecule.addAtom(molecule.getBuilder().newInstance(IAtom.class,Elements.CARBON));
 		molecule.addAtom(molecule.getBuilder().newInstance(IAtom.class,Elements.HYDROGEN));
 		molecule.getAtom(0).setImplicitHydrogenCount(3);
@@ -170,8 +169,8 @@ public class CML2WriterTest extends CDKTestCase {
 	
 	@Test public void testCMLCrystal() throws Exception {
 		StringWriter writer = new StringWriter();
-        ICrystal crystal = new NNCrystal();
-        IAtom silicon = new NNAtom("Si");
+        ICrystal crystal = new Crystal();
+        IAtom silicon = new Atom("Si");
         silicon.setFractionalPoint3d(
         	new Point3d(0.0, 0.0, 0.0)
         );
@@ -192,7 +191,7 @@ public class CML2WriterTest extends CDKTestCase {
 	
     @Test public void testQSARCustomization() throws Exception {
         StringWriter writer = new StringWriter();
-        IMolecule molecule = MoleculeFactory.makeBenzene();
+        IAtomContainer molecule = MoleculeFactory.makeBenzene();
         IMolecularDescriptor descriptor = new WeightDescriptor();
 
         CMLWriter cmlWriter = new CMLWriter(writer);
@@ -212,13 +211,13 @@ public class CML2WriterTest extends CDKTestCase {
     
     @Test public void testReactionCustomization() throws Exception {
     	StringWriter writer = new StringWriter();
-        IReaction reaction = new NNReaction();
+        IReaction reaction = new Reaction();
         reaction.setID("reaction1");
-        IMolecule reactant = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer reactant = reaction.getBuilder().newInstance(IAtomContainer.class);
         reactant.setID("react");
-        IMolecule product = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer product = reaction.getBuilder().newInstance(IAtomContainer.class);
         product.setID("product");
-        IMolecule agent = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer agent = reaction.getBuilder().newInstance(IAtomContainer.class);
         agent.setID("agent");
         
         reaction.addReactant(reactant);
@@ -239,8 +238,8 @@ public class CML2WriterTest extends CDKTestCase {
     
     @Test public void testPDBAtomCustomization() throws Exception {
         StringWriter writer = new StringWriter();
-        IMolecule molecule = new NNMolecule();
-        IPDBAtom atom = new NNPDBAtom("C");
+        IAtomContainer molecule = new AtomContainer();
+        IPDBAtom atom = new PDBAtom("C");
         atom.setName("CA");
         atom.setResName("PHE");
         molecule.addAtom(atom);
@@ -265,9 +264,9 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction = scheme1.getBuilder().newInstance(IReaction.class);
         reaction.setID("r1");
-        IMolecule moleculeA = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeA = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeA.setID("A");
-        IMolecule moleculeB = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeB = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeB.setID("B");
         reaction.addReactant(moleculeA);
         reaction.addProduct(moleculeB);
@@ -276,7 +275,7 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction2 = reaction.getBuilder().newInstance(IReaction.class);
         reaction2.setID("r2");
-        IMolecule moleculeC = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeC = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeC.setID("C");
         reaction2.addReactant(moleculeB);
         reaction2.addProduct(moleculeC);
@@ -306,9 +305,9 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction = DefaultChemObjectBuilder.getInstance().newInstance(IReaction.class);
         reaction.setID("r1");
-        IMolecule moleculeA = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeA = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeA.setID("A");
-        IMolecule moleculeB = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeB = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeB.setID("B");
         reaction.addReactant(moleculeA);
         reaction.addProduct(moleculeB);
@@ -317,7 +316,7 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction2 = reaction.getBuilder().newInstance(IReaction.class);
         reaction2.setID("r2");
-        IMolecule moleculeC = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeC = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeC.setID("C");
         reaction2.addReactant(moleculeB);
         reaction2.addProduct(moleculeC);
@@ -345,7 +344,7 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction = DefaultChemObjectBuilder.getInstance().newInstance(IReaction.class);
         reaction.setID("r1");
-        IMolecule moleculeA = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeA = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeA.setID("A");
         IMolecularFormula formula = new MolecularFormula();
         formula.addIsotope(reaction.getBuilder().newInstance(IIsotope.class,"C"), 10);
@@ -353,7 +352,7 @@ public class CML2WriterTest extends CDKTestCase {
         formula.addIsotope(reaction.getBuilder().newInstance(IIsotope.class,"N"), 2);
         formula.addIsotope(reaction.getBuilder().newInstance(IIsotope.class,"O"), 1);
         moleculeA.setProperty(CDKConstants.FORMULA,formula);
-        IMolecule moleculeB = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeB = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeB.setID("B");
         reaction.addReactant(moleculeA);
         reaction.addProduct(moleculeB);
@@ -362,7 +361,7 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction2 = reaction.getBuilder().newInstance(IReaction.class);
         reaction2.setID("r2");
-        IMolecule moleculeC = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeC = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeC.setID("C");
         reaction2.addReactant(moleculeB);
         reaction2.addProduct(moleculeC);
@@ -393,10 +392,10 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction = DefaultChemObjectBuilder.getInstance().newInstance(IReaction.class);
         reaction.setID("r1");
-        IMolecule moleculeA = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeA = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeA.setID("A");
         moleculeA.setProperty(CDKConstants.FORMULA,"C 10 H 15 N 2 O 1");
-        IMolecule moleculeB = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeB = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeB.setID("B");
         reaction.addReactant(moleculeA);
         reaction.addProduct(moleculeB);
@@ -405,7 +404,7 @@ public class CML2WriterTest extends CDKTestCase {
         
         IReaction reaction2 = reaction.getBuilder().newInstance(IReaction.class);
         reaction2.setID("r2");
-        IMolecule moleculeC = reaction.getBuilder().newInstance(IMolecule.class);
+        IAtomContainer moleculeC = reaction.getBuilder().newInstance(IAtomContainer.class);
         moleculeC.setID("C");
         reaction2.addReactant(moleculeB);
         reaction2.addProduct(moleculeC);
@@ -428,7 +427,7 @@ public class CML2WriterTest extends CDKTestCase {
     }
     @Test public void testChemModeID() throws Exception {
     	StringWriter writer = new StringWriter();
-    	IChemModel chemModel = new NNChemModel();
+    	IChemModel chemModel = new ChemModel();
     	chemModel.setID("cm0");
     	
     	CMLWriter cmlWriter = new CMLWriter(writer);
@@ -441,7 +440,7 @@ public class CML2WriterTest extends CDKTestCase {
     }
     @Test public void testMoleculeSetID() throws Exception {
     	StringWriter writer = new StringWriter();
-    	IMoleculeSet moleculeSet = new NNMoleculeSet();
+    	IAtomContainerSet moleculeSet = new AtomContainerSet();
     	moleculeSet.setID("ms0");
     	
     	CMLWriter cmlWriter = new CMLWriter(writer);
@@ -477,9 +476,9 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction = DefaultChemObjectBuilder.getInstance().newInstance(IReaction.class);
 //        reaction.setID("r1");
-//        IMolecule moleculeA = reaction.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeA = reaction.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeA.setID("A");
-//        IMolecule moleculeB = reaction.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeB = reaction.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeB.setID("B");
 //        reaction.addReactant(moleculeA);
 //        reaction.addProduct(moleculeB);
@@ -488,7 +487,7 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction2 = reaction.getNewBuilder().newInstance(IReaction.class);
 //        reaction2.setID("r2");
-//        IMolecule moleculeC = reaction.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeC = reaction.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeC.setID("C");
 //        reaction2.addReactant(moleculeB);
 //        reaction2.addProduct(moleculeC);
@@ -520,9 +519,9 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction1 = DefaultChemObjectBuilder.getInstance().newInstance(IReaction.class);
 //        reaction1.setID("r1.1");
-//        IMolecule moleculeA = reaction1.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeA = reaction1.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeA.setID("A");
-//        IMolecule moleculeB = reaction1.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeB = reaction1.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeB.setID("B");
 //        reaction1.addReactant(moleculeA);
 //        reaction1.addProduct(moleculeB);
@@ -531,7 +530,7 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction2 = reaction1.getNewBuilder().newInstance(IReaction.class);
 //        reaction2.setID("r1.2");
-//        IMolecule moleculeC = reaction1.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeC = reaction1.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeC.setID("C");
 //        reaction2.addReactant(moleculeB);
 //        reaction2.addProduct(moleculeC);
@@ -543,7 +542,7 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction3 = reaction1.getNewBuilder().newInstance(IReaction.class);
 //        reaction3.setID("r2.1");
-//        IMolecule moleculeD = reaction1.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeD = reaction1.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeD.setID("D");
 //        reaction3.addReactant(moleculeA);
 //        reaction3.addProduct(moleculeD);
@@ -552,7 +551,7 @@ public class CML2WriterTest extends CDKTestCase {
 //        
 //        IReaction reaction4 = reaction1.getNewBuilder().newInstance(IReaction.class);
 //        reaction4.setID("r2.2");
-//        IMolecule moleculeE = reaction1.getNewBuilder().newInstance(IMolecule.class);
+//        IAtomContainer moleculeE = reaction1.getNewBuilder().newInstance(IAtomContainer.class);
 //        moleculeE.setID("E");
 //        reaction4.addReactant(moleculeD);
 //        reaction4.addProduct(moleculeE);

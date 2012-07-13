@@ -38,6 +38,7 @@ import org.openscience.cdk.dict.DictionaryDatabase;
 import org.openscience.cdk.geometry.CrystalGeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
@@ -47,8 +48,6 @@ import org.openscience.cdk.interfaces.ICrystal;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.interfaces.IMolecularFormulaSet;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IMonomer;
 import org.openscience.cdk.interfaces.IPDBPolymer;
 import org.openscience.cdk.interfaces.IPseudoAtom;
@@ -235,7 +234,7 @@ public class Convertor {
             cmlList.appendChild(cdkReactionSetToCMLReactionList(model.getReactionSet(), false));
         }
         if (model.getMoleculeSet() != null) {
-            cmlList.appendChild(cdkMoleculeSetToCMLList(model.getMoleculeSet(), false));
+            cmlList.appendChild(cdkAtomContainerSetToCMLList(model.getMoleculeSet(), false));
         }
 
         return cmlList;
@@ -243,7 +242,7 @@ public class Convertor {
     
     public CMLCml cdkReactionSchemeToCMLReactionSchemeAndMoleculeList(IReactionScheme cdkScheme){
     	CMLCml cml = new CMLCml();
-    	cml.appendChild(cdkMoleculeSetToCMLList(ReactionSchemeManipulator.getAllMolecules(cdkScheme)));
+    	cml.appendChild(cdkAtomContainerSetToCMLList(ReactionSchemeManipulator.getAllAtomContainers(cdkScheme)));
     	cml.appendChild(cdkReactionSchemeToCMLReactionScheme(cdkScheme, true, true));
     	return cml;
     }
@@ -305,11 +304,11 @@ public class Convertor {
         return reactionList;
     }
 
-    public CMLMoleculeList cdkMoleculeSetToCMLList(IMoleculeSet moleculeSet) {
-        return cdkMoleculeSetToCMLList(moleculeSet, true);
+    public CMLMoleculeList cdkAtomContainerSetToCMLList(IAtomContainerSet moleculeSet) {
+        return cdkAtomContainerSetToCMLList(moleculeSet, true);
     }
 
-    private CMLMoleculeList cdkMoleculeSetToCMLList(IMoleculeSet moleculeSet, boolean setIDs) {
+    private CMLMoleculeList cdkAtomContainerSetToCMLList(IAtomContainerSet moleculeSet, boolean setIDs) {
     	CMLMoleculeList cmlList = new CMLMoleculeList();
         cmlList.setConvention("cdk:moleculeSet");
 
@@ -320,16 +319,10 @@ public class Convertor {
         	cmlList.setId(moleculeSet.getID());
         	
         for (int i = 0; i < moleculeSet.getAtomContainerCount(); i++) {
-            IAtomContainer container = moleculeSet.getMolecule(i);
-            if (container instanceof IMolecule) {
-                cmlList.appendChild(
-                    cdkMoleculeToCMLMolecule((IMolecule)container, false)
-                );
-            } else {
-                cmlList.appendChild(
-                    cdkAtomContainerToCMLMolecule(container, false, false)
-                );
-            }
+            IAtomContainer container = moleculeSet.getAtomContainer(i);
+            cmlList.appendChild(
+                cdkAtomContainerToCMLMolecule(container, false, false)
+            );
         }
         return cmlList;
     }
@@ -367,29 +360,29 @@ public class Convertor {
         
         // reactants
         CMLReactantList cmlReactants = new CMLReactantList();
-        Iterator<IAtomContainer> reactants = reaction.getReactants().molecules().iterator();
+        Iterator<IAtomContainer> reactants = reaction.getReactants().atomContainers().iterator();
         while (reactants.hasNext()) {
             CMLReactant cmlReactant = new CMLReactant();
-            cmlReactant.addMolecule(cdkMoleculeToCMLMolecule((IMolecule)reactants.next(), false));
+            cmlReactant.addMolecule(cdkAtomContainerToCMLMolecule(reactants.next()));
             cmlReactants.addReactant(cmlReactant);
             
         }
 
         // products
         CMLProductList cmlProducts = new CMLProductList();
-        Iterator<IAtomContainer> products = reaction.getProducts().molecules().iterator();
+        Iterator<IAtomContainer> products = reaction.getProducts().atomContainers().iterator();
         while (products.hasNext()) {
             CMLProduct cmlProduct = new CMLProduct();
-            cmlProduct.addMolecule(cdkMoleculeToCMLMolecule((IMolecule)products.next(), false));
+            cmlProduct.addMolecule(cdkAtomContainerToCMLMolecule(products.next()));
             cmlProducts.addProduct(cmlProduct);
         }
         
 //      substance
         CMLSubstanceList cmlSubstances = new CMLSubstanceList();
-        Iterator<IAtomContainer> substance = reaction.getAgents().molecules().iterator();
+        Iterator<IAtomContainer> substance = reaction.getAgents().atomContainers().iterator();
         while (substance.hasNext()) {
             CMLSubstance cmlSubstance = new CMLSubstance();
-            cmlSubstance.addMolecule(cdkMoleculeToCMLMolecule((IMolecule)substance.next(), false));
+            cmlSubstance.addMolecule(cdkAtomContainerToCMLMolecule(substance.next()));
             cmlSubstances.addSubstance(cmlSubstance);
         }
         if (reaction.getID() != null) 
@@ -473,14 +466,6 @@ public class Convertor {
             cmlMolecule.addAtom(cmlAtom);
        	}
         return cmlMolecule;
-    }
-
-    public CMLMolecule cdkMoleculeToCMLMolecule(IMolecule structure) {
-        return cdkMoleculeToCMLMolecule(structure, true);
-    }
-
-    private CMLMolecule cdkMoleculeToCMLMolecule(IMolecule structure, boolean setIDs) {
-        return cdkAtomContainerToCMLMolecule(structure, setIDs, false);
     }
 
     public CMLMolecule cdkAtomContainerToCMLMolecule(IAtomContainer structure) {
@@ -734,8 +719,10 @@ public class Convertor {
             this.checkPrefix(bondStereo);
             if (cdkBond.getStereo() == IBond.Stereo.UP) {
                 bondStereo.setDictRef("cml:W");
+                bondStereo.setXMLContent("W");
             } else {
                 bondStereo.setDictRef("cml:H");
+                bondStereo.setXMLContent("H");
             }
             cmlBond.appendChild(bondStereo);
         }

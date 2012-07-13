@@ -1,6 +1,4 @@
-/* $Revision$ $Author$ $Date$
- *
- * Copyright (C) 2004-2007  Matteo Floris <mfe4@users.sf.net>
+/* Copyright (C) 2004-2007  Matteo Floris <mfe4@users.sf.net>
  * Copyright (C) 2006-2007  Federico
  *
  * Contact: cdk-devel@lists.sourceforge.net
@@ -29,8 +27,6 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.Ring;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
@@ -41,6 +37,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.qsar.DescriptorSpecification;
 import org.openscience.cdk.qsar.DescriptorValue;
@@ -190,7 +187,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
 /////////////////////////FIRST SECTION OF MAIN METHOD: DEFINITION OF MAIN VARIABLES
 /////////////////////////AND AROMATICITY AND PI-SYSTEM AND RINGS DETECTION
 
-        Molecule mol = new Molecule(varAtomContainer);
+        IAtomContainer mol = varAtomContainer.getBuilder().newInstance(IAtomContainer.class, varAtomContainer);
         if (varAtomContainer != acold) {
             acold = varAtomContainer;
 // DETECTION OF pi SYSTEMS
@@ -219,7 +216,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
             }
         }
         IRingSet rsAtom;
-        Ring ring;
+        IRing ring;
         IRingSet ringsWithThisBond;
 // SET ISINRING FLAGS FOR BONDS
         Iterator<IBond> bondsInContainer = varAtomContainer.bonds().iterator();
@@ -302,7 +299,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
                                 if (!curAtomThird.equals(neighbour0)) {
                                     rsAtom = varRingSet.getRings(thirdBond);
                                     for (int f = 0; f < rsAtom.getAtomContainerCount(); f++) {
-                                        ring = (Ring) rsAtom.getAtomContainer(f);
+                                        ring = (IRing) rsAtom.getAtomContainer(f);
                                         if (ring.getRingSize() > 4 && ring.contains(thirdBond)) {
                                             theBondIsInA6MemberedRing = true;
                                         }
@@ -448,7 +445,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
 
 //Others definitions
 
-    private boolean getIfBondIsNotRotatable(Molecule mol, IBond bond, IAtomContainer detected) {
+    private boolean getIfBondIsNotRotatable(IAtomContainer mol, IBond bond, IAtomContainer detected) {
         boolean isBondNotRotatable = false;
         int counter = 0;
         IAtom atom0 = bond.getAtom(0);
@@ -474,7 +471,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
         return isBondNotRotatable;
     }
 
-    private boolean getIfACarbonIsDoubleBondedToAnOxygen(Molecule mol, IAtom carbonAtom) {
+    private boolean getIfACarbonIsDoubleBondedToAnOxygen(IAtomContainer mol, IAtom carbonAtom) {
         boolean isDoubleBondedToOxygen = false;
         List<IAtom> neighToCarbon = mol.getConnectedAtomsList(carbonAtom);
         IBond tmpBond;
@@ -535,7 +532,7 @@ public class RDFProtonDescriptor_GSR implements IAtomicDescriptor {
 
     // given a double bond
     // this method returns a bond bonded to this double bond
-    private int getNearestBondtoAGivenAtom(Molecule mol, IAtom atom, IBond bond) {
+    private int getNearestBondtoAGivenAtom(IAtomContainer mol, IAtom atom, IBond bond) {
         int nearestBond = 0;
         double[] values;
         double distance = 0;

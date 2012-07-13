@@ -32,8 +32,6 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
 import org.openscience.cdk.isomorphism.matchers.QueryAtomContainer;
@@ -228,27 +226,27 @@ public class StructureResonanceGenerator {
 	 * @param molecule The IMolecule to analyze
 	 * @return         The different resonance structures
 	 */
-    @TestMethod("testGetStructures_IMolecule")
-	public IMoleculeSet getStructures(IMolecule molecule) {
+    @TestMethod("testGetStructures_IAtomContainer")
+	public IAtomContainerSet getStructures(IAtomContainer molecule) {
     	int countStructure = 0;
-    	IMoleculeSet setOfMol = molecule.getBuilder().newInstance(IMoleculeSet.class);
-		setOfMol.addMolecule(molecule);
+    	IAtomContainerSet setOfMol = molecule.getBuilder().newInstance(IAtomContainerSet.class);
+		setOfMol.addAtomContainer(molecule);
 		
-		for(int i = 0 ; i < setOfMol.getMoleculeCount() ; i++){
-			IMolecule mol = setOfMol.getMolecule(i);
+		for(int i = 0 ; i < setOfMol.getAtomContainerCount() ; i++){
+			IAtomContainer mol = setOfMol.getAtomContainer(i);
             for (IReactionProcess aReactionsList : reactionsList) {
                 IReactionProcess reaction = aReactionsList;
-                IMoleculeSet setOfReactants = molecule.getBuilder().newInstance(IMoleculeSet.class);
-                setOfReactants.addMolecule(mol);
+                IAtomContainerSet setOfReactants = molecule.getBuilder().newInstance(IAtomContainerSet.class);
+                setOfReactants.addAtomContainer(mol);
                 try {
                     IReactionSet setOfReactions = reaction.initiate(setOfReactants, null);
                     if (setOfReactions.getReactionCount() != 0)
                         for (int k = 0; k < setOfReactions.getReactionCount(); k++)
                             for (int j = 0; j < setOfReactions.getReaction(k).getProducts().getAtomContainerCount(); j++)
                             {
-                                IMolecule product = setOfReactions.getReaction(k).getProducts().getMolecule(j);
+                                IAtomContainer product = setOfReactions.getReaction(k).getProducts().getAtomContainer(j);
                                 if (!existAC(setOfMol, product)) {
-                                    setOfMol.addMolecule(product);
+                                    setOfMol.addAtomContainer(product);
                                     countStructure++;
                                     if (countStructure > maxStructures)
                                         return setOfMol;
@@ -269,18 +267,18 @@ public class StructureResonanceGenerator {
 	 * @param molecule The IMolecule to analyze
 	 * @return         The different containers
 	 */
-    @TestMethod("testGetContainers_IMolecule")
-	public IAtomContainerSet getContainers(IMolecule molecule) {
+    @TestMethod("testGetContainers_IAtomContainer")
+	public IAtomContainerSet getContainers(IAtomContainer molecule) {
     	IAtomContainerSet setOfCont = molecule.getBuilder().newInstance(IAtomContainerSet.class);
-		IMoleculeSet setOfMol = getStructures(molecule);
+		IAtomContainerSet setOfMol = getStructures(molecule);
 		
-		if(setOfMol.getMoleculeCount() == 0)
+		if(setOfMol.getAtomContainerCount() == 0)
 			return setOfCont;
 
 		/*extraction of all bonds which has been produced a changes of order*/
 		List<IBond> bondList = new ArrayList<IBond>();
-    	for(int i = 1 ; i < setOfMol.getMoleculeCount() ; i++){
-    		IMolecule mol = setOfMol.getMolecule(i);
+    	for(int i = 1 ; i < setOfMol.getAtomContainerCount() ; i++){
+    		IAtomContainer mol = setOfMol.getAtomContainer(i);
     		for(int j = 0; j < mol.getBondCount(); j++){
 				IBond bond = molecule.getBond(j);
 				if(!mol.getBond(j).getOrder().equals(bond.getOrder())){
@@ -370,8 +368,8 @@ public class StructureResonanceGenerator {
 	 * @param atom     The IAtom
 	 * @return         The container with the atom
 	 */
-    @TestMethod("testGetContainer_IMolecule_IAtom")
-	public IAtomContainer getContainer(IMolecule molecule, IAtom atom) {
+    @TestMethod("testGetContainer_IAtomContainer_IAtom")
+	public IAtomContainer getContainer(IAtomContainer molecule, IAtom atom) {
     	IAtomContainerSet setOfCont = getContainers(molecule);
     	if(setOfCont == null)
     		return null;
@@ -392,8 +390,8 @@ public class StructureResonanceGenerator {
 	 * @param bond     The IBond
 	 * @return         The container with the bond
 	 */
-    @TestMethod("testGetContainer_IMolecule_IBond")
-	public IAtomContainer getContainer(IMolecule molecule, IBond bond) {
+    @TestMethod("testGetContainer_IAtomContainer_IBond")
+	public IAtomContainer getContainer(IAtomContainer molecule, IBond bond) {
     	IAtomContainerSet setOfCont = getContainers(molecule);
     	if(setOfCont == null)
     		return null;
@@ -417,7 +415,7 @@ public class StructureResonanceGenerator {
 
 		IAtomContainer acClone = null;
     	try {
-    		acClone = (IMolecule) atomContainer.clone();
+    		acClone = (IAtomContainer) atomContainer.clone();
 			if(!lookingSymmetry){ /*remove all aromatic flags*/
 				for (IAtom atom : acClone.atoms()) atom.setFlag(CDKConstants.ISAROMATIC, false);
 				for (IBond bond : acClone.bonds()) bond.setFlag(CDKConstants.ISAROMATIC, false);

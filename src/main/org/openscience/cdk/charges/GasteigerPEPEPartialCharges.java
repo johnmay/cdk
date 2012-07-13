@@ -39,8 +39,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.reaction.IReactionProcess;
 import org.openscience.cdk.reaction.type.HeterolyticCleavagePBReaction;
@@ -201,10 +199,10 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
 		
 		/*find resonance containers, which eliminates the repetitions*/
 		StructureResonanceGenerator gRN = new StructureResonanceGenerator();/*according G. should be integrated the breaking bonding*/
-		IAtomContainerSet acSet = gRN.getContainers((IMolecule) removingFlagsAromaticity(ac));
+		IAtomContainerSet acSet = gRN.getContainers(removingFlagsAromaticity(ac));
 //		IAtomContainerSet acSet = ConjugatedPiSystemsDetector.detect(removingFlagsAromaticity(ac));
 		
-		IMoleculeSet iSet = ac.getBuilder().newInstance(IMoleculeSet.class);
+		IAtomContainerSet iSet = ac.getBuilder().newInstance(IAtomContainerSet.class);
 		iSet.addAtomContainer(ac);
 		
 		if(acSet != null)
@@ -218,10 +216,10 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
 			else
 				reactionList1.add(reactionHCPB);
 			
-			IMoleculeSet a = gR1.getStructures((IMolecule) removingFlagsAromaticity(ac));
+			IAtomContainerSet a = gR1.getStructures( removingFlagsAromaticity(ac));
 			if(a.getAtomContainerCount() > 1){
 				for(int j = 1; j < a.getAtomContainerCount(); j ++){ // the first is already added
-					iSet.addAtomContainer(a.getMolecule(j));			
+					iSet.addAtomContainer(a.getAtomContainer(j));
 				}
 			}
 			ac = setFlags(container, ac, false);
@@ -230,10 +228,10 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
 			for(int number = 0; number < ac.getBondCount() ; number++){
 				IAtomContainer aa = setAntiFlags(container,ac, number,true);
 				if(aa != null){
-					IMoleculeSet ab = gR2.getStructures((IMolecule) aa);
+					IAtomContainerSet ab = gR2.getStructures(aa);
 					if(ab.getAtomContainerCount() > 1)
 						for(int j = 1; j < ab.getAtomContainerCount(); j ++){ // the first is already added
-							iSet.addAtomContainer(ab.getMolecule(j));			
+							iSet.addAtomContainer(ab.getAtomContainer(j));
 						}
 					ac = setAntiFlags(container, aa, number, false);
 				}
@@ -489,7 +487,7 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
         IReactionProcess type = new HeterolyticCleavageSBReaction();
         cleanFlagReactiveCenter(ac);
         boolean found = false; /* control obtained containers */
-		IMoleculeSet setOfReactants = ac.getBuilder().newInstance(IMoleculeSet.class);
+		IAtomContainerSet setOfReactants = ac.getBuilder().newInstance(IAtomContainerSet.class);
 		/* search of reactive center.*/
 		out:
 		for(int i = 0 ; i < ac.getBondCount() ; i++){
@@ -520,7 +518,7 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
 			return null;
 		
 		
-		setOfReactants.addMolecule((IMolecule) ac);
+		setOfReactants.addAtomContainer(ac);
 		
 		List<IParameterReact> paramList = new ArrayList<IParameterReact>();
 	    IParameterReact param = new SetReactionCenter();
@@ -530,14 +528,14 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
         IReactionSet setOfReactions = type.initiate(setOfReactants, null);
         for(int i = 0; i < setOfReactions.getReactionCount(); i++){
         	type = new HyperconjugationReaction();
-    		IMoleculeSet setOfM2 = ac.getBuilder().newInstance(IMoleculeSet.class);
-    		IMolecule mol= setOfReactions.getReaction(i).getProducts().getMolecule(0);
+    		IAtomContainerSet setOfM2 = ac.getBuilder().newInstance(IAtomContainerSet.class);
+    		IAtomContainer mol= setOfReactions.getReaction(i).getProducts().getAtomContainer(0);
     		for(int k = 0; k < mol.getBondCount(); k++){
     			mol.getBond(k).setFlag(CDKConstants.REACTIVE_CENTER,false);
     			mol.getBond(k).getAtom(0).setFlag(CDKConstants.REACTIVE_CENTER,false);
     			mol.getBond(k).getAtom(1).setFlag(CDKConstants.REACTIVE_CENTER,false);
     		}
-    		setOfM2.addMolecule((IMolecule) mol);
+    		setOfM2.addAtomContainer(mol);
     		List<IParameterReact> paramList2 = new ArrayList<IParameterReact>();
     	    IParameterReact param2 = new SetReactionCenter();
             param2.setParameter(Boolean.FALSE);
@@ -546,7 +544,7 @@ public class GasteigerPEPEPartialCharges implements IChargeCalculator {
             IReactionSet setOfReactions2 = type.initiate(setOfM2, null);
 			if(setOfReactions2.getReactionCount() > 0){
 				
-			IMolecule react = setOfReactions2.getReaction(0).getReactants().getMolecule(0);
+			IAtomContainer react = setOfReactions2.getReaction(0).getReactants().getAtomContainer(0);
 
 			set.addAtomContainer(react);
 			}

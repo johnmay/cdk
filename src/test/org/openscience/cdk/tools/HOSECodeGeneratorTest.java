@@ -32,15 +32,15 @@ import javax.vecmath.Point2d;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
+import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
@@ -62,7 +62,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
         String filename = "data/mdl/2,5-dimethyl-furan.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);
-        Molecule mol1 = (Molecule) reader.read(new Molecule());
+        IAtomContainer mol1 = reader.read(DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
 		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol1);
         CDKHueckelAromaticityDetector.detectAromaticity(mol1);
         Assert.assertEquals(new HOSECodeGenerator().getHOSECode(mol1, mol1.getAtom(2), 6),new HOSECodeGenerator().getHOSECode(mol1, mol1.getAtom(3), 6));
@@ -78,12 +78,12 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
         String filename = "data/mdl/isopropylacetate.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);
-        Molecule mol1 = (Molecule) reader.read(new Molecule());
+        IAtomContainer mol1 = reader.read(DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
         String code1=new HOSECodeGenerator().getHOSECode(mol1, mol1.getAtom(0), 6);
         filename="data/mdl/testisopropylacetate.mol";
         InputStream ins2 = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLV2000Reader reader2 = new MDLV2000Reader(ins2, Mode.STRICT);
-        Molecule mol2 = (Molecule) reader2.read(new Molecule());
+        IAtomContainer mol2 = reader2.read(DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
         String code2=new HOSECodeGenerator().getHOSECode(mol2, mol2.getAtom(2), 6);
         Assert.assertNotSame(code2, code1);
 	}
@@ -123,7 +123,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
 			"C-3;*C*C*C(//)"
 		};
 		
-		  IMolecule mol = new Molecule();
+		  IAtomContainer mol = new AtomContainer();
 		  IAtom a1 = mol.getBuilder().newInstance(IAtom.class,"O");
 		  a1.setPoint2d(new Point2d(502.88457268119913, 730.4999999999999));  mol.addAtom(a1);
 		  IAtom a2 = mol.getBuilder().newInstance(IAtom.class,"C");
@@ -348,7 +348,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
 "C-3;*C*C*C(*C*C,*C,*CC,O/*CC,*CC,*&O,*&,*C*C,&/*&,=OC,*&,=&,C,*C&,*C)"
 		};
 		
-		  IMolecule mol = new Molecule();
+		  IAtomContainer mol = new AtomContainer();
 		  IAtom a1 = mol.getBuilder().newInstance(IAtom.class,"O");
 		  a1.setPoint2d(new Point2d(502.88457268119913, 730.4999999999999));  mol.addAtom(a1);
 		  IAtom a2 = mol.getBuilder().newInstance(IAtom.class,"C");
@@ -484,7 +484,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
      "C-3;*C*C(*C,*C/*C*C,*&/*&*N,*C)",
      "C-3;*C*C(*C*C,*C/*C*N,*C,*&/*&,*&,*&)"};
 
-		IMolecule molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("C1(C=CN2)=C2C=CC=C1");
+		IAtomContainer molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("C1(C=CN2)=C2C=CC=C1");
 		//display(molecule);
 		HOSECodeGenerator hcg = new HOSECodeGenerator();
 		String s = null;
@@ -504,7 +504,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
 	 */
 	@Test public void testBug655169() throws Exception
 	{
-		IMolecule molecule = null;
+	    IAtomContainer molecule = null;
 		HOSECodeGenerator hcg = null;
 		String[] result = {
 		    "C-4;C(=C/Y/)",
@@ -558,7 +558,7 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
 	 */
 	@Test public void testBug795480() throws Exception
 	{
-		IMolecule molecule = null;
+	    IAtomContainer molecule = null;
 		HOSECodeGenerator hcg = null;
 		String[] result = {
 		    "C-4-;C(=C/Y'+4'/)",
@@ -586,11 +586,11 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
     }
 	
   	@Test public void testGetAtomsOfSphere() throws Exception {
-  		IMolecule molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("CC=CBr");
+  	  IAtomContainer molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("CC=CBr");
   		CDKHueckelAromaticityDetector.detectAromaticity(molecule);
   		HOSECodeGenerator hcg = new HOSECodeGenerator();
 
-  		hcg.getSpheres((Molecule) molecule, molecule.getAtom(0), 4, true);
+  		hcg.getSpheres(molecule, molecule.getAtom(0), 4, true);
   		List atoms = hcg.getNodesInSphere(3);
 
   		Assert.assertEquals(1, atoms.size());
@@ -598,11 +598,11 @@ public class HOSECodeGeneratorTest extends CDKTestCase {
 	}
   	
   	@Test public void testGetAtomsOfSphereWithHydr() throws Exception {
-  		IMolecule molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("C([H])([H])([H])C([H])=C([H])Br");
+  	    IAtomContainer molecule = (new SmilesParser(DefaultChemObjectBuilder.getInstance())).parseSmiles("C([H])([H])([H])C([H])=C([H])Br");
   		CDKHueckelAromaticityDetector.detectAromaticity(molecule);
   		HOSECodeGenerator hcg = new HOSECodeGenerator();
 
-  		hcg.getSpheres((Molecule) molecule, molecule.getAtom(0), 3, true);
+  		hcg.getSpheres(molecule, molecule.getAtom(0), 3, true);
   		List atoms = hcg.getNodesInSphere(3);
 
   		Assert.assertEquals(2, atoms.size());

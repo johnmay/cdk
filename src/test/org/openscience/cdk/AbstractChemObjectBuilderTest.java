@@ -32,9 +32,11 @@ import org.openscience.cdk.interfaces.IAtomParity;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBioPolymer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IBond.Order;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.ICrystal;
 import org.openscience.cdk.interfaces.IElectronContainer;
@@ -45,10 +47,7 @@ import org.openscience.cdk.interfaces.ILonePair;
 import org.openscience.cdk.interfaces.IMapping;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.interfaces.IMolecularFormulaSet;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IMonomer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IPDBAtom;
 import org.openscience.cdk.interfaces.IPDBMonomer;
 import org.openscience.cdk.interfaces.IPDBPolymer;
@@ -62,6 +61,8 @@ import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.interfaces.ISingleElectron;
 import org.openscience.cdk.interfaces.IStrand;
+import org.openscience.cdk.interfaces.ITetrahedralChirality;
+import org.openscience.cdk.interfaces.ITetrahedralChirality.Stereo;
 
 /**
  * Checks the functionality of {@link IChemObjectBuilder} implementations.
@@ -234,7 +235,7 @@ public abstract class AbstractChemObjectBuilderTest extends CDKTestCase {
         builder.newInstance(
             IBond.class,
             builder.newInstance(IAtom.class),
-            builder.newInstance(IMolecule.class)
+            builder.newInstance(IAtomContainer.class)
         );
     }
 
@@ -421,27 +422,6 @@ public abstract class AbstractChemObjectBuilderTest extends CDKTestCase {
         );
         Assert.assertNotNull(mapping);
     }
-    
-    @Test public void testNewMolecule() {
-        IChemObjectBuilder builder = rootObject.getBuilder();
-        IMolecule lonePair = builder.newInstance(IMolecule.class);
-        Assert.assertNotNull(lonePair);
-    }   
-
-    @Test public void testNewMolecule_int_int_int_int() {
-        IChemObjectBuilder builder = rootObject.getBuilder();
-        IMolecule lonePair = builder.newInstance(IMolecule.class, 1,2,3,4);
-        Assert.assertNotNull(lonePair);
-    }   
-
-    @Test public void testNewMolecule_IAtomContainer() {
-        IChemObjectBuilder builder = rootObject.getBuilder();
-        IMolecule lonePair = builder.newInstance(
-            IMolecule.class,
-            builder.newInstance(IAtomContainer.class)
-        );
-        Assert.assertNotNull(lonePair);
-    }   
 
     @Test public void testNewMonomer() {
         IChemObjectBuilder builder = rootObject.getBuilder();
@@ -600,7 +580,7 @@ public abstract class AbstractChemObjectBuilderTest extends CDKTestCase {
 
     @Test public void testNewMoleculeSet() {
         IChemObjectBuilder builder = rootObject.getBuilder();
-        IMoleculeSet set = builder.newInstance(IMoleculeSet.class);
+        IAtomContainerSet set = builder.newInstance(IAtomContainerSet.class);
         Assert.assertNotNull(set);
     }
 
@@ -677,6 +657,32 @@ public abstract class AbstractChemObjectBuilderTest extends CDKTestCase {
             builder.newInstance(IMolecularFormula.class)
         );
         Assert.assertNotNull(af);
+    }
+
+    @Test public void testNewTetrahedralChirality() {
+        IChemObjectBuilder builder = rootObject.getBuilder();
+        IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
+        molecule.addAtom(builder.newInstance(IAtom.class, "Cl"));
+        molecule.addAtom(builder.newInstance(IAtom.class, "C"));
+        molecule.addAtom(builder.newInstance(IAtom.class, "Br"));
+        molecule.addAtom(builder.newInstance(IAtom.class, "I"));
+        molecule.addAtom(builder.newInstance(IAtom.class, "H"));
+        molecule.addBond(0, 1, Order.SINGLE);
+        molecule.addBond(1, 2, Order.SINGLE);
+        molecule.addBond(1, 3, Order.SINGLE);
+        molecule.addBond(1, 4, Order.SINGLE);
+        IAtom[] ligands = new IAtom[] {
+            molecule.getAtom(4),
+            molecule.getAtom(3),
+            molecule.getAtom(2),
+            molecule.getAtom(0)
+        };
+        ITetrahedralChirality chirality = builder.newInstance(
+            ITetrahedralChirality.class,
+            molecule.getAtom(1), ligands, Stereo.CLOCKWISE
+        );
+        Assert.assertNotNull(chirality);
+        Assert.assertEquals(builder, chirality.getBuilder());
     }
 
     @Test public void testSugggestion() {

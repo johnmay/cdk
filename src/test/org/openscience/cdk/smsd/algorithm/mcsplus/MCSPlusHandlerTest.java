@@ -21,18 +21,21 @@
  */
 package org.openscience.cdk.smsd.algorithm.mcsplus;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.smiles.SmilesParser;
@@ -40,7 +43,6 @@ import org.openscience.cdk.smsd.Isomorphism;
 import org.openscience.cdk.smsd.interfaces.AbstractMCSAlgorithmTest;
 import org.openscience.cdk.smsd.interfaces.Algorithm;
 import org.openscience.cdk.smsd.tools.MolHandler;
-import static org.junit.Assert.*;
 
 /**
  * Unit testing for the {@link MCSPlusHandler} class.
@@ -82,34 +84,14 @@ public class MCSPlusHandlerTest extends AbstractMCSAlgorithmTest {
 
     /**
      * Test of set method, of class MCSPlusHandler.
-     * @throws InvalidSmilesException
+     * @throws Exception
      */
     @Test
-    public void testSet_IAtomContainer_IAtomContainer() throws InvalidSmilesException {
+    public void testSet_IAtomContainer_IAtomContainer() throws Exception {
         System.out.println("set");
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
         IAtomContainer target = sp.parseSmiles("C\\C=C/Nc1cccc(c1)N(O)\\C=C\\C\\C=C\\C=C/C");
         IAtomContainer queryac = sp.parseSmiles("Nc1ccccc1");
-
-        MCSPlusHandler smsd1 = new MCSPlusHandler();
-        MolHandler mol1 = new MolHandler(queryac, true, true);
-        MolHandler mol2 = new MolHandler(target, true, true);
-        smsd1.set(mol1, mol2);
-        smsd1.searchMCS(true);
-        assertNotNull(smsd1.getFirstMapping());
-
-    }
-
-    /**
-     * Test of set method, of class MCSPlusHandler.
-     * @throws Exception
-     */
-    @Test
-    public void testSet_IMolecule_IMolecule() throws Exception {
-        System.out.println("set");
-        SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule target = sp.parseSmiles("C\\C=C/Nc1cccc(c1)N(O)\\C=C\\C\\C=C\\C=C/C");
-        IMolecule queryac = sp.parseSmiles("Nc1ccccc1");
 
         MCSPlusHandler smsd1 = new MCSPlusHandler();
         MolHandler mol1 = new MolHandler(queryac, true, true);
@@ -129,8 +111,8 @@ public class MCSPlusHandlerTest extends AbstractMCSAlgorithmTest {
         System.out.println("set");
         String molfile = "data/mdl/decalin.mol";
         String queryfile = "data/mdl/decalin.mol";
-        Molecule query = new Molecule();
-        Molecule target = new Molecule();
+        IAtomContainer query = new AtomContainer();
+        IAtomContainer target = new AtomContainer();
 
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(molfile);
         MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);

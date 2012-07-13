@@ -29,8 +29,7 @@ import java.util.Map;
 
 import javax.vecmath.Point2d;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.interfaces.IAtom;
@@ -80,8 +79,8 @@ public class BasicAtomGeneratorTest extends AbstractGeneratorTest {
         int alignment = 1;
         AtomSymbolElement element = 
             generator.generateElement(atom, alignment, model);
-        Assert.assertEquals(atom.getPoint2d().x, element.xCoord);
-        Assert.assertEquals(atom.getPoint2d().y, element.yCoord);
+        Assert.assertEquals(atom.getPoint2d().x, element.xCoord, 0.01);
+        Assert.assertEquals(atom.getPoint2d().y, element.yCoord, 0.01);
         Assert.assertEquals(atom.getSymbol(), element.text);
         Assert.assertEquals((int)atom.getFormalCharge(), element.formalCharge);
         Assert.assertEquals((int)atom.getImplicitHydrogenCount(), element.hydrogenCount);

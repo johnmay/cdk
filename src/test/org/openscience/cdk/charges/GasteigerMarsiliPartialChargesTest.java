@@ -33,11 +33,11 @@ import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
 import org.openscience.cdk.tools.LonePairElectronChecker;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
@@ -56,7 +56,7 @@ import java.io.InputStream;
  */
 public class GasteigerMarsiliPartialChargesTest extends CDKTestCase {
 
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     private LonePairElectronChecker lpcheck = new LonePairElectronChecker();
     
 	/**
@@ -70,7 +70,7 @@ public class GasteigerMarsiliPartialChargesTest extends CDKTestCase {
 		
 		GasteigerMarsiliPartialCharges peoe = new GasteigerMarsiliPartialCharges();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(new Atom("C"));
         molecule.addAtom(new Atom("F"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -95,7 +95,7 @@ public class GasteigerMarsiliPartialChargesTest extends CDKTestCase {
 		
 		GasteigerMarsiliPartialCharges peoe = new GasteigerMarsiliPartialCharges();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(new Atom("C"));
         molecule.addAtom(new Atom("F"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -118,7 +118,7 @@ public class GasteigerMarsiliPartialChargesTest extends CDKTestCase {
     public void testAssignGasteigerSigmaMarsiliFactors_IAtomContainer() throws Exception {
     	GasteigerMarsiliPartialCharges peoe = new GasteigerMarsiliPartialCharges();
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+    	IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
 		molecule.addAtom(new Atom("C"));
 		molecule.getAtom(0).setCharge(0.0);
         molecule.addAtom(new Atom("F"));

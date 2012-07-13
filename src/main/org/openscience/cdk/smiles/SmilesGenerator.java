@@ -25,7 +25,6 @@
 package org.openscience.cdk.smiles;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
@@ -37,12 +36,11 @@ import org.openscience.cdk.graph.invariant.CanonicalLabeler;
 import org.openscience.cdk.graph.invariant.MorganNumbersTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IIsotope;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IRingSet;
@@ -223,30 +221,30 @@ public class SmilesGenerator
 	public synchronized String createSMILES(IReaction reaction) throws CDKException
 	{
 		StringBuffer reactionSMILES = new StringBuffer();
-		IMoleculeSet reactants = reaction.getReactants();
+		IAtomContainerSet reactants = reaction.getReactants();
 		for (int i = 0; i < reactants.getAtomContainerCount(); i++)
 		{
-			reactionSMILES.append(createSMILES(reactants.getMolecule(i)));
+			reactionSMILES.append(createSMILES(reactants.getAtomContainer(i)));
 			if (i + 1 < reactants.getAtomContainerCount())
 			{
 				reactionSMILES.append('.');
 			}
 		}
 		reactionSMILES.append('>');
-		IMoleculeSet agents = reaction.getAgents();
+		IAtomContainerSet agents = reaction.getAgents();
 		for (int i = 0; i < agents.getAtomContainerCount(); i++)
 		{
-			reactionSMILES.append(createSMILES(agents.getMolecule(i)));
+			reactionSMILES.append(createSMILES(agents.getAtomContainer(i)));
 			if (i + 1 < agents.getAtomContainerCount())
 			{
 				reactionSMILES.append('.');
 			}
 		}
 		reactionSMILES.append('>');
-		IMoleculeSet products = reaction.getProducts();
+		IAtomContainerSet products = reaction.getProducts();
 		for (int i = 0; i < products.getAtomContainerCount(); i++)
 		{
-			reactionSMILES.append(createSMILES(products.getMolecule(i)));
+			reactionSMILES.append(createSMILES(products.getAtomContainer(i)));
 			if (i + 1 < products.getAtomContainerCount())
 			{
 				reactionSMILES.append('.');
@@ -318,13 +316,13 @@ public class SmilesGenerator
      */
 	public synchronized String createSMILES(IAtomContainer molecule, boolean chiral, boolean doubleBondConfiguration[]) throws CDKException
 	{
-		IMoleculeSet moleculeSet = ConnectivityChecker.partitionIntoMolecules(molecule);
-		if (moleculeSet.getMoleculeCount() > 1)
+	    IAtomContainerSet moleculeSet = ConnectivityChecker.partitionIntoMolecules(molecule);
+		if (moleculeSet.getAtomContainerCount() > 1)
 		{
 			StringBuffer fullSMILES = new StringBuffer();
 			for (int i = 0; i < moleculeSet.getAtomContainerCount(); i++)
 			{
-				IMolecule molPart = moleculeSet.getMolecule(i);
+			    IAtomContainer molPart = moleculeSet.getAtomContainer(i);
 				fullSMILES.append(createSMILESWithoutCheckForMultipleMolecules(
 				        molPart, chiral, doubleBondConfiguration));
 				if (i < (moleculeSet.getAtomContainerCount() - 1))
@@ -386,7 +384,7 @@ public class SmilesGenerator
 			}
 			//logger.debug("Setting all VISITED flags to false");
 			atom.setFlag(CDKConstants.VISITED, false);
-			if ((Long) atom.getProperty("CanonicalLable") == 1)
+			if ((Long) atom.getProperty(InvPair.CANONICAL_LABEL) == 1)
 			{
 				start = atom;
 			}
@@ -455,8 +453,8 @@ public class SmilesGenerator
 		
 		// remove all CanonicalLable/InvariancePair props
 		for (int k = 0; k < molecule.getAtomCount(); k++) {
-			molecule.getAtom(k).removeProperty("CanonicalLable");
-			molecule.getAtom(k).removeProperty("InvariancePair");
+			molecule.getAtom(k).removeProperty(InvPair.CANONICAL_LABEL);
+			molecule.getAtom(k).removeProperty(InvPair.INVARIANCE_PAIR);
 		}
 		
 		return l.toString();
@@ -655,7 +653,10 @@ public class SmilesGenerator
 				{
 					public int compare(Object o1, Object o2)
 					{
-						return (int) ((Long) ((IAtom) o1).getProperty("CanonicalLable") - (Long) ((IAtom) o2).getProperty("CanonicalLable"));
+						return (int) (
+						    (Long) ((IAtom) o1).getProperty(InvPair.CANONICAL_LABEL) -
+						    (Long) ((IAtom) o2).getProperty(InvPair.CANONICAL_LABEL)
+						);
 					}
 				});
 		}
@@ -1619,7 +1620,7 @@ public class SmilesGenerator
 	private void parseAtom(IAtom a, StringBuffer buffer, IAtomContainer container, boolean chiral, boolean[] doubleBondConfiguration, IAtom parent, List atomsInOrderOfSmiles, List currentChain, boolean useAromaticity)
 	{
 		String symbol = a.getSymbol();
-        if (a instanceof PseudoAtom) symbol = "*";
+        if (a instanceof IPseudoAtom) symbol = "*";
         
 		boolean stereo = false;
 		if(chiral)

@@ -28,9 +28,9 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.MoleculeSet;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomContainerSet;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.listener.PropertiesListener;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -49,13 +49,13 @@ public class SMILESWriterTest extends ChemObjectIOTest {
 
     @Test public void testAccepts() throws Exception {
     	SMILESWriter reader = new SMILESWriter();
-    	Assert.assertTrue(reader.accepts(Molecule.class));
-        Assert.assertTrue(reader.accepts(MoleculeSet.class));
+    	Assert.assertTrue(reader.accepts(AtomContainer.class));
+        Assert.assertTrue(reader.accepts(AtomContainerSet.class));
     }
 
     @Test public void testWriteSMILESFile() throws Exception {
         StringWriter stringWriter = new StringWriter();
-        IMolecule benzene = MoleculeFactory.makeBenzene();
+        IAtomContainer benzene = MoleculeFactory.makeBenzene();
         SMILESWriter smilesWriter = new SMILESWriter(stringWriter);
         smilesWriter.write(benzene);
         smilesWriter.close();
@@ -64,7 +64,7 @@ public class SMILESWriterTest extends ChemObjectIOTest {
 
     @Test public void testWriteAromatic() throws Exception {
         StringWriter stringWriter = new StringWriter();
-        IMolecule benzene = MoleculeFactory.makeBenzene();
+        IAtomContainer benzene = MoleculeFactory.makeBenzene();
         SMILESWriter smilesWriter = new SMILESWriter(stringWriter);
 
         Properties prop = new Properties();

@@ -41,12 +41,11 @@ import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.formats.Gaussian98Format;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.setting.BooleanIOSetting;
@@ -275,8 +274,8 @@ public class Gaussian98Reader extends DefaultChemObjectReader {
      * @throws CDKException Description of the Exception
      */
     private void readCoordinates(IChemModel model) throws CDKException, IOException {
-        IMoleculeSet moleculeSet = model.getBuilder().newInstance(IMoleculeSet.class);
-        IMolecule molecule = model.getBuilder().newInstance(IMolecule.class);
+        IAtomContainerSet moleculeSet = model.getBuilder().newInstance(IAtomContainerSet.class);
+        IAtomContainer molecule = model.getBuilder().newInstance(IAtomContainer.class);
         String line = input.readLine();
         line = input.readLine();
         line = input.readLine();
@@ -341,7 +340,7 @@ public class Gaussian98Reader extends DefaultChemObjectReader {
            *  be used as a counter in the nmr reading
            */
         atomCount = molecule.getAtomCount();
-        moleculeSet.addMolecule(molecule);
+        moleculeSet.addAtomContainer(molecule);
         model.setMoleculeSet(moleculeSet);
     }
 
@@ -355,8 +354,8 @@ public class Gaussian98Reader extends DefaultChemObjectReader {
      */
     private void readPartialCharges(IChemModel model) throws CDKException, IOException {
         logger.info("Reading partial atomic charges");
-        IMoleculeSet moleculeSet = model.getMoleculeSet();
-        IMolecule molecule = moleculeSet.getMolecule(0);
+        IAtomContainerSet moleculeSet = model.getMoleculeSet();
+        IAtomContainer molecule = moleculeSet.getAtomContainer(0);
         String line = input.readLine();
         // skip first line after "Total atomic charges"
         while (input.ready()) {
@@ -549,26 +548,15 @@ public class Gaussian98Reader extends DefaultChemObjectReader {
 
 
     private void initIOSettings() {
-        readOptimizedStructureOnly = new BooleanIOSetting("ReadOptimizedStructureOnly", IOSetting.LOW,
+        readOptimizedStructureOnly = addSetting(new BooleanIOSetting("ReadOptimizedStructureOnly", IOSetting.Importance.LOW,
                 "Should I only read the optimized structure from a geometry optimization?",
-                "false");
+                "false"));
     }
 
     private void customizeJob() {
         fireIOSettingQuestion(readOptimizedStructureOnly);
     }
 
-
-    /**
-     *  Gets the iOSettings attribute of the Gaussian98Reader object
-     *
-     *@return The iOSettings value
-     */
-    public IOSetting[] getIOSettings() {
-        IOSetting[] settings = new IOSetting[1];
-        settings[0] = readOptimizedStructureOnly;
-		return settings;
-	}
 
 }
 

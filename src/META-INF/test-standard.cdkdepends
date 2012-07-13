@@ -2,7 +2,7 @@ cdk-annotation.jar
 cdk-interfaces.jar
 cdk-core.jar
 cdk-data.jar
-cdk-nonotify.jar
+cdk-silent.jar
 cdk-io.jar
 cdk-extra.jar
 cdk-valencycheck.jar
@@ -13,3 +13,4 @@ cdk-isomorphism.jar
 cdk-testdata.jar
 cdk-diff.jar
 cdk-libiocml.jar
+cdk-smarts.jar

@@ -23,20 +23,26 @@
  */
 package org.openscience.cdk.smsd;
 
-import junit.framework.Assert;
-import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.Molecule;
+import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
@@ -44,12 +50,6 @@ import org.openscience.cdk.isomorphism.matchers.QueryAtomContainerCreator;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.smsd.algorithm.mcsplus.MCSPlusHandlerTest;
 import org.openscience.cdk.smsd.interfaces.Algorithm;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.smsd.tools.ExtAtomContainerManipulator;
 import org.openscience.cdk.smsd.tools.MolHandler;
 
@@ -88,8 +88,8 @@ public class SMSDTest {
     public void testInit_3args_1() throws CDKException {
         System.out.println("init");
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule target = sp.parseSmiles("C\\C=C/OCC=C");
-        IMolecule queryac = sp.parseSmiles("CCCOCC(C)=C");
+        IAtomContainer target = sp.parseSmiles("C\\C=C/OCC=C");
+        IAtomContainer queryac = sp.parseSmiles("CCCOCC(C)=C");
 
         Isomorphism smsd1 = new Isomorphism(Algorithm.DEFAULT, false);
         smsd1.init(queryac, target, true, true);
@@ -147,31 +147,14 @@ public class SMSDTest {
     public void testSet_IAtomContainer_IAtomContainer() throws CDKException {
         System.out.println("set");
         SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule target = sp.parseSmiles("C\\C=C/Nc1cccc(c1)N(O)\\C=C\\C\\C=C\\C=C/C");
-        IMolecule queryac = sp.parseSmiles("Nc1ccccc1");
+        IAtomContainer target = sp.parseSmiles("C\\C=C/Nc1cccc(c1)N(O)\\C=C\\C\\C=C\\C=C/C");
+        IAtomContainer queryac = sp.parseSmiles("Nc1ccccc1");
 
         Isomorphism smsd1 = new Isomorphism(Algorithm.DEFAULT, true);
         smsd1.init(queryac, target, true, true);
         smsd1.setChemFilters(true, true, true);
         assertNotNull(smsd1.getFirstMapping());
 
-    }
-
-    /**
-     * Test of set method, of class Isomorphism.
-     * @throws Exception
-     */
-    @Test
-    public void testSet_IMolecule_IMolecule() throws Exception {
-        System.out.println("set");
-        SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
-        IMolecule target = sp.parseSmiles("C\\C=C/Nc1cccc(c1)N(O)\\C=C\\C\\C=C\\C=C/C");
-        IMolecule queryac = sp.parseSmiles("Nc1ccccc1");
-
-        Isomorphism smsd1 = new Isomorphism(Algorithm.DEFAULT, true);
-        smsd1.init(queryac, target, true, true);
-        smsd1.setChemFilters(true, true, true);
-        assertNotNull(smsd1.getFirstMapping());
     }
 
     /**
@@ -184,8 +167,8 @@ public class SMSDTest {
         System.out.println("set");
         String molfile = "data/mdl/decalin.mol";
         String queryfile = "data/mdl/decalin.mol";
-        Molecule query = new Molecule();
-        Molecule target = new Molecule();
+        IAtomContainer query = new AtomContainer();
+        IAtomContainer target = new AtomContainer();
 
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(molfile);
         MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);

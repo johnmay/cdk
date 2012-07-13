@@ -29,9 +29,9 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.interfaces.IAtom;
@@ -39,11 +39,10 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.CMLReader;
 import org.openscience.cdk.io.CMLWriter;
-import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
+import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
@@ -78,7 +77,7 @@ public class CanonicalLabelerTest extends CDKTestCase {
 
     @Test
     public void testCanonLabel_IAtomContainer() throws Exception {
-		IMolecule molecule = parser.parseSmiles("CC(=O)CBr");
+        IAtomContainer molecule = parser.parseSmiles("CC(=O)CBr");
 
 
         
@@ -105,7 +104,7 @@ public class CanonicalLabelerTest extends CDKTestCase {
 	 */
     @Test
     public void testSomeMoleculeWithDifferentStartingOrder() throws Exception {
-		IMolecule molecule = parser.parseSmiles("O=C(C)CBr");
+        IAtomContainer molecule = parser.parseSmiles("O=C(C)CBr");
 		labeler.canonLabel(molecule);
 		Iterator atoms = molecule.atoms().iterator();
 		while (atoms.hasNext()) {
@@ -126,7 +125,7 @@ public class CanonicalLabelerTest extends CDKTestCase {
         String filename = "data/mdl/bug1014344-1.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLReader reader = new MDLReader(ins, Mode.STRICT);
-        Molecule mol1 = (Molecule) reader.read(new Molecule());
+        IAtomContainer mol1 = reader.read(new AtomContainer());
         addImplicitHydrogens(mol1);
         StringWriter output=new StringWriter();
         CMLWriter cmlWriter = new CMLWriter(output);
@@ -171,13 +170,13 @@ public class CanonicalLabelerTest extends CDKTestCase {
      */
     @Test
     public void testBug2944519(){
-        IMolecule ac = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class);
+        IAtomContainer ac = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
         ac.addAtom(ac.getBuilder().newInstance(IAtom.class,"C"));
         ac.addAtom(ac.getBuilder().newInstance(IAtom.class,"O"));
         ac.addBond(0,1,IBond.Order.SINGLE);
         CanonicalLabeler canLabler = new CanonicalLabeler();
         canLabler.canonLabel(ac);
-        IMolecule ac2 = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class);
+        IAtomContainer ac2 = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
         ac2.addAtom(ac2.getBuilder().newInstance(IAtom.class,"O"));
         ac2.addAtom(ac2.getBuilder().newInstance(IAtom.class,"C"));
         ac2.addBond(0,1,IBond.Order.SINGLE);

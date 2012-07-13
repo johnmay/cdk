@@ -35,7 +35,6 @@ import java.util.NoSuchElementException;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.PCCompoundASNReader;
 import org.openscience.cdk.io.formats.IResourceFormat;
@@ -68,7 +67,7 @@ extends DefaultIteratingChemObjectReader<IAtomContainer> {
     
     private boolean nextAvailableIsKnown;
     private boolean hasNext;
-    private IMolecule nextMolecule;
+    private IAtomContainer nextMolecule;
     
     private String currentLine;
     private int depth;
@@ -140,12 +139,7 @@ extends DefaultIteratingChemObjectReader<IAtomContainer> {
             			new StringReader(buffer.toString())
             		);
             		IChemFile cFile = (IChemFile)asnReader.read(builder.newInstance(IChemFile.class));
-            		IAtomContainer container = ChemFileManipulator.getAllAtomContainers(cFile).get(0);
-            		if (container instanceof IMolecule) {
-            			nextMolecule = (IMolecule)container;
-            		} else {
-            			nextMolecule = builder.newInstance(IMolecule.class,container);
-            		}
+            		nextMolecule = ChemFileManipulator.getAllAtomContainers(cFile).get(0);
             	}
             } catch (Exception exception) {
                 logger.error("Error while reading next molecule: ", exception.getMessage());

@@ -3,6 +3,8 @@ cdk-interfaces.jar
 cdk-core.jar
 cdk-data.jar
 cdk-test.jar
+cdk-standard.jar
+cdk-silent.jar
 cdk-isomorphism.jar
 cdk-standard.jar
-cdk-nonotify.jar
+cdk-silent.jar

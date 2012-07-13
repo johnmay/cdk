@@ -19,7 +19,13 @@
 
 package org.openscience.cdk.silent;
 
-import org.openscience.cdk.interfaces.*;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemObjectChangeEvent;
+import org.openscience.cdk.interfaces.IChemObjectListener;
+import org.openscience.cdk.interfaces.ICrystal;
+import org.openscience.cdk.interfaces.IReactionSet;
+import org.openscience.cdk.interfaces.IRingSet;
 
 import java.io.Serializable;
 
@@ -47,7 +53,7 @@ public class ChemModel extends ChemObject implements Serializable, IChemModel, I
 	/**
 	 *  A MoleculeSet.
 	 */
-	protected IMoleculeSet setOfMolecules = null;
+	protected IAtomContainerSet setOfMolecules = null;
 
 	/**
 	 *  A ReactionSet.
@@ -76,7 +82,7 @@ public class ChemModel extends ChemObject implements Serializable, IChemModel, I
      *
      * @see      #setMoleculeSet
 	 */
-	public IMoleculeSet getMoleculeSet()
+	public IAtomContainerSet getMoleculeSet()
 	{
 		return this.setOfMolecules;
 	}
@@ -89,7 +95,7 @@ public class ChemModel extends ChemObject implements Serializable, IChemModel, I
      *
      * @see      #getMoleculeSet
 	 */
-	public void setMoleculeSet(IMoleculeSet setOfMolecules)
+	public void setMoleculeSet(IAtomContainerSet setOfMolecules)
 	{
 		this.setOfMolecules = setOfMolecules;
 	}
@@ -199,22 +205,22 @@ public class ChemModel extends ChemObject implements Serializable, IChemModel, I
 		ChemModel clone = (ChemModel)super.clone();
         // clone the content
         if (setOfMolecules != null) {
-            clone.setOfMolecules = (MoleculeSet)((MoleculeSet)setOfMolecules).clone();
+            clone.setOfMolecules = (AtomContainerSet) setOfMolecules.clone();
         } else {
             clone.setOfMolecules = null;
         }
         if (setOfReactions != null) {
-            clone.setOfReactions = (IReactionSet)((ReactionSet)setOfReactions).clone();
+            clone.setOfReactions = (IReactionSet) setOfReactions.clone();
         } else {
             clone.setOfReactions = null;
         }
         if (crystal != null) {
-            clone.crystal = (Crystal)((Crystal)crystal).clone();
+            clone.crystal = (Crystal) crystal.clone();
         } else {
             clone.crystal = null;
         }
         if (ringSet != null) {
-            clone.ringSet = (RingSet)((RingSet)ringSet).clone();
+            clone.ringSet = (RingSet) ringSet.clone();
         } else {
             clone.ringSet = null;
         }

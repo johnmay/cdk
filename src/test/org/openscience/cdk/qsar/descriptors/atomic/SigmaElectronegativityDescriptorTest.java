@@ -28,12 +28,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.IAtomicDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.LonePairElectronChecker;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -45,7 +46,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
  */ 
 public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 	
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     private LonePairElectronChecker lpcheck = new LonePairElectronChecker();
     
 	public  SigmaElectronegativityDescriptorTest() {}
@@ -62,7 +63,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		Integer[] params = new Integer[1];
         
         SmilesParser sp = new SmilesParser(builder);
-        IMolecule mol = sp.parseSmiles("CF"); 
+        IAtomContainer mol = sp.parseSmiles("CF"); 
         addExplicitHydrogens(mol);
         
         for (int i = 0 ; i < 2 ; i++){
@@ -84,7 +85,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		Integer[] params = new Integer[1];
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("CCl");
+		IAtomContainer mol = sp.parseSmiles("CCl");
 		addExplicitHydrogens(mol);
 		for (int i = 0 ; i < 2 ; i++){
 			params[0] = 6;
@@ -104,7 +105,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
         
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("C=CCBr");
+		IAtomContainer mol = sp.parseSmiles("C=CCBr");
 		addExplicitHydrogens(mol);
 		
 		for (int i = 0 ; i < 4 ; i++){
@@ -123,7 +124,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		IAtomicDescriptor descriptor = new SigmaElectronegativityDescriptor();
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("C(C)(C)CCI");
+		IAtomContainer mol = sp.parseSmiles("C(C)(C)CCI");
 		addExplicitHydrogens(mol);
 		
 		double result= ((DoubleResult)descriptor.calculate(mol.getAtom(5),mol).getValue()).doubleValue();
@@ -139,7 +140,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		Integer[] params = new Integer[1];
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("CCOCC");
+		IAtomContainer mol = sp.parseSmiles("CCOCC");
 		addExplicitHydrogens(mol);
 		
 		for (int i = 0 ; i < 5 ; i++){
@@ -159,7 +160,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		Integer[] params = new Integer[1];
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("NCCO");
+		IAtomContainer mol = sp.parseSmiles("NCCO");
 		addExplicitHydrogens(mol);
 		
 		for (int i = 0 ; i < 4 ; i++){
@@ -178,7 +179,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		IAtomicDescriptor descriptor = new SigmaElectronegativityDescriptor();
         
 		SmilesParser sp = new SmilesParser( builder);
-		IMolecule mol = sp.parseSmiles("C=CCS");
+		IAtomContainer mol = sp.parseSmiles("C=CCS");
 		addExplicitHydrogens(mol);
 		
 		for (int i = 0 ; i < 4 ; i++){
@@ -194,7 +195,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
     @Test
     public void testCompareIonized() throws ClassNotFoundException, CDKException, java.lang.Exception{
         
-		IMolecule molA = builder.newInstance(IMolecule.class);
+        IAtomContainer molA = builder.newInstance(IAtomContainer.class);
 		molA.addAtom(builder.newInstance(IAtom.class,"C"));
 		molA.addAtom(builder.newInstance(IAtom.class,"C"));
 		molA.addBond(0, 1, IBond.Order.SINGLE);
@@ -209,7 +210,7 @@ public class SigmaElectronegativityDescriptorTest extends AtomicDescriptorTest {
 		
         double resultA= ((DoubleResult)descriptor.calculate(molA.getAtom(3),molA).getValue()).doubleValue();
         
-        IMolecule molB = builder.newInstance(IMolecule.class);
+        IAtomContainer molB = builder.newInstance(IAtomContainer.class);
 		molB.addAtom(builder.newInstance(IAtom.class,"C"));
 		molB.addAtom(builder.newInstance(IAtom.class,"C"));
 		molB.addBond(0, 1, IBond.Order.SINGLE);

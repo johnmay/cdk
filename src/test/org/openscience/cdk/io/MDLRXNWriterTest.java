@@ -33,17 +33,16 @@ import java.io.StringWriter;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.Mapping;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
-import org.openscience.cdk.nonotify.NNReactionSet;
-import org.openscience.cdk.Mapping;
+import org.openscience.cdk.silent.ReactionSet;
 
 /**
  * TestCase for the writer MDL rxn files using one test file.
@@ -68,13 +67,13 @@ public class MDLRXNWriterTest extends ChemObjectIOTest {
 
     @Test public void testRoundtrip() throws Exception {
         IReaction reaction = builder.newInstance(IReaction.class);
-        IMolecule hydroxide = builder.newInstance(IMolecule.class);
+        IAtomContainer hydroxide = builder.newInstance(IAtomContainer.class);
         hydroxide.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction.addReactant(hydroxide);
-        IMolecule proton = builder.newInstance(IMolecule.class);
+        IAtomContainer proton = builder.newInstance(IAtomContainer.class);
         proton.addAtom(builder.newInstance(IAtom.class,"H"));
         reaction.addReactant(proton);
-        IMolecule water = builder.newInstance(IMolecule.class);
+        IAtomContainer water = builder.newInstance(IAtomContainer.class);
         water.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction.addProduct(water);
         reaction.addMapping(new Mapping(hydroxide.getAtom(0),water.getAtom(0)));
@@ -102,18 +101,18 @@ public class MDLRXNWriterTest extends ChemObjectIOTest {
     
     @Test public void testReactionSet_1() throws Exception {
         IReaction reaction11 = builder.newInstance(IReaction.class);
-        IMolecule hydroxide = builder.newInstance(IMolecule.class);
+        IAtomContainer hydroxide = builder.newInstance(IAtomContainer.class);
         hydroxide.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction11.addReactant(hydroxide);
-        IMolecule proton = builder.newInstance(IMolecule.class);
+        IAtomContainer proton = builder.newInstance(IAtomContainer.class);
         proton.addAtom(builder.newInstance(IAtom.class,"H"));
         reaction11.addReactant(proton);
         
-        IMolecule water = builder.newInstance(IMolecule.class);
+        IAtomContainer water = builder.newInstance(IAtomContainer.class);
         water.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction11.addProduct(water);
         
-        IReactionSet reactionSet = new NNReactionSet();
+        IReactionSet reactionSet = new ReactionSet();
         reactionSet.addReaction(reaction11);
         
         // now serialize to MDL RXN
@@ -133,34 +132,34 @@ public class MDLRXNWriterTest extends ChemObjectIOTest {
         reader.close();
         
         Assert.assertEquals(2, reaction2.getReactantCount());
-        Assert.assertEquals(1, reaction2.getReactants().getMolecule(0).getAtomCount());
-        Assert.assertEquals(1, reaction2.getReactants().getMolecule(1).getAtomCount());
+        Assert.assertEquals(1, reaction2.getReactants().getAtomContainer(0).getAtomCount());
+        Assert.assertEquals(1, reaction2.getReactants().getAtomContainer(1).getAtomCount());
         Assert.assertEquals(1, reaction2.getProductCount());
-        Assert.assertEquals(1, reaction2.getProducts().getMolecule(0).getAtomCount());
+        Assert.assertEquals(1, reaction2.getProducts().getAtomContainer(0).getAtomCount());
     }
 
     
     @Test public void testReactionSet_2() throws Exception {
         IReaction reaction11 = builder.newInstance(IReaction.class);
-        IMolecule hydroxide = builder.newInstance(IMolecule.class);
+        IAtomContainer hydroxide = builder.newInstance(IAtomContainer.class);
         hydroxide.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction11.addReactant(hydroxide);
-        IMolecule proton = builder.newInstance(IMolecule.class);
+        IAtomContainer proton = builder.newInstance(IAtomContainer.class);
         proton.addAtom(builder.newInstance(IAtom.class,"H"));
         reaction11.addReactant(proton);
         
-        IMolecule water = builder.newInstance(IMolecule.class);
+        IAtomContainer water = builder.newInstance(IAtomContainer.class);
         water.addAtom(builder.newInstance(IAtom.class,"O"));
         reaction11.addProduct(water);
         
         IReaction reaction12 = builder.newInstance(IReaction.class);
-        IMolecule h = builder.newInstance(IMolecule.class);
+        IAtomContainer h = builder.newInstance(IAtomContainer.class);
         h.addAtom(builder.newInstance(IAtom.class,"H"));
-        IMolecule n = builder.newInstance(IMolecule.class);
+        IAtomContainer n = builder.newInstance(IAtomContainer.class);
         n.addAtom(builder.newInstance(IAtom.class,"N"));
         reaction12.addReactant(h);
         reaction12.addReactant(n);
-        IMolecule ammonia = builder.newInstance(IMolecule.class);
+        IAtomContainer ammonia = builder.newInstance(IAtomContainer.class);
         ammonia.addAtom(builder.newInstance(IAtom.class,"N"));
         ammonia.addAtom(builder.newInstance(IAtom.class,"H"));
         ammonia.addBond(0, 1, IBond.Order.SINGLE);
@@ -187,10 +186,10 @@ public class MDLRXNWriterTest extends ChemObjectIOTest {
         reader.close();
 
         Assert.assertEquals(2, reactionSetF.getReactionCount());
-        Assert.assertEquals(1, reactionSetF.getReaction(0).getReactants().getMolecule(0).getAtomCount());
-        Assert.assertEquals(1, reactionSetF.getReaction(0).getReactants().getMolecule(1).getAtomCount());
+        Assert.assertEquals(1, reactionSetF.getReaction(0).getReactants().getAtomContainer(0).getAtomCount());
+        Assert.assertEquals(1, reactionSetF.getReaction(0).getReactants().getAtomContainer(1).getAtomCount());
         Assert.assertEquals(1, reactionSetF.getReaction(0).getProductCount());
-        Assert.assertEquals(1, reactionSetF.getReaction(0).getProducts().getMolecule(0).getAtomCount());
+        Assert.assertEquals(1, reactionSetF.getReaction(0).getProducts().getAtomContainer(0).getAtomCount());
     }
     
 }

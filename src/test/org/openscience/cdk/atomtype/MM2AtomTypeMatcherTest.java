@@ -28,15 +28,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.config.AtomTypeFactory;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.nonotify.NNMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.AtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.AtomTypeTools;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -53,7 +52,7 @@ public class MM2AtomTypeMatcherTest extends AbstractAtomTypeTest {
 
 	private static ILoggingTool logger =
 	    LoggingToolFactory.createLoggingTool(MM2AtomTypeMatcherTest.class);
-	private static IMolecule testMolecule = null;
+	private static IAtomContainer testMolecule = null;
 	
     private static Map<String, Integer> testedAtomTypes = new HashMap<String, Integer>();
 
@@ -65,7 +64,7 @@ public class MM2AtomTypeMatcherTest extends AbstractAtomTypeTest {
     		logger.debug("**** reading MOL file ******");
     		InputStream ins = MM2AtomTypeMatcher.class.getClassLoader().getResourceAsStream("data/mdl/mmff94AtomTypeTest_molecule.mol");
     		ISimpleChemObjectReader mdl = new MDLV2000Reader(ins);
-    		testMolecule=(IMolecule)mdl.read(new NNMolecule());
+    		testMolecule = mdl.read(new AtomContainer());
     		logger.debug("Molecule load:"+testMolecule.getAtomCount());
     		att.assignAtomTypePropertiesToAtom(testMolecule);
     		for (int i=0;i<testMolecule.getAtomCount();i++){
@@ -84,7 +83,7 @@ public class MM2AtomTypeMatcherTest extends AbstractAtomTypeTest {
     }
     
     @Test public void testFindMatchingAtomType_IAtomContainer() throws Exception {
-        IMolecule mol = new Molecule();
+        IAtomContainer mol = new AtomContainer();
         IAtom atom = new Atom("C");
         final IAtomType.Hybridization thisHybridization = IAtomType.Hybridization.SP3;
         atom.setHybridization(thisHybridization);
@@ -138,7 +137,7 @@ public class MM2AtomTypeMatcherTest extends AbstractAtomTypeTest {
     @Test public void countTestedAtomTypes() {
     	AtomTypeFactory factory = AtomTypeFactory.getInstance(
     		"org/openscience/cdk/config/data/mm2_atomtypes.xml",
-            NoNotificationChemObjectBuilder.getInstance()
+            SilentChemObjectBuilder.getInstance()
         );
     	
    	    IAtomType[] expectedTypes = factory.getAllAtomTypes();

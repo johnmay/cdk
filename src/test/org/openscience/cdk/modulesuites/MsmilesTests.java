@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.openscience.cdk.coverage.SmilesCoverageTest;
+import org.openscience.cdk.fingerprint.LingoFingerprinterTest;
 import org.openscience.cdk.io.MoSSOutputReaderTest;
 import org.openscience.cdk.io.SMILESReaderTest;
 import org.openscience.cdk.io.iterator.IteratingSMILESReaderTest;
@@ -51,6 +52,7 @@ import org.openscience.cdk.normalize.NormalizerTest;
     SmilesParserTest.class,
     SmilesGeneratorTest.class,
     NormalizerTest.class,
+    LingoFingerprinterTest.class,
     FixBondOrdersToolTest.class
 })
 public class MsmilesTests {}

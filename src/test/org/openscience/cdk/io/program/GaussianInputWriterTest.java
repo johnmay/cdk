@@ -29,7 +29,8 @@ import java.io.StringWriter;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.ChemObjectIOTest;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -49,14 +50,14 @@ public class GaussianInputWriterTest extends ChemObjectIOTest {
 
     @Test public void testAccepts() {
     	GaussianInputWriter reader = new GaussianInputWriter();
-    	Assert.assertTrue(reader.accepts(IMolecule.class));
+    	Assert.assertTrue(reader.accepts(IAtomContainer.class));
     }
 
     /**
      * @cdk.bug 2501715
      */
     @Test public void testWrite() throws Exception {
-    	IMolecule molecule=MoleculeFactory.makeAlphaPinene();
+        IAtomContainer molecule=MoleculeFactory.makeAlphaPinene();
         StringWriter writer = new StringWriter();
         GaussianInputWriter gaussianWriter = new GaussianInputWriter(writer);
         gaussianWriter.write(molecule);

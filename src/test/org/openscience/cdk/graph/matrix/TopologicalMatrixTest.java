@@ -4,14 +4,14 @@ import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.io.MDLReader;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
+import org.openscience.cdk.io.MDLV2000Reader;
 
 /**
- * @cdk.module test-standard
+ * @cdk.module test-qsarmolecular
  */
 public class TopologicalMatrixTest extends CDKTestCase {
 
@@ -19,8 +19,8 @@ public class TopologicalMatrixTest extends CDKTestCase {
 		String filename = "data/mdl/clorobenzene.mol";
 		InputStream ins = this.getClass().getClassLoader().getResourceAsStream(
 				filename);
-		MDLReader reader = new MDLReader(ins, Mode.STRICT);
-		IMolecule container = (IMolecule)reader.read(new Molecule());
+		MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);
+		IAtomContainer container = (IAtomContainer)reader.read(new AtomContainer());
 		int[][] matrix = TopologicalMatrix.getMatrix(container);
 		Assert.assertEquals(12, matrix.length);
 		for (int i = 0; i < matrix.length; i++) {

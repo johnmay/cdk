@@ -22,9 +22,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openscience.cdk.CDKTestCase;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
@@ -41,10 +41,10 @@ public class RepeatedCDKAtomTypeMatcherSMILESTest extends CDKTestCase {
     
     @BeforeClass public static void setup() {
         smilesParser =
-            new SmilesParser(NoNotificationChemObjectBuilder.getInstance());
+            new SmilesParser(SilentChemObjectBuilder.getInstance());
         atomTypeMatcher =
             CDKAtomTypeMatcher.getInstance(
-                NoNotificationChemObjectBuilder.getInstance()
+                SilentChemObjectBuilder.getInstance()
             );
     }
 
@@ -93,7 +93,7 @@ public class RepeatedCDKAtomTypeMatcherSMILESTest extends CDKTestCase {
     }
 
     private void typeAndRetype(String smiles) throws Exception {
-        IMolecule mol = smilesParser.parseSmiles(smiles);
+        IAtomContainer mol = smilesParser.parseSmiles(smiles);
         IAtomType[] types = atomTypeMatcher.findMatchingAtomType(mol);
         for (int i=0; i<types.length; i++) {
             AtomTypeManipulator.configure(mol.getAtom(i), types[i]);

@@ -24,30 +24,30 @@
 package org.openscience.cdk.reaction.type;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.isomorphism.UniversalIsomorphismTester;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
 import org.openscience.cdk.isomorphism.matchers.QueryAtomContainerCreator;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
 import org.openscience.cdk.reaction.IReactionProcess;
 import org.openscience.cdk.reaction.ReactionProcessTest;
 import org.openscience.cdk.reaction.type.parameters.IParameterReact;
 import org.openscience.cdk.reaction.type.parameters.SetReactionCenter;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.ReactionManipulator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TestSuite that runs a test for the TautomerizationReactionTest.
@@ -57,7 +57,7 @@ import org.openscience.cdk.tools.manipulator.ReactionManipulator;
  */
 public class TautomerizationReactionTest extends ReactionProcessTest {
 
-	private IChemObjectBuilder builder = NoNotificationChemObjectBuilder.getInstance();
+	private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 	/**
 	 *  The JUnit setup method
 	 */
@@ -82,12 +82,12 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 	 * 
 	 * @return    The test suite
 	 */
-	@Test public void testInitiate_IMoleculeSet_IMoleculeSet() throws Exception {
+	@Test public void testInitiate_IAtomContainerSet_IAtomContainerSet() throws Exception {
 
 		IReactionProcess type = new TautomerizationReaction();
 		
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 
 		/* initiate */
         List<IParameterReact> paramList = new ArrayList<IParameterReact>();
@@ -100,23 +100,23 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
         Assert.assertEquals(1, setOfReactions.getReactionCount());
         Assert.assertEquals(1, setOfReactions.getReaction(0).getProductCount());
 
-        IMolecule product = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
         
-        IMolecule molecule2 = getExpectedProducts().getMolecule(0);
+        IAtomContainer molecule2 = getExpectedProducts().getAtomContainer(0);
         
         IQueryAtomContainer queryAtom = QueryAtomContainerCreator.createSymbolAndChargeQueryContainer(product);
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(molecule2,queryAtom));
         
         // reverse process
-        IMoleculeSet setOfReactants2 = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
-		setOfReactants2.addMolecule(molecule2);
+        IAtomContainerSet setOfReactants2 = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
+		setOfReactants2.addAtomContainer(molecule2);
 		
 		IReactionSet setOfReactions2 = type.initiate(setOfReactants2, null);
         
         Assert.assertEquals(1, setOfReactions2.getReactionCount());
         Assert.assertEquals(1, setOfReactions2.getReaction(0).getProductCount());
 
-        IMolecule product2 = setOfReactions2.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product2 = setOfReactions2.getReaction(0).getProducts().getAtomContainer(0);
         
         queryAtom = QueryAtomContainerCreator.createSymbolAndChargeQueryContainer(product2);
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(molecule,queryAtom));
@@ -133,8 +133,8 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 	@Test public void testManuallyCentreActive() throws Exception {
 		IReactionProcess type = new TautomerizationReaction();
 		
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 
 		/*manually putting the active center*/
 		molecule.getAtom(0).setFlag(CDKConstants.REACTIVE_CENTER,true);
@@ -156,9 +156,9 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
         Assert.assertEquals(1, setOfReactions.getReactionCount());
         Assert.assertEquals(1, setOfReactions.getReaction(0).getProductCount());
 
-        IMolecule product = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
 
-        IMolecule molecule2 = getExpectedProducts().getMolecule(0);
+        IAtomContainer molecule2 = getExpectedProducts().getAtomContainer(0);
         
         IQueryAtomContainer queryAtom = QueryAtomContainerCreator.createSymbolAndChargeQueryContainer(product);
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(molecule2,queryAtom));
@@ -172,15 +172,15 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
         molecule2.getBond(0).setFlag(CDKConstants.REACTIVE_CENTER,true);
         molecule2.getBond(1).setFlag(CDKConstants.REACTIVE_CENTER,true);
         molecule2.getBond(5).setFlag(CDKConstants.REACTIVE_CENTER,true);
-        IMoleculeSet setOfReactants2 = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
-		setOfReactants2.addMolecule(molecule2);
+        IAtomContainerSet setOfReactants2 = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
+		setOfReactants2.addAtomContainer(molecule2);
 		
 		IReactionSet setOfReactions2 = type.initiate(setOfReactants2, null);
         
         Assert.assertEquals(1, setOfReactions2.getReactionCount());
         Assert.assertEquals(1, setOfReactions2.getReaction(0).getProductCount());
 
-        IMolecule product2 = setOfReactions2.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product2 = setOfReactions2.getReaction(0).getProducts().getAtomContainer(0);
         
         queryAtom = QueryAtomContainerCreator.createSymbolAndChargeQueryContainer(product2);
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(molecule,queryAtom));
@@ -196,8 +196,8 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 	@Test public void testCDKConstants_REACTIVE_CENTER() throws Exception {
 		IReactionProcess type  = new TautomerizationReaction();
 		
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 
 		/*manually putting the active center*/
 		molecule.getAtom(0).setFlag(CDKConstants.REACTIVE_CENTER,true);
@@ -217,7 +217,7 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
         /* initiate */
         IReactionSet setOfReactions = type.initiate(setOfReactants, null);
 
-        IMolecule reactant = setOfReactions.getReaction(0).getReactants().getMolecule(0);
+        IAtomContainer reactant = setOfReactions.getReaction(0).getReactants().getAtomContainer(0);
 		Assert.assertTrue(molecule.getAtom(0).getFlag(CDKConstants.REACTIVE_CENTER));
 		Assert.assertTrue(reactant.getAtom(0).getFlag(CDKConstants.REACTIVE_CENTER));
 		Assert.assertTrue(molecule.getAtom(1).getFlag(CDKConstants.REACTIVE_CENTER));
@@ -244,8 +244,8 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 	@Test public void testMapping() throws Exception {
 		IReactionProcess type = new TautomerizationReaction();
 		
-		IMoleculeSet setOfReactants = getExampleReactants();
-        IMolecule molecule = setOfReactants.getMolecule(0);
+		IAtomContainerSet setOfReactants = getExampleReactants();
+        IAtomContainer molecule = setOfReactants.getAtomContainer(0);
 
 		/*automatic looking for active center*/
         List<IParameterReact> paramList = new ArrayList<IParameterReact>();
@@ -257,7 +257,7 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 		
         IReactionSet setOfReactions = type.initiate(setOfReactants, null);
         
-        IMolecule product = setOfReactions.getReaction(0).getProducts().getMolecule(0);
+        IAtomContainer product = setOfReactions.getReaction(0).getProducts().getAtomContainer(0);
 
         Assert.assertEquals(7,setOfReactions.getReaction(0).getMappingCount());
         
@@ -276,13 +276,13 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 	 * 
 	 * @cdk.inchi InChI=1/C2H4O/c1-2-3/h2H,1H3
 	 * 
-	 * @return The IMolecule
+	 * @return The IAtomContainer
 	 * @throws CDKException
 	 */
-	private IMoleculeSet getExampleReactants() {
-		IMoleculeSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
+	private IAtomContainerSet getExampleReactants() {
+		IAtomContainerSet setOfReactants = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
 		
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
         molecule.addAtom(builder.newInstance(IAtom.class,"O"));
         molecule.addAtom(builder.newInstance(IAtom.class,"C"));
         molecule.addBond(0, 1, IBond.Order.DOUBLE);
@@ -302,19 +302,19 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 			e.printStackTrace();
 		}
         
-        setOfReactants.addMolecule(molecule);
+        setOfReactants.addAtomContainer(molecule);
 		return setOfReactants;
 	}
 	/**
 	 * Get the expected set of molecules.
 	 * 
 	 * @cdk.inchi InChI=1/C2H4O/c1-2-3/h2-3H,1H2
-	 * @return The IMoleculeSet
+	 * @return The IAtomContainerSet
 	 */
-	private IMoleculeSet getExpectedProducts() {
-		IMoleculeSet setOfProducts = builder.newInstance(IMoleculeSet.class);
+	private IAtomContainerSet getExpectedProducts() {
+		IAtomContainerSet setOfProducts = builder.newInstance(IAtomContainerSet.class);
 
-		IMolecule molecule = builder.newInstance(IMolecule.class);
+		IAtomContainer molecule = builder.newInstance(IAtomContainer.class);
         molecule.addAtom(builder.newInstance(IAtom.class,"O"));
         molecule.addAtom(builder.newInstance(IAtom.class,"C"));
         molecule.addBond(0, 1, IBond.Order.SINGLE);
@@ -334,7 +334,7 @@ public class TautomerizationReactionTest extends ReactionProcessTest {
 			e.printStackTrace();
 		}
         
-        setOfProducts.addMolecule(molecule);
+        setOfProducts.addAtomContainer(molecule);
 		return setOfProducts;
 	}
 }

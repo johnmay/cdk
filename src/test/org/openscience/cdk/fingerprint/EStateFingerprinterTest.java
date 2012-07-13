@@ -1,7 +1,5 @@
-/* $Revision: 10903 $ $Author: egonw $ $Date: 2008-05-07 09:48:07 -0400 (Wed, 07 May 2008) $    
- * 
- * Copyright (C) 2008 Rajarshi Guha
- *               2009 Egon Willighagen <egonw@users.sf.net>
+/* Copyright (C) 2008 Rajarshi Guha
+ *               2009,2011 Egon Willighagen <egonw@users.sf.net>
  * 
  * Contact: cdk-devel@lists.sourceforge.net
  * Contact: rajarshi@users.sourceforge.net
@@ -30,14 +28,14 @@ import java.util.BitSet;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
 /**
  * @cdk.module test-fingerprint
  */
-public class EStateFingerprinterTest extends AbstractFingerprinterTest {
+public class EStateFingerprinterTest extends AbstractFixedLengthFingerprinterTest {
 
 	private static ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(EStateFingerprinterTest.class);
@@ -54,7 +52,7 @@ public class EStateFingerprinterTest extends AbstractFingerprinterTest {
 
     @Test
     public void testFingerprint() throws Exception {
-		SmilesParser parser = new SmilesParser(NoNotificationChemObjectBuilder.getInstance());
+		SmilesParser parser = new SmilesParser(SilentChemObjectBuilder.getInstance());
 		IFingerprinter printer = new EStateFingerprinter();
 
 		BitSet bs1 = printer.getFingerprint(parser.parseSmiles("C=C-C#N"));

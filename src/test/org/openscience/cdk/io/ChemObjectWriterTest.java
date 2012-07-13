@@ -21,19 +21,20 @@
  */
 package org.openscience.cdk.io;
 
-import java.io.StringWriter;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IChemObject;
-import org.openscience.cdk.nonotify.NNAtomContainer;
-import org.openscience.cdk.nonotify.NNAtomContainerSet;
-import org.openscience.cdk.nonotify.NNChemFile;
-import org.openscience.cdk.nonotify.NNChemModel;
-import org.openscience.cdk.nonotify.NNMolecule;
-import org.openscience.cdk.nonotify.NNMoleculeSet;
-import org.openscience.cdk.nonotify.NNReaction;
+import org.openscience.cdk.silent.AtomContainer;
+import org.openscience.cdk.silent.AtomContainerSet;
+import org.openscience.cdk.silent.ChemFile;
+import org.openscience.cdk.silent.ChemModel;
+import org.openscience.cdk.silent.Reaction;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 
 /**
  * TestCase for {@link IChemObjectWriter} implementations.
@@ -50,9 +51,8 @@ public abstract class ChemObjectWriterTest extends ChemObjectIOTest {
     }
 
     private static IChemObject[] allChemObjectsTypes = {
-        new NNChemFile(), new NNChemModel(), new NNMolecule(),
-        new NNReaction(), new NNAtomContainerSet(), new NNAtomContainer(),
-        new NNMoleculeSet()
+        new ChemFile(), new ChemModel(),
+        new Reaction(), new AtomContainerSet(), new AtomContainer()
     };
 
     /**
@@ -81,4 +81,15 @@ public abstract class ChemObjectWriterTest extends ChemObjectIOTest {
         }
     }
 
+    @Test public void testSetWriter_Writer() throws Exception {
+        Assert.assertNotNull("No IChemObjectWriter has been set!", chemObjectIO);
+        StringWriter testWriter = new StringWriter();
+        chemObjectIO.setWriter(testWriter);
+    }
+
+    @Test public void testSetWriter_OutputStream() throws Exception {
+        Assert.assertNotNull("No IChemObjectWriter has been set!", chemObjectIO);
+        ByteArrayOutputStream testStream = new ByteArrayOutputStream();
+        chemObjectIO.setWriter(testStream);
+    }
 }

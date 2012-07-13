@@ -37,17 +37,15 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IBond.Order;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.interfaces.IBond.Order;
+import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.io.CMLReader;
 import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -69,7 +67,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 
     @BeforeClass
     public static void setup() {
-        builder = NoNotificationChemObjectBuilder.getInstance();
+        builder = SilentChemObjectBuilder.getInstance();
         lpcheck = new LonePairElectronChecker();
     }
 
@@ -77,7 +75,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     public void testDetectButadiene() throws Exception
 	{
         logger.info("Entering testDetectButadiene.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/cml/butadiene.cml";
         mol = readCMLMolecule(filename);
 
@@ -106,7 +104,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     @Test public void testDetectNaphtalene() throws Exception
 	{
         logger.info("Entering testDetectNaphtalene.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/cml/naphtalene.cml";
         mol = readCMLMolecule(filename);
 
@@ -135,7 +133,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     @Test public void testDetectToluene() throws Exception
 	{
         logger.info("Entering testDetectToluene.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/cml/toluene.cml";
         mol = readCMLMolecule(filename);
 
@@ -164,12 +162,12 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     @Test public void testNonConnectedPiSystems() throws Exception
 	{
         logger.info("Entering testNonConnectedPiSystems.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/mdl/nonConnectedPiSystems.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLReader reader = new MDLReader(ins);
         IChemFile chemFile = (IChemFile)reader.read((ChemObject)new ChemFile());
-        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getMolecule(0);
+        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);
         CDKHueckelAromaticityDetector.detectAromaticity(mol);
         
         IAtomContainerSet acSet = ConjugatedPiSystemsDetector.detect(mol);
@@ -207,12 +205,12 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     @Test public void testPiSystemWithCarbokation() throws Exception
 	{
         logger.info("Entering testPiSystemWithCarbokation.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/mdl/piSystemWithCarbokation.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLReader reader = new MDLReader(ins);
         IChemFile chemFile = (IChemFile)reader.read((ChemObject)new ChemFile());
-        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getMolecule(0);    
+        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);    
         
         CDKHueckelAromaticityDetector.detectAromaticity(mol);
         
@@ -248,12 +246,12 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     @Test public void testPiSystemWithCumulativeDB() throws Exception
 	{
         logger.info("Entering testPiSystemWithCumulativeDB.");
-        IMolecule mol = null;
+        IAtomContainer mol = null;
         String filename = "data/mdl/piSystemCumulative.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         MDLReader reader = new MDLReader(ins);
         IChemFile chemFile = (IChemFile)reader.read((ChemObject)new ChemFile());
-        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getMolecule(0);    
+        mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);    
 
         CDKHueckelAromaticityDetector.detectAromaticity(mol);
         
@@ -295,7 +293,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void testAceticAcid() throws Exception
 	{
-    	IMolecule mol = null;
+        IAtomContainer mol = null;
     	mol = (new SmilesParser(builder)).parseSmiles("CC(=O)O");
     	addImplicitHydrogens(mol);
     	lpcheck.saturate(mol);
@@ -325,12 +323,12 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void testNN_dimethylaniline_cation() throws Exception
 	{
-    	IMolecule mol = null;
+        IAtomContainer mol = null;
     	String filename = "data/mdl/NN_dimethylaniline.mol";
     	InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
     	MDLV2000Reader reader = new MDLV2000Reader(ins);
     	IChemFile chemFile = (IChemFile)reader.read((ChemObject)new ChemFile());
-    	mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getMolecule(0);  
+    	mol = chemFile.getChemSequence(0).getChemModel(0).getMoleculeSet().getAtomContainer(0);  
     	
     	addImplicitHydrogens(mol);
     	lpcheck.saturate(mol);
@@ -352,7 +350,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void test1_fluorobutadienene() throws Exception
 	{
-    	IMolecule mol = (new SmilesParser(builder)).parseSmiles("FC=CC=C");
+        IAtomContainer mol = (new SmilesParser(builder)).parseSmiles("FC=CC=C");
     	addImplicitHydrogens(mol);
     	lpcheck.saturate(mol);
     	AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
@@ -375,7 +373,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void testEthyne_difluoro() throws Exception
 	{
-    	IMolecule mol = null;
+        IAtomContainer mol = null;
     	mol = (new SmilesParser(builder)).parseSmiles("FC#CF");
     	addImplicitHydrogens(mol);
     	lpcheck.saturate(mol);
@@ -398,7 +396,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void test3Aminomethane_cation() throws Exception
 	{
-    	IMolecule mol = builder.newInstance(IMolecule.class);
+        IAtomContainer mol = builder.newInstance(IAtomContainer.class);
     	mol.addAtom(builder.newInstance(IAtom.class,"N"));
     	mol.addAtom(builder.newInstance(IAtom.class,"C"));
     	mol.addBond(0, 1, Order.SINGLE);
@@ -442,8 +440,8 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 *  
 	 *@return    Description of the Return Value
 	 */
-    private IMolecule readCMLMolecule(String filename) throws Exception {
-    	IMolecule mol = null;
+    private IAtomContainer readCMLMolecule(String filename) throws Exception {
+    	IAtomContainer mol = null;
     	logger.debug("Filename: " + filename);
     	InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
     	CMLReader reader = new CMLReader(ins);
@@ -456,10 +454,10 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
     	Assert.assertEquals(1, sequence.getChemModelCount());
     	IChemModel chemModel = sequence.getChemModel(0);
     	Assert.assertNotNull(chemModel);
-    	IMoleculeSet moleculeSet = chemModel.getMoleculeSet();
+    	IAtomContainerSet moleculeSet = chemModel.getMoleculeSet();
     	Assert.assertNotNull(moleculeSet);
-    	Assert.assertEquals(1, moleculeSet.getMoleculeCount());
-    	mol = moleculeSet.getMolecule(0);
+    	Assert.assertEquals(1, moleculeSet.getAtomContainerCount());
+    	mol = moleculeSet.getAtomContainer(0);
     	Assert.assertNotNull(mol);
         
         return mol;
@@ -475,7 +473,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
     @Test public void testCyanoallene() throws Exception
 	{
-    	IMolecule mol = null;
+        IAtomContainer mol = null;
     	mol = (new SmilesParser(builder)).parseSmiles("C=C=CC#N");
     	addImplicitHydrogens(mol);
     	lpcheck.saturate(mol);
@@ -502,7 +500,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
 	@Test public void testChargeWithProtonExplicit() throws ClassNotFoundException, CDKException, java.lang.Exception {
 		SmilesParser sp = new SmilesParser(builder);
-		IMolecule mol = sp.parseSmiles("[H]C([H])=C([H])[C+]([H])[H]");
+		IAtomContainer mol = sp.parseSmiles("[H]C([H])=C([H])[C+]([H])[H]");
 		lpcheck.saturate(mol);
     	CDKHueckelAromaticityDetector.detectAromaticity(mol);
         
@@ -526,7 +524,7 @@ public class ConjugatedPiSystemsDetectorTest extends CDKTestCase
 	 */
 	@Test public void testChargeWithProtonImplicit() throws ClassNotFoundException, CDKException, java.lang.Exception {
 		SmilesParser sp = new SmilesParser(builder);
-		IMolecule mol = sp.parseSmiles("C=C[C+]");
+		IAtomContainer mol = sp.parseSmiles("C=C[C+]");
 		lpcheck.saturate(mol);
     	CDKHueckelAromaticityDetector.detectAromaticity(mol);
         

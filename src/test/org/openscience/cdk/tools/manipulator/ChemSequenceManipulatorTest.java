@@ -20,30 +20,43 @@
  */
 package org.openscience.cdk.tools.manipulator;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.openscience.cdk.*;
-import org.openscience.cdk.interfaces.*;
-import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.tools.IDCreator;
-import org.openscience.cdk.tools.manipulator.ChemSequenceManipulator;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.Bond;
+import org.openscience.cdk.CDKTestCase;
+import org.openscience.cdk.ChemModel;
+import org.openscience.cdk.ChemSequence;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.Reaction;
+import org.openscience.cdk.ReactionSet;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemSequence;
+import org.openscience.cdk.interfaces.IReaction;
+import org.openscience.cdk.interfaces.IReactionSet;
+import org.openscience.cdk.tools.IDCreator;
 
 /**
  * @cdk.module test-standard
  */
 public class ChemSequenceManipulatorTest extends CDKTestCase {
     
-	IMolecule molecule1 = null;
-	IMolecule molecule2 = null;
+	IAtomContainer molecule1 = null;
+	IAtomContainer molecule2 = null;
 	IAtom atomInMol1 = null;
 	IBond bondInMol1 = null;
 	IAtom atomInMol2 = null;
-	IMoleculeSet moleculeSet = null;
+	IAtomContainerSet moleculeSet = null;
 	IReaction reaction = null;
 	IReactionSet reactionSet = null;
 	IChemModel chemModel1 = null;
@@ -57,17 +70,17 @@ public class ChemSequenceManipulatorTest extends CDKTestCase {
 
     @Before
     public void setUp() {
-		molecule1 = new Molecule();
+		molecule1 = new AtomContainer();
 		atomInMol1 = new Atom("Cl");
 		molecule1.addAtom(atomInMol1);
 		molecule1.addAtom(new Atom("Cl"));
 		bondInMol1 = new Bond(atomInMol1, molecule1.getAtom(1));
 		molecule1.addBond(bondInMol1);
-		molecule2 = new Molecule();
+		molecule2 = new AtomContainer();
 		atomInMol2 = new Atom("O");
 		atomInMol2.setImplicitHydrogenCount(2);
 		molecule2.addAtom(atomInMol2);
-		moleculeSet = new MoleculeSet();
+		moleculeSet = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
 		moleculeSet.addAtomContainer(molecule1);
 		moleculeSet.addAtomContainer(molecule2);
 		reaction = new Reaction();
@@ -113,8 +126,8 @@ public class ChemSequenceManipulatorTest extends CDKTestCase {
         for (Object o : list) {
             //if (o instanceof IAtom) ++atomCount;
             //if (o instanceof IBond) ++bondCount;
-            if (o instanceof IMolecule) ++molCount;
-            else if (o instanceof IMoleculeSet) ++molSetCount;
+            if (o instanceof IAtomContainer) ++molCount;
+            else if (o instanceof IAtomContainerSet) ++molSetCount;
             else if (o instanceof IReaction) ++reactionCount;
             else if (o instanceof IReactionSet) ++reactionSetCount;
             else if (o instanceof IChemModel) ++chemModelCount;

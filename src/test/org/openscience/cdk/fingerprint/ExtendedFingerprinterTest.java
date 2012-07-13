@@ -1,6 +1,4 @@
-/* $Revision$ $Author$ $Date$    
- * 
- * Copyright (C) 1997-2009  Egon Willighagen <egonw@users.sf.net>
+/* Copyright (C) 1997-2009,2011  Egon Willighagen <egonw@users.sf.net>
  * 
  * Contact: cdk-devel@lists.sourceforge.net
  * 
@@ -33,14 +31,13 @@ import javax.vecmath.Point2d;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.ringsearch.RingPartitioner;
@@ -51,7 +48,7 @@ import org.openscience.cdk.tools.diff.AtomContainerDiff;
 /**
  * @cdk.module test-fingerprint
  */
-public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
+public class ExtendedFingerprinterTest extends AbstractFixedLengthFingerprinterTest {
 	
 	public IFingerprinter getFingerprinter() {
 		return new ExtendedFingerprinter();
@@ -66,9 +63,9 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		IFingerprinter fingerprinter = new ExtendedFingerprinter();
 		Assert.assertNotNull(fingerprinter);
 		
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 		Assert.assertFalse(FingerprinterTool.isSubset(bs1, bs));
@@ -79,11 +76,11 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		ExtendedFingerprinter fingerprinter = new ExtendedFingerprinter();
 		Assert.assertNotNull(fingerprinter);
 		
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		IRingSet rs=new SSSRFinder(mol).findSSSR();
 		List rslist=RingPartitioner.partitionRings(rs);
 		BitSet bs = fingerprinter.getFingerprint(mol,rs, rslist);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 		Assert.assertFalse(FingerprinterTool.isSubset(bs1, bs));
@@ -100,9 +97,9 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		IFingerprinter fingerprinter = new ExtendedFingerprinter(512);
 		Assert.assertNotNull(fingerprinter);
 		
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 		Assert.assertFalse(FingerprinterTool.isSubset(bs1, bs));
@@ -112,9 +109,9 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		IFingerprinter fingerprinter = new ExtendedFingerprinter(512,7);
 		Assert.assertNotNull(fingerprinter);
 		
-		Molecule mol = MoleculeFactory.makeIndole();
+		IAtomContainer mol = MoleculeFactory.makeIndole();
 		BitSet bs = fingerprinter.getFingerprint(mol);
-		Molecule frag1 = MoleculeFactory.makePyrrole();
+		IAtomContainer frag1 = MoleculeFactory.makePyrrole();
 		BitSet bs1 = fingerprinter.getFingerprint(frag1);
 		Assert.assertTrue(FingerprinterTool.isSubset(bs, bs1));
 		Assert.assertFalse(FingerprinterTool.isSubset(bs1, bs));
@@ -126,7 +123,7 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 	 */
 	@Test public void testDifferentRingFinders()throws Exception{
 		IFingerprinter fingerprinter = new ExtendedFingerprinter();
-		Molecule ac1=new Molecule();
+		IAtomContainer ac1 = new AtomContainer();
 		Atom atom1=new Atom("C");
 		Atom atom2=new Atom("C");
 		Atom atom3=new Atom("C");
@@ -151,7 +148,7 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		ac1.addBond(bond4);
 		ac1.addBond(bond5);
 		ac1.addBond(bond6);
-		Molecule ac2=new Molecule();
+		IAtomContainer ac2 = new AtomContainer();
 		ac2.addAtom(atom1);
 		ac2.addAtom(atom2);
 		ac2.addAtom(atom3);
@@ -176,7 +173,7 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 	 * for a system with three condensed rings using the fingerprint
 	 */
 	@Test public void testCondensedSingle()throws Exception{
-		  IMolecule molcondensed = new Molecule();
+		  IAtomContainer molcondensed = new AtomContainer();
 		  IAtom a1 = molcondensed.getBuilder().newInstance(IAtom.class,"C");
 		  a1.setPoint2d(new Point2d(421.99999999999994, 860.0));  molcondensed.addAtom(a1);
 		  IAtom a2 = molcondensed.getBuilder().newInstance(IAtom.class,"C");
@@ -246,7 +243,7 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 		  IBond b18 = molcondensed.getBuilder().newInstance(IBond.class,a13, a16, IBond.Order.SINGLE);
 		  molcondensed.addBond(b18);
 		  
-		  IMolecule molsingle = new Molecule();
+		  IAtomContainer molsingle = new AtomContainer();
 		  IAtom a1s = molsingle.getBuilder().newInstance(IAtom.class,"C");
 		  a1s.setPoint2d(new Point2d(421.99999999999994, 860.0));  molsingle.addAtom(a1s);
 		  IAtom a2s = molsingle.getBuilder().newInstance(IAtom.class,"C");
@@ -346,16 +343,16 @@ public class ExtendedFingerprinterTest extends AbstractFingerprinterTest {
 	 */
 	@Test public void testChebi() throws java.lang.Exception
 	{
-		Molecule searchmol = null;
-		Molecule findmol = null;
+		IAtomContainer searchmol = null;
+		IAtomContainer findmol = null;
 		String filename = "data/mdl/chebisearch.mol";
 		InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
 		MDLV2000Reader reader = new MDLV2000Reader(ins);
-		searchmol = reader.read(new Molecule());
+		searchmol = reader.read(new AtomContainer());
 		filename = "data/mdl/chebifind.mol";
 		ins = this.getClass().getClassLoader().getResourceAsStream(filename);
 		reader = new MDLV2000Reader(ins);
-		findmol = reader.read(new Molecule());
+		findmol = reader.read(new AtomContainer());
 		IFingerprinter fingerprinter = new ExtendedFingerprinter();
 		BitSet superBS = fingerprinter.getFingerprint(findmol);
 		BitSet subBS = fingerprinter.getFingerprint(searchmol);

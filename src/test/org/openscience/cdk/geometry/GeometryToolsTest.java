@@ -32,7 +32,6 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.config.Elements;
@@ -40,16 +39,12 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IBond.Order;
-import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IRing;
 import org.openscience.cdk.interfaces.IRingSet;
-import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
+import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.isomorphism.AtomMappingTools;
-import org.openscience.cdk.nonotify.NNAtom;
-import org.openscience.cdk.nonotify.NNAtomContainer;
 import org.openscience.cdk.tools.diff.AtomContainerDiff;
 
 /**
@@ -97,15 +92,15 @@ public class GeometryToolsTest extends CDKTestCase {
     @Test public void testHas2DCoordinates_With000() throws CDKException {
         String filenameMol = "data/mdl/with000coordinate.mol";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filenameMol);
-        IMolecule molOne=null;
+        IAtomContainer molOne=null;
         MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);
-        molOne = (IMolecule)reader.read(new Molecule());
+        molOne = (IAtomContainer)reader.read(new AtomContainer());
         Assert.assertEquals(2,GeometryTools.has2DCoordinatesNew(molOne));
     }
     
     @Test public void testTranslateAllPositive_IAtomContainer() {
-		IAtomContainer container = new NNAtomContainer();
-		IAtom atom = new NNAtom(Elements.CARBON);
+		IAtomContainer container = new AtomContainer();
+		IAtom atom = new Atom(Elements.CARBON);
 		atom.setPoint2d(new Point2d(-3, -2));
 		container.addAtom(atom);
 		GeometryTools.translateAllPositive(container);
@@ -126,15 +121,15 @@ public class GeometryToolsTest extends CDKTestCase {
 		String filenameMolTwo = "data/mdl/murckoTest6_3d.mol";
     	//String filenameMolTwo = "data/mdl/murckoTest6_3d_2.mol";
 	    InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filenameMolOne);
-	    Molecule molOne=null;
-	    Molecule molTwo=null;
+	    IAtomContainer molOne;
+	    IAtomContainer molTwo;
 	    Map mappedAtoms=new HashMap();
 	    MDLV2000Reader reader = new MDLV2000Reader(ins, Mode.STRICT);
-	    molOne = (Molecule)reader.read(new Molecule());
+	    molOne = reader.read(new AtomContainer());
 		
 	    ins = this.getClass().getClassLoader().getResourceAsStream(filenameMolTwo);
 	    reader = new MDLV2000Reader(ins, Mode.STRICT);
-	    molTwo = (Molecule)reader.read(new Molecule());
+	    molTwo = reader.read(new AtomContainer());
 	   
 	    mappedAtoms=AtomMappingTools.mapAtomsOfAlignedStructures(molOne, molTwo, mappedAtoms);
 	    //logger.debug("mappedAtoms:"+mappedAtoms.toString());
@@ -463,10 +458,10 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,1));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(1,0));
-        IMolecule react1 = new Molecule();
+        IAtomContainer react1 = new AtomContainer();
         react1.addAtom(atom1);
         react1.addAtom(atom2);
-        IMolecule react2 = (IMolecule)react1.clone();
+        IAtomContainer react2 = (IAtomContainer)react1.clone();
 
         // shift the second molecule right
         GeometryTools.shiftContainer(
@@ -504,10 +499,10 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,0));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(0,1));
-        IMolecule react1 = new Molecule();
+        IAtomContainer react1 = new AtomContainer();
         react1.addAtom(atom1);
         react1.addAtom(atom2);
-        IMolecule react2 = (IMolecule)react1.clone();
+        IAtomContainer react2 = (IAtomContainer)react1.clone();
 
         // shift the second molecule right
         GeometryTools.shiftContainer(
@@ -537,7 +532,7 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,0));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(1,0));
-        IMolecule acont = new Molecule();
+        IAtomContainer acont = new AtomContainer();
         IReaction reaction = new Reaction();
         reaction.addReactant(acont);
         acont.addAtom(atom1);
@@ -560,7 +555,7 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,0));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(1,0));
-        IMolecule acont = new Molecule();
+        IAtomContainer acont = new AtomContainer();
         reaction.addReactant(acont);
         acont.addAtom(atom1);
         acont.addAtom(atom2);
@@ -571,7 +566,7 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,0));
         atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(3,0));
-        acont = new Molecule();
+        acont = new AtomContainer();
         reaction.addProduct(acont);
         acont.addAtom(atom1);
         acont.addAtom(atom2);
@@ -589,14 +584,14 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,1));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(1,0));
-        IMolecule react1 = new Molecule();
+        IAtomContainer react1 = new AtomContainer();
         IReaction reaction = new Reaction();
         reaction.addReactant(react1);
         react1.addAtom(atom1);
         react1.addAtom(atom2);
         react1.addBond(0,1, IBond.Order.SINGLE);
         IReaction reaction2 = (IReaction)reaction.clone();
-        IMolecule react2 = reaction2.getReactants().getMolecule(0);
+        IAtomContainer react2 = reaction2.getReactants().getAtomContainer(0);
 
         // shift the second reaction up
         GeometryTools.shiftReactionVertical(
@@ -636,14 +631,14 @@ public class GeometryToolsTest extends CDKTestCase {
         atom1.setPoint2d(new Point2d(0,0));
         IAtom atom2 = new Atom("C");
         atom2.setPoint2d(new Point2d(1,0));
-        IMolecule react1 = new Molecule();
+        IAtomContainer react1 = new AtomContainer();
         IReaction reaction = new Reaction();
         reaction.addReactant(react1);
         react1.addAtom(atom1);
         react1.addAtom(atom2);
         react1.addBond(0,1, IBond.Order.SINGLE);
         IReaction reaction2 = (IReaction)reaction.clone();
-        IMolecule react2 = reaction2.getReactants().getMolecule(0);
+        IAtomContainer react2 = reaction2.getReactants().getAtomContainer(0);
 
         // shift the second reaction up
         GeometryTools.shiftReactionVertical(
@@ -688,7 +683,7 @@ public class GeometryToolsTest extends CDKTestCase {
     }
 
     private int alignmentTestHelper(IAtom zero, IAtom... pos) {
-    	IMolecule mol = new Molecule();
+    	IAtomContainer mol = new AtomContainer();
 		mol.addAtom(zero);
 		for(IAtom atom:pos){
 			mol.addAtom(atom);

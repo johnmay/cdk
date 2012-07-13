@@ -35,6 +35,7 @@ import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Generates an extended fingerprint for a given {@link IAtomContainer}, that
@@ -97,6 +98,11 @@ public class ExtendedFingerprinter implements IFingerprinter {
     public BitSet getFingerprint(IAtomContainer container) 
                   throws CDKException {
         return this.getFingerprint(container,null,null);
+    }
+
+    /** {@inheritDoc} */
+    public Map<String, Integer> getRawFingerprint(IAtomContainer iAtomContainer) throws CDKException {
+        throw new UnsupportedOperationException();
     }
 
     /**

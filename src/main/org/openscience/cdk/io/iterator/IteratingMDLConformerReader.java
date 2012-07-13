@@ -9,13 +9,13 @@ import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ConformerContainer;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 
 /**
  * Iterate over conformers of a collection of molecules stored in SDF format.
  * <p/>
- * This class is analogous to the {@link org.openscience.cdk.io.iterator.IteratingMDLReader} except that
+ * This class is analogous to the {@link org.openscience.cdk.io.iterator.IteratingSDFReader} except that
  * rather than return a single {@link org.openscience.cdk.interfaces.IMolecule} at each iteration this
  * class will return all the conformers for a given molecule at each iteration.
  * <p/>
@@ -50,22 +50,22 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
  */
 @TestClass("org.openscience.cdk.io.iterator.IteratingMDLConformerReaderTest")
 public class IteratingMDLConformerReader implements Iterator {
-    private IteratingMDLReader imdlr;
+    private IteratingSDFReader imdlr;
     private ConformerContainer container;
-    private IMolecule lastMol = null;
+    private IAtomContainer lastMol = null;
 
     private boolean hasNext = false;
     private boolean nextIsKnown = false;
 
     @TestMethod("testSDF")
     public IteratingMDLConformerReader(Reader in, IChemObjectBuilder builder) {
-        imdlr = new IteratingMDLReader(in, builder);
+        imdlr = new IteratingSDFReader(in, builder);
         container = new ConformerContainer();
     }
 
     @TestMethod("testSDF")
     public IteratingMDLConformerReader(InputStream in, IChemObjectBuilder builder) {
-        imdlr = new IteratingMDLReader(in, builder);
+        imdlr = new IteratingSDFReader(in, builder);
         container = new ConformerContainer();
     }
 
@@ -80,7 +80,7 @@ public class IteratingMDLConformerReader implements Iterator {
         if (!nextIsKnown) {
             while (imdlr.hasNext()) {
                 slurpedConformers = true;
-                IMolecule mol = (IMolecule) imdlr.next();
+                IAtomContainer mol = (IAtomContainer) imdlr.next();
                 if (container.size() == 0) container.add(mol);
                 else {
                     if (container.getTitle().equals(mol.getProperty(CDKConstants.TITLE))) container.add(mol);

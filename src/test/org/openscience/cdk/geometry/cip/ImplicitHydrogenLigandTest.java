@@ -25,8 +25,8 @@ package org.openscience.cdk.geometry.cip;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openscience.cdk.CDKTestCase;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.nonotify.NoNotificationChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
 /**
@@ -36,8 +36,8 @@ public class ImplicitHydrogenLigandTest extends CDKTestCase {
 
     @Test
     public void testConstructorAndGetMethods() throws Exception {
-        SmilesParser smiles = new SmilesParser(NoNotificationChemObjectBuilder.getInstance());
-        IMolecule molecule = smiles.parseSmiles("ClC(Br)(I)");
+        SmilesParser smiles = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smiles.parseSmiles("ClC(Br)(I)");
 
         ILigand ligand = new ImplicitHydrogenLigand(
             molecule, new VisitedAtoms(), molecule.getAtom(1)

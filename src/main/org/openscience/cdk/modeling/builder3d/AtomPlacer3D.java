@@ -30,6 +30,8 @@ import javax.vecmath.Vector3d;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.annotations.TestClass;
+import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
@@ -46,6 +48,8 @@ import org.openscience.cdk.interfaces.IBond;
  * @cdk.module     builder3d
  * @cdk.githash
  */
+@TestClass("org.openscience.cdk.modeling.builder3d.AtomPlacer3DTest " +
+ "org.openscience.cdk.modeling.builder3d.FurtherAtomPlacer3DTest")
 public class AtomPlacer3D {
 
 	private Map<Object,List> pSet = null;
@@ -78,6 +82,7 @@ public class AtomPlacer3D {
 	 *
 	 * @param  molecule the reference molecule for searching the chain 
 	 * @param  chain  chain to be searched
+	 * @param  molecule  the chain container (reference) molecule
 	 * @return        the atom number of the first heavy atom the number of heavy atoms in the chain
 	 */
 	public int[] findHeavyAtomsInChain(IAtomContainer molecule, IAtomContainer chain) {
@@ -97,7 +102,7 @@ public class AtomPlacer3D {
 
 
 	/**
-	 *  Mark all atoms in chain as placed (CDKConstant ISPLACED)
+	 *  Mark all atoms in chain as placed. (CDKConstant ISPLACED)
 	 *
 	 * @param  ac  chain
 	 * @return     chain all atoms marked as placed
@@ -111,9 +116,11 @@ public class AtomPlacer3D {
 
 	
 	/**
-	 *  Method assigns 3Dcoordinates to the heavy atoms in an aliphatic chain
+	 *  Method assigns 3Dcoordinates to the heavy atoms in an aliphatic chain.
 	 *
+	 * @param molecule        the reference molecule for the chain
 	 * @param  chain          the atoms to be assigned, must be connected
+	 * 
 	 */
 	public void placeAliphaticHeavyChain(IAtomContainer molecule, IAtomContainer chain) throws CDKException{
 		//logger.debug("******** Place aliphatic Chain *********");
@@ -189,7 +196,8 @@ public class AtomPlacer3D {
 	 * The first Atom end up in the origin, the second on on the x axis, and the third
 	 * one in the XY plane. The rest is added by applying the Zmatrix distances, angles
 	 * and dihedrals. Assign coordinates directly to the atoms.
-	 *
+	 * 
+	 * @param  molecule  the molecule to be placed in 3D
 	 * @param  flag_branched  marks branched chain
 	 * author: egonw,cho
 	 */
@@ -252,7 +260,7 @@ public class AtomPlacer3D {
 
 
 	/**
-	 *  Gets the hybridisationState of an atom
+	 *  Gets the hybridisationState of an atom.
 	 *
 	 *@param  atom1  atom
 	 *@return        The hybridisationState value (sp=1;sp2=2;sp3=3)
@@ -310,6 +318,7 @@ public class AtomPlacer3D {
 	 * @param  id2            atom2 id
 	 * @return                The distanceValue value from the force field parameter set
 	 */
+	@TestMethod("testGetBondLengthValue")
 	public double getBondLengthValue(String id1, String id2){
 		String dkey = "";
 		if (pSet.containsKey(("bond" + id1 + ";" + id2))) {
@@ -334,6 +343,7 @@ public class AtomPlacer3D {
 	 * @param  id3            Description of the Parameter
 	 * @return                The angleKey value
 	 */
+	@TestMethod("testGetAngleValue")
 	public double getAngleValue(String id1, String id2, String id3) {
 		String akey = "";
 		if (pSet.containsKey(("angle" + id1 + ";" + id2 + ";" + id3))) {

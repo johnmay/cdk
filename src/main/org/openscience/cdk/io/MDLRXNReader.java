@@ -27,15 +27,6 @@
  */
 package org.openscience.cdk.io;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
@@ -45,16 +36,24 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.IMapping;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.formats.MDLRXNFormat;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Reads a molecule from an MDL RXN file {@cdk.cite DAL92}.
@@ -343,8 +342,8 @@ public class MDLRXNReader extends DefaultChemObjectReader {
                 // read MDL molfile content
                 MDLReader reader = new MDLReader(
                   new StringReader(molFile.toString()));
-                IMolecule reactant = (IMolecule)reader.read(
-                  builder.newInstance(IMolecule.class)
+                IAtomContainer reactant = (IAtomContainer)reader.read(
+                  builder.newInstance(IAtomContainer.class)
                 );
                   
                 // add reactant
@@ -375,8 +374,8 @@ public class MDLRXNReader extends DefaultChemObjectReader {
                     new StringReader(molFile.toString()),
                     super.mode
                 );
-                IMolecule product = (IMolecule)reader.read(
-                  builder.newInstance(IMolecule.class));
+                IAtomContainer product = (IAtomContainer)reader.read(
+                  builder.newInstance(IAtomContainer.class));
                   
                 // add reactant
                 reaction.addProduct(product);
@@ -393,14 +392,14 @@ public class MDLRXNReader extends DefaultChemObjectReader {
         logger.info("Reading atom-atom mapping from file");
         // distribute all atoms over two AtomContainer's
         IAtomContainer reactingSide = builder.newInstance(IAtomContainer.class);
-        Iterator molecules = reaction.getReactants().molecules().iterator();
+        Iterator molecules = reaction.getReactants().atomContainers().iterator();
         while (molecules.hasNext()) {
-            reactingSide.add((IMolecule)molecules.next());
+            reactingSide.add((IAtomContainer)molecules.next());
         }
         IAtomContainer producedSide = builder.newInstance(IAtomContainer.class);
-        molecules = reaction.getProducts().molecules().iterator();
+        molecules = reaction.getProducts().atomContainers().iterator();
         while (molecules.hasNext()) {
-            producedSide.add((IMolecule)molecules.next());
+            producedSide.add((IAtomContainer)molecules.next());
         }
         
         // map the atoms

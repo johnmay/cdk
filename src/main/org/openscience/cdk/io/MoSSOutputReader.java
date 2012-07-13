@@ -32,12 +32,12 @@ import org.openscience.cdk.annotations.TestClass;
 import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.formats.MoSSOutputFormat;
 import org.openscience.cdk.smiles.SmilesParser;
@@ -120,7 +120,7 @@ public class MoSSOutputReader extends DefaultChemObjectReader {
     public boolean accepts(Class testClass) {
         Class[] interfaces = testClass.getInterfaces();
         for (int i=0; i<interfaces.length; i++) {
-            if (IMoleculeSet.class.equals(interfaces[i])) return true;
+            if (IAtomContainerSet.class.equals(interfaces[i])) return true;
             if (IChemFile.class.equals(interfaces[i])) return true;
         }
         Class superClass = testClass.getSuperclass();
@@ -135,10 +135,10 @@ public class MoSSOutputReader extends DefaultChemObjectReader {
      * @return        the content in a {@link IMoleculeSet} object
      */
     public <T extends IChemObject> T read(T object) throws CDKException {
-        if (object instanceof IMoleculeSet) {
-            IMoleculeSet cf = (IMoleculeSet)object;
+        if (object instanceof IAtomContainerSet) {
+            IAtomContainerSet cf = (IAtomContainerSet)object;
             try {
-                cf = readMoleculeSet(cf);
+                cf = readAtomContainerSet(cf);
             } catch (IOException e) {
                 logger.error("Input/Output error while reading from input.");
             }
@@ -147,9 +147,9 @@ public class MoSSOutputReader extends DefaultChemObjectReader {
             IChemFile chemFile = (IChemFile)object;
             IChemSequence chemSeq = object.getBuilder().newInstance(IChemSequence.class);
             IChemModel chemModel = object.getBuilder().newInstance(IChemModel.class);
-            IMoleculeSet molSet = object.getBuilder().newInstance(IMoleculeSet.class);
+            IAtomContainerSet molSet = object.getBuilder().newInstance(IAtomContainerSet.class);
             try {
-                molSet = readMoleculeSet(molSet);
+                molSet = readAtomContainerSet(molSet);
             } catch (IOException e) {
                 logger.error("Input/Output error while reading from input.");
             }
@@ -164,8 +164,11 @@ public class MoSSOutputReader extends DefaultChemObjectReader {
 
     /**
      * Read the file content into a {@link IMoleculeSet}.
+     * @param molSet an {@link IAtomContainerSet} to store the structures
+     * @return the {@link IAtomContainerSet} containing the molecules read in
+     * @throws java.io.IOException if there is an error during reading
      */
-    private IMoleculeSet readMoleculeSet(IMoleculeSet molSet) throws IOException {
+    private IAtomContainerSet readAtomContainerSet(IAtomContainerSet molSet) throws IOException {
         SmilesParser parser = new SmilesParser(molSet.getBuilder());
         parser.setPreservingAromaticity(true);
         String line = input.readLine();
@@ -173,12 +176,12 @@ public class MoSSOutputReader extends DefaultChemObjectReader {
         while (line != null) {
             String[] cols = line.split(",");
             try {
-                IMolecule mol = parser.parseSmiles(cols[1]);
+                IAtomContainer mol = parser.parseSmiles(cols[1]);
                 mol.setProperty("focusSupport", cols[5]);
                 mol.setProperty("complementSupport", cols[7]);
                 mol.setProperty("atomCount", cols[2]);
                 mol.setProperty("bondCount", cols[3]);
-                molSet.addMolecule(mol);
+                molSet.addAtomContainer(mol);
             } catch (InvalidSmilesException exception) {
                 logger.error("Skipping invalid SMILES: " + cols[1]);
                 logger.debug(exception);

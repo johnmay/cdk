@@ -37,6 +37,7 @@ import org.openscience.cdk.smiles.smarts.SMARTSQueryTool;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
 
 import java.util.BitSet;
+import java.util.Map;
 
 /**
  * Generates a Pubchem fingerprint for a molecule.
@@ -91,15 +92,8 @@ public class PubchemFingerprinter implements IFingerprinter {
     private byte[] m_bits;
 
     private SMARTSQueryTool sqt;
-
     public PubchemFingerprinter() {
-        try {
-            sqt = new SMARTSQueryTool("C");
-        } catch (CDKException e) {
-            // bad practice but, the above initialization
-            // will never fail so we don't bother throwing
-            // the exception
-        }
+    	sqt = new SMARTSQueryTool("C");
         m_bits = new byte[(FP_SIZE + 7) >> 3];
     }
 
@@ -125,6 +119,11 @@ public class PubchemFingerprinter implements IFingerprinter {
             if (isBitOn(i)) fp.set(i);
         }
         return fp;
+    }
+
+    /** {@inheritDoc} */
+    public Map<String, Integer> getRawFingerprint(IAtomContainer iAtomContainer) throws CDKException {
+        throw new UnsupportedOperationException();
     }
 
     /**

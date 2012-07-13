@@ -42,7 +42,7 @@ import java.util.List;
  * fragments by using code like:
  * <pre>
  *   MoleculeSet fragments = ConnectivityChecker.partitionIntoMolecules(disconnectedContainer);
- *   int fragmentCount = fragments.getMoleculeCount();
+ *   int fragmentCount = fragments.getAtomContainerCount();
  * </pre> 
  *
  * @cdk.module standard
@@ -67,7 +67,7 @@ public class ConnectivityChecker
         if (atomContainer.getAtomCount() < 2) return true;
 
 		IAtomContainer newContainer = atomContainer.getBuilder().newInstance(IAtomContainer.class);
-		IMolecule molecule = atomContainer.getBuilder().newInstance(IMolecule.class);
+		IAtomContainer molecule = atomContainer.getBuilder().newInstance(IAtomContainer.class);
 		List<IAtom> sphere = new ArrayList<IAtom>();
         for (IAtom atom : atomContainer.atoms()) {
             atom.setFlag(CDKConstants.VISITED, false);
@@ -97,10 +97,10 @@ public class ConnectivityChecker
      * @cdk.dictref   blue-obelisk:graphPartitioning
 	 */
     @TestMethod("testPartitionIntoMolecules_IAtomContainer,testPartitionIntoMoleculesKeepsAtomIDs,testPartitionIntoMolecules_IsConnected_Consistency")
-    public static IMoleculeSet partitionIntoMolecules(IAtomContainer atomContainer) {
+    public static IAtomContainerSet partitionIntoMolecules(IAtomContainer atomContainer) {
 		IAtomContainer newContainer = atomContainer.getBuilder().newInstance(IAtomContainer.class);
-		IMolecule molecule;
-		IMoleculeSet molecules = atomContainer.getBuilder().newInstance(IMoleculeSet.class);
+		IAtomContainer molecule;
+		IAtomContainerSet molecules = atomContainer.getBuilder().newInstance(IAtomContainerSet.class);
 		List<IAtom> sphere = new ArrayList<IAtom>();
 
         for (IAtom atom : atomContainer.atoms()) {
@@ -120,12 +120,12 @@ public class ConnectivityChecker
 
         while(newContainer.getAtomCount() > 0) {
 			IAtom atom = newContainer.getAtom(0);
-			molecule = atomContainer.getBuilder().newInstance(IMolecule.class);
+			molecule = atomContainer.getBuilder().newInstance(IAtomContainer.class);
 			sphere.clear();
 			sphere.add(atom);
 			atom.setFlag(CDKConstants.VISITED, true);
 			PathTools.breadthFirstSearch(newContainer, sphere, molecule);
-			molecules.addMolecule(molecule);
+			molecules.addAtomContainer(molecule);
 			newContainer.remove(molecule);
 		}
 		return molecules;

@@ -23,18 +23,16 @@
  */
 package org.openscience.cdk.structgen;
 
-import java.util.Vector;
-
-import javax.vecmath.Vector2d;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.graph.ConnectivityChecker;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.templates.MoleculeFactory;
+
+import javax.vecmath.Vector2d;
+import java.util.Vector;
 
 /**
  * @cdk.module test-structgen
@@ -50,9 +48,9 @@ public class RandomStructureGeneratorTest extends CDKTestCase {
 	}
 
 	@Test public void testTwentyRandomStructures() {
-		Molecule molecule = MoleculeFactory.makeAlphaPinene();
+	    IAtomContainer molecule = MoleculeFactory.makeAlphaPinene();
 		RandomGenerator rg = new RandomGenerator(molecule);
-		IMolecule result = null;
+		IAtomContainer result = null;
 		for (int f = 0; f < 50; f++) {
 			result = rg.proposeStructure();
 			Assert.assertEquals(molecule.getAtomCount(), result.getAtomCount());
@@ -66,14 +64,14 @@ public class RandomStructureGeneratorTest extends CDKTestCase {
 	 */
 	private boolean everythingOk(Vector structures) throws Exception
 	{
-		StructureDiagramGenerator sdg = null; 
-		Molecule mol = null;
+		StructureDiagramGenerator sdg;
+		IAtomContainer mol;
 		if (debug) System.out.println("number of structures in vector: " + structures.size());
 		for (int f = 0; f < structures.size(); f++)
 		{
 			sdg = new StructureDiagramGenerator();
 
-			mol = (Molecule)structures.elementAt(f);
+			mol = (IAtomContainer)structures.elementAt(f);
 			sdg.setMolecule(mol);
 
 			sdg.generateCoordinates(new Vector2d(0,1));

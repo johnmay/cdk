@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
 
 /**
@@ -71,8 +71,8 @@ public class AbstractMCSTest {
     @Test
     public void testInit_3args_1() throws Exception {
         System.out.println("init");
-        IMolecule source = null;
-        IMolecule target = null;
+        IAtomContainer source = null;
+        IAtomContainer target = null;
         boolean removeHydrogen = false;
         AbstractMCS instance = new AbstractMCSImpl();
         instance.init(source, target, removeHydrogen, true);
@@ -297,10 +297,6 @@ public class AbstractMCSTest {
     }
 
     public class AbstractMCSImpl extends AbstractMCS {
-
-        @Override
-        public void init(IMolecule source, IMolecule target, boolean removeHydrogen, boolean cleanMol) throws CDKException {
-        }
 
         @Override
         public void init(IAtomContainer source, IAtomContainer target, boolean removeHydrogen, boolean cleanMol) throws CDKException {

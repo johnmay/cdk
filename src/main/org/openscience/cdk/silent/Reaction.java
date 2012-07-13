@@ -23,7 +23,11 @@
  */
 package org.openscience.cdk.silent;
 
-import org.openscience.cdk.interfaces.*;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IMapping;
+import org.openscience.cdk.interfaces.IReaction;
 
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -59,11 +63,11 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
 
 	protected int growArraySize = 3;
 
-    protected IMoleculeSet reactants;
-    protected IMoleculeSet products;
+    protected IAtomContainerSet reactants;
+    protected IAtomContainerSet products;
     /** These are the used solvent, catalysts etc that normally appear above
         the reaction arrow */
-    protected IMoleculeSet agents;
+    protected IAtomContainerSet agents;
     
     protected IMapping[] map;
     protected int mappingCount;
@@ -74,9 +78,9 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * Constructs an empty, forward reaction.
      */
     public Reaction() {
-        this.reactants = new MoleculeSet();
-        this.products = new MoleculeSet();
-        this.agents = new MoleculeSet();
+        this.reactants = getBuilder().newInstance(IAtomContainerSet.class);
+        this.products = getBuilder().newInstance(IAtomContainerSet.class);
+        this.agents = getBuilder().newInstance(IAtomContainerSet.class);
         this.map = new Mapping[growArraySize];
         mappingCount = 0;
         reactionDirection = IReaction.Direction.FORWARD;
@@ -104,19 +108,20 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * Returns a MoleculeSet containing the reactants in this reaction.
      *
      * @return A MoleculeSet containing the reactants in this reaction
-     * @see    #setReactants
+     * @see    org.openscience.cdk.interfaces.IReaction#setReactants
      */
-    public IMoleculeSet getReactants() {
+    public IAtomContainerSet getReactants() {
         return reactants;
     }
 
     /**
      * Assigns a MoleculeSet to the reactants in this reaction.
      *
+     *
      * @param setOfMolecules The new set of reactants
      * @see   #getReactants
      */
-    public void setReactants(IMoleculeSet setOfMolecules) {
+    public void setReactants(IAtomContainerSet setOfMolecules) {
         reactants = setOfMolecules;
     }
 	
@@ -124,19 +129,20 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * Returns a MoleculeSet containing the products of this reaction.
      *
      * @return A MoleculeSet containing the products in this reaction
-     * @see    #setProducts
+     * @see    org.openscience.cdk.interfaces.IReaction#setProducts
      */
-    public IMoleculeSet getProducts() {
+    public IAtomContainerSet getProducts() {
         return products;
     }
     
 	/**
      * Assigns a MoleculeSet to the products of this reaction.
      *
+     *
      * @param setOfMolecules The new set of products
      * @see   #getProducts
      */
-    public void setProducts(IMoleculeSet setOfMolecules) {
+    public void setProducts(IAtomContainerSet setOfMolecules) {
         products = setOfMolecules;
     }
 	
@@ -146,7 +152,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @return A MoleculeSet containing the agents in this reaction
      * @see    #addAgent
      */
-    public IMoleculeSet getAgents() {
+    public IAtomContainerSet getAgents() {
         return agents;
     }
     
@@ -192,7 +198,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @param reactant   Molecule added as reactant to this reaction
      * @see   #getReactants
      */
-    public void addReactant(IMolecule reactant) {
+    public void addReactant(IAtomContainer reactant) {
         addReactant(reactant, 1.0);
 	/* notifyChanged() is called by 
 	   addReactant(Molecule reactant, double coefficient) */
@@ -204,7 +210,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @param agent   Molecule added as agent to this reaction
      * @see   #getAgents
      */
-    public void addAgent(IMolecule agent) {
+    public void addAgent(IAtomContainer agent) {
         agents.addAtomContainer(agent);
     }
 
@@ -215,7 +221,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @param coefficient Stoichiometry coefficient for this molecule
      * @see   #getReactants
      */
-    public void addReactant(IMolecule reactant, Double coefficient) {
+    public void addReactant(IAtomContainer reactant, Double coefficient) {
         reactants.addAtomContainer(reactant, coefficient);
     }
     
@@ -225,7 +231,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @param product    Molecule added as product to this reaction
      * @see   #getProducts
      */
-    public void addProduct(IMolecule product) {
+    public void addProduct(IAtomContainer product) {
         this.addProduct(product, 1.0);
 	/* notifyChanged() is called by 
 	addProduct(Molecule product, double coefficient)*/
@@ -238,7 +244,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @param coefficient Stoichiometry coefficient for this molecule
      * @see   #getProducts
      */
-    public void addProduct(IMolecule product, Double coefficient) {
+    public void addProduct(IAtomContainer product, Double coefficient) {
         products.addAtomContainer(product, coefficient);
 	/* notifyChanged() is called by 
 	   addReactant(Molecule reactant, double coefficient) */
@@ -251,7 +257,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @return -1, if the given molecule is not a product in this Reaction
      * @see    #setReactantCoefficient
      */
-    public Double getReactantCoefficient(IMolecule reactant) {
+    public Double getReactantCoefficient(IAtomContainer reactant) {
         return reactants.getMultiplier(reactant);
     }
     
@@ -262,7 +268,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @return -1, if the given molecule is not a product in this Reaction
      * @see    #setProductCoefficient
      */
-    public Double getProductCoefficient(IMolecule product) {
+    public Double getProductCoefficient(IAtomContainer product) {
         return products.getMultiplier(product);
     }
 	
@@ -274,7 +280,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @return  true if Molecule has been found and stoichiometry has been set.
      * @see     #getReactantCoefficient
      */
-    public boolean setReactantCoefficient(IMolecule reactant, Double coefficient) {
+    public boolean setReactantCoefficient(IAtomContainer reactant, Double coefficient) {
     	boolean result = reactants.setMultiplier(reactant, coefficient);
     	return result;
     }
@@ -288,7 +294,7 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
      * @return  true if Molecule has been found and stoichiometry has been set.
      * @see     #getProductCoefficient
      */
-    public boolean setProductCoefficient(IMolecule product, Double coefficient) {
+    public boolean setProductCoefficient(IAtomContainer product, Double coefficient) {
         boolean result = products.setMultiplier(product, coefficient);
     	return result;
     }
@@ -441,23 +447,24 @@ public class Reaction extends ChemObject implements Serializable, IReaction, Clo
 	public Object clone() throws CloneNotSupportedException {
 		Reaction clone = (Reaction)super.clone();
         // clone the reactants, products and agents
-        clone.reactants = (MoleculeSet)((MoleculeSet)reactants).clone();
-        clone.agents = (MoleculeSet)((MoleculeSet)agents).clone();
-        clone.products = (MoleculeSet)((MoleculeSet)products).clone();
+        clone.reactants = (IAtomContainerSet) reactants.clone();
+        clone.agents = (IAtomContainerSet) agents.clone();
+        clone.products = (IAtomContainerSet) products.clone();
         // create a Map of corresponding atoms for molecules (key: original Atom, 
         // value: clone Atom)
         Map<IAtom, IAtom> atomatom = new Hashtable<IAtom, IAtom>();
-        for (int i = 0; i < reactants.getMoleculeCount(); ++i) {
-            Molecule mol = (Molecule)((MoleculeSet)reactants).getMolecule(i);
-            Molecule mol2 = (Molecule)clone.reactants.getMolecule(i);
+        for (int i = 0; i < reactants.getAtomContainerCount(); ++i) {
+            IAtomContainer mol = reactants.getAtomContainer(i);
+            IAtomContainer mol2 = clone.reactants.getAtomContainer(i);
             for (int j = 0; j < mol.getAtomCount(); ++j) atomatom.put(mol.getAtom(j), mol2.getAtom(j));
         }
         
         // clone the maps
 		clone.map = new Mapping[map.length];
 		for (int f = 0; f < mappingCount; f++) {
-			clone.map[f] = new Mapping((ChemObject)atomatom.get(map[f].getChemObject(0)), (ChemObject)atomatom.get(map[f].getChemObject(1)));
+			clone.map[f] = new Mapping(atomatom.get(map[f].getChemObject(0)), atomatom.get(map[f].getChemObject(1)));
 		}
 		return clone;
 	}
+
 }

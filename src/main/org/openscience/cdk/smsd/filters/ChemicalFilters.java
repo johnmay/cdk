@@ -50,8 +50,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IBond.Order;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtom;
 import org.openscience.cdk.isomorphism.matchers.IQueryBond;
@@ -450,8 +448,8 @@ public class ChemicalFilters {
 //      System.out.println("Mol Size Eorg: " + sourceMol.getMolecule().getAtomCount() + " , Mol Size Porg: " +
 //        targetMol.getMolecule().getAtomCount());
 
-        IAtomContainer Educt = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class, rMol);
-        IAtomContainer product = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class, pMol);
+        IAtomContainer Educt = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class, rMol);
+        IAtomContainer product = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class, pMol);
 
 
         if (MCSAtomSolution != null) {
@@ -470,8 +468,8 @@ public class ChemicalFilters {
 //        System.out.println("\nSort By Energies");
         double totalBondEnergy = -9999.0;
 
-        IAtomContainer Educt = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class, rMol);
-        IAtomContainer product = DefaultChemObjectBuilder.getInstance().newInstance(IMolecule.class, pMol);
+        IAtomContainer Educt = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class, rMol);
+        IAtomContainer product = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainer.class, pMol);
 
         for (IAtom eAtom : Educt.atoms()) {
             eAtom.setFlag(0, false);
@@ -851,7 +849,7 @@ public class ChemicalFilters {
 
     private int getFragmentCount(IAtomContainer molecule) {
         boolean fragmentFlag = true;
-        IAtomContainerSet fragmentMolSet = DefaultChemObjectBuilder.getInstance().newInstance(IMoleculeSet.class);
+        IAtomContainerSet fragmentMolSet = DefaultChemObjectBuilder.getInstance().newInstance(IAtomContainerSet.class);
         int countFrag = 0;
         if (molecule.getAtomCount()
                 > 0) {

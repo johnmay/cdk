@@ -30,27 +30,27 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.CDKTestCase;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemModel;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.ChemSequence;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.ReactionSet;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemSequence;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
-import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
+import org.openscience.cdk.io.MDLReader;
 import org.openscience.cdk.tools.IDCreator;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -63,12 +63,12 @@ public class ChemFileManipulatorTest extends CDKTestCase {
 	private final static ILoggingTool logger =
         LoggingToolFactory.createLoggingTool(ChemFileManipulatorTest.class);
 	
-	IMolecule molecule1 = null;
-	IMolecule molecule2 = null;
+	IAtomContainer molecule1 = null;
+	IAtomContainer molecule2 = null;
 	IAtom atomInMol1 = null;
 	IBond bondInMol1 = null;
 	IAtom atomInMol2 = null;
-	IMoleculeSet moleculeSet = null;
+	IAtomContainerSet moleculeSet = null;
 	IReaction reaction = null;
 	IReactionSet reactionSet = null;
 	IChemModel chemModel = null;
@@ -82,17 +82,17 @@ public class ChemFileManipulatorTest extends CDKTestCase {
 
     @Before
     public void setUp() {
-		molecule1 = new Molecule();
+		molecule1 = new AtomContainer();
 		atomInMol1 = new Atom("Cl");
 		molecule1.addAtom(atomInMol1);
 		molecule1.addAtom(new Atom("Cl"));
 		bondInMol1 = new Bond(atomInMol1, molecule1.getAtom(1));
 		molecule1.addBond(bondInMol1);
-		molecule2 = new Molecule();
+		molecule2 = new AtomContainer();
 		atomInMol2 = new Atom("O");
 		atomInMol2.setImplicitHydrogenCount(2);
 		molecule2.addAtom(atomInMol2);
-		moleculeSet = new MoleculeSet();
+		moleculeSet = new AtomContainerSet();
 		moleculeSet.addAtomContainer(molecule1);
 		moleculeSet.addAtomContainer(molecule2);
 		reaction = new Reaction();
@@ -165,8 +165,8 @@ public class ChemFileManipulatorTest extends CDKTestCase {
     		Object o = iter.next();
     		if (o instanceof IAtom) ++atomCount;
     		if (o instanceof IBond) ++bondCount;
-    		if (o instanceof IMolecule) ++molCount;
-    		else if (o instanceof IMoleculeSet) ++molSetCount;
+    		if (o instanceof IAtomContainer) ++molCount;
+    		else if (o instanceof IAtomContainerSet) ++molSetCount;
     		else if (o instanceof IReaction) ++reactionCount;
     		else if (o instanceof IReactionSet) ++reactionSetCount;
     		else if (o instanceof IChemModel) ++chemModelCount;

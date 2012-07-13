@@ -43,14 +43,14 @@ import org.openscience.cdk.annotations.TestMethod;
 import org.openscience.cdk.config.IsotopeFactory;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.IIsotope;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.io.formats.MDLFormat;
@@ -152,7 +152,7 @@ public class MDLReader extends DefaultChemObjectReader {
 		for (int i=0; i<interfaces.length; i++) {
 			if (IChemFile.class.equals(interfaces[i])) return true;
 			if (IChemModel.class.equals(interfaces[i])) return true;
-			if (IMolecule.class.equals(interfaces[i])) return true;
+			if (IAtomContainer.class.equals(interfaces[i])) return true;
 		}
     Class superClass = classObject.getSuperclass();
     if (superClass != null) return this.accepts(superClass);
@@ -174,21 +174,21 @@ public class MDLReader extends DefaultChemObjectReader {
 			return (T)readChemFile((IChemFile)object);
         } else if (object instanceof IChemModel) {
             return (T)readChemModel((IChemModel)object);
-		} else if (object instanceof IMolecule) {
-			return (T)readMolecule((IMolecule)object);
+		} else if (object instanceof IAtomContainer) {
+			return (T)readMolecule((IAtomContainer)object);
 		} else {
 			throw new CDKException("Only supported are ChemFile and Molecule.");
 		}
 	}
 
     private IChemModel readChemModel(IChemModel chemModel) throws CDKException {
-    	IMoleculeSet setOfMolecules = chemModel.getMoleculeSet();
+        IAtomContainerSet setOfMolecules = chemModel.getMoleculeSet();
         if (setOfMolecules == null) {
-            setOfMolecules = chemModel.getBuilder().newInstance(IMoleculeSet.class);
+            setOfMolecules = chemModel.getBuilder().newInstance(IAtomContainerSet.class);
         }
-        IMolecule m = readMolecule(chemModel.getBuilder().newInstance(IMolecule.class));
+        IAtomContainer m = readMolecule(chemModel.getBuilder().newInstance(IAtomContainer.class));
 		if (m != null) {
-			setOfMolecules.addMolecule(m);
+			setOfMolecules.addAtomContainer(m);
 		}
         chemModel.setMoleculeSet(setOfMolecules);
         return chemModel;
@@ -203,15 +203,15 @@ public class MDLReader extends DefaultChemObjectReader {
         IChemSequence chemSequence = chemFile.getBuilder().newInstance(IChemSequence.class);
         
         IChemModel chemModel = chemFile.getBuilder().newInstance(IChemModel.class);
-		IMoleculeSet setOfMolecules = chemFile.getBuilder().newInstance(IMoleculeSet.class);
-		IMolecule m = readMolecule(chemFile.getBuilder().newInstance(IMolecule.class));
+		IAtomContainerSet setOfMolecules = chemFile.getBuilder().newInstance(IAtomContainerSet.class);
+		IAtomContainer m = readMolecule(chemFile.getBuilder().newInstance(IAtomContainer.class));
 		if (m != null) {
-			setOfMolecules.addMolecule(m);
+			setOfMolecules.addAtomContainer(m);
 		}
         chemModel.setMoleculeSet(setOfMolecules);
         chemSequence.addChemModel(chemModel);
         
-        setOfMolecules = chemFile.getBuilder().newInstance(IMoleculeSet.class);
+        setOfMolecules = chemFile.getBuilder().newInstance(IAtomContainerSet.class);
         chemModel = chemFile.getBuilder().newInstance(IChemModel.class);
 		String str;
         try {
@@ -222,15 +222,15 @@ public class MDLReader extends DefaultChemObjectReader {
                 // reading mol files
 		str = new String(line);
 		if (str.equals("$$$$")) {
-		    m = readMolecule(chemFile.getBuilder().newInstance(IMolecule.class));
+		    m = readMolecule(chemFile.getBuilder().newInstance(IAtomContainer.class));
 		    
 		    if (m != null) {
-			setOfMolecules.addMolecule(m);
+			setOfMolecules.addAtomContainer(m);
 			
 			chemModel.setMoleculeSet(setOfMolecules);
 			chemSequence.addChemModel(chemModel);
 			
-			setOfMolecules = chemFile.getBuilder().newInstance(IMoleculeSet.class);
+			setOfMolecules = chemFile.getBuilder().newInstance(IAtomContainerSet.class);
 			chemModel = chemFile.getBuilder().newInstance(IChemModel.class);
 			
 		    }
@@ -307,7 +307,7 @@ public class MDLReader extends DefaultChemObjectReader {
 	 *
 	 *@return    The Molecule that was read from the MDL file.
 	 */
-	private IMolecule readMolecule(IMolecule molecule) throws CDKException {
+	private IAtomContainer readMolecule(IAtomContainer molecule) throws CDKException {
         logger.debug("Reading new molecule");
         int linecount = 0;
         int atoms = 0;
@@ -604,19 +604,14 @@ public class MDLReader extends DefaultChemObjectReader {
     }
     
     private void initIOSettings() {
-        forceReadAs3DCoords = new BooleanIOSetting("ForceReadAs3DCoordinates", IOSetting.LOW,
+        forceReadAs3DCoords = addSetting(new BooleanIOSetting("ForceReadAs3DCoordinates", IOSetting.Importance.LOW,
           "Should coordinates always be read as 3D?", 
-          "false");
+          "false"));
     }
     
     public void customizeJob() {
         fireIOSettingQuestion(forceReadAs3DCoords);
     }
 
-    public IOSetting[] getIOSettings() {
-        IOSetting[] settings = new IOSetting[1];
-        settings[0] = forceReadAs3DCoords;
-        return settings;
-    }
 }
 

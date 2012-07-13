@@ -23,11 +23,11 @@ package org.openscience.cdk.debug;
 import java.util.Map;
 
 import org.openscience.cdk.Reaction;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomContainerSet;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IChemObjectChangeEvent;
 import org.openscience.cdk.interfaces.IChemObjectListener;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
@@ -156,72 +156,72 @@ public class DebugReaction extends Reaction
 		return super.getProductCount();
 	}
 
-	public IMoleculeSet getReactants() {
+	public IAtomContainerSet getReactants() {
 		logger.debug("Getting reactants: ", super.getReactants());
 		return super.getReactants();
 	}
 
-	public void setReactants(IMoleculeSet reactants) {
+	public void setReactants(IAtomContainerSet reactants) {
 		logger.debug("Setting reactants: ", reactants);
 		super.setReactants(reactants);
 	}
 
-	public IMoleculeSet getProducts() {
+	public IAtomContainerSet getProducts() {
 		logger.debug("Getting products: ", super.getProducts());
 		return super.getProducts();
 	}
 
-	public void setProducts(IMoleculeSet products) {
+	public void setProducts(IAtomContainerSet products) {
 		logger.debug("Setting products: ", products);
 		super.setProducts(products);
 	}
 
-	public IMoleculeSet getAgents() {
+	public IAtomContainerSet getAgents() {
 		logger.debug("Getting agents: ", super.getAgents());
 		return super.getAgents();
 	}
 
-	public void addReactant(IMolecule reactant) {
+	public void addReactant(IAtomContainer reactant) {
 		logger.debug("Adding reactant: ", reactant);
 		super.addReactant(reactant);
 	}
 
-	public void addAgent(IMolecule agent) {
+	public void addAgent(IAtomContainer agent) {
 		logger.debug("Adding agent: ", agent);
 		super.addAgent(agent);
 	}
 
-	public void addReactant(IMolecule reactant, Double coefficient) {
+	public void addReactant(IAtomContainer reactant, Double coefficient) {
 		logger.debug("Adding reactant with coefficient: ", reactant, ""+coefficient);
 		super.addReactant(reactant, coefficient);
 	}
 
-	public void addProduct(IMolecule product) {
+	public void addProduct(IAtomContainer product) {
 		logger.debug("Adding product: ", product);
 		super.addProduct(product);
 	}
 
-	public void addProduct(IMolecule product, Double coefficient) {
+	public void addProduct(IAtomContainer product, Double coefficient) {
 		logger.debug("Adding product with coefficient: ", product, ""+coefficient);
 		super.addProduct(product, coefficient);
 	}
 
-	public Double getReactantCoefficient(IMolecule reactant) {
+	public Double getReactantCoefficient(IAtomContainer reactant) {
 		logger.debug("Setting reactant coefficient: ", reactant, ""+ super.getReactantCoefficient(reactant));
 		return super.getReactantCoefficient(reactant);
 	}
 
-	public Double getProductCoefficient(IMolecule product) {
+	public Double getProductCoefficient(IAtomContainer product) {
 		logger.debug("Setting product coefficient: ", product, ""+ super.getProductCoefficient(product));
 		return super.getProductCoefficient(product);
 	}
 
-	public boolean setReactantCoefficient(IMolecule reactant, Double coefficient) {
+	public boolean setReactantCoefficient(IAtomContainer reactant, Double coefficient) {
 		logger.debug("Setting reactant coefficient: ", reactant, ""+coefficient);
 		return super.setReactantCoefficient(reactant, coefficient);
 	}
 
-	public boolean setProductCoefficient(IMolecule product, Double coefficient) {
+	public boolean setProductCoefficient(IAtomContainer product, Double coefficient) {
 		logger.debug("Setting product coefficient: ", product, ""+coefficient);
 		return super.setProductCoefficient(product, coefficient);
 	}
