@@ -28,6 +28,7 @@
  */
 package org.openscience.cdk.isomorphism;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.BitSet;
 import java.util.Iterator;
@@ -62,6 +63,7 @@ import org.openscience.cdk.isomorphism.matchers.SymbolQueryAtom;
 import org.openscience.cdk.isomorphism.matchers.smarts.AliphaticSymbolAtom;
 import org.openscience.cdk.isomorphism.matchers.smarts.AnyAtom;
 import org.openscience.cdk.isomorphism.mcss.RMap;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.templates.MoleculeFactory;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
@@ -656,6 +658,43 @@ public class UniversalIsomorphismTesterTest extends CDKTestCase
         //Isomorphism check
         boolean res = UniversalIsomorphismTester.isSubgraph(target, q);
         Assert.assertFalse("C**C should not match SCCS", res);
+    }
+
+    // is this method in a utils anywhere?
+    public IAtomContainer loadMDLV2000(String resource) throws CDKException {
+
+        MDLV2000Reader reader = new MDLV2000Reader(getClass().getResourceAsStream(resource));
+
+        try {
+            return reader.read(SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
+        } catch (CDKException e) {
+            throw e;
+        } finally {
+            if(reader != null)
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+        }
+
+    }
+
+    @Test public void testMatcher_SymbolAndCharge() throws CDKException {
+
+        IAtomContainer dalanine   = loadMDLV2000("/data/mdl/ChEBI_15570.mol");
+        IAtomContainer dalaninate = loadMDLV2000("/data/mdl/ChEBI_32435.mol");
+        IAtomContainer dalaninium = loadMDLV2000("/data/mdl/ChEBI_32436.mol");
+
+        Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate));
+        Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
+        Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
+
+        // test with symbol and charge matching (not yet implemented)
+        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate));
+        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
+        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
+
     }
 
 }
