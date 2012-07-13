@@ -695,7 +695,6 @@ public class UniversalIsomorphismTesterTest extends CDKTestCase
         IAtomContainer dalaninium = loadMDLV2000("/data/mdl/ChEBI_32436.mol");
 
         Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate));
-        Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
        // Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
        // Assert.assertTrue(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
 
@@ -705,8 +704,6 @@ public class UniversalIsomorphismTesterTest extends CDKTestCase
         System.out.println(dalaninate.getAtomCount());
 
         // test with symbol and charge matching (not yet implemented)
-        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium));
-        Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium));
         Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninate, matcher));
         //Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalanine, dalaninium,  matcher));
         //Assert.assertFalse(UniversalIsomorphismTester.isIsomorph(dalaninate, dalaninium,matcher));
