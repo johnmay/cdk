@@ -36,6 +36,8 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtom;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
 import org.openscience.cdk.isomorphism.matchers.IQueryBond;
+import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
+import org.openscience.cdk.isomorphism.matchers.atom.SymbolMatcher;
 import org.openscience.cdk.isomorphism.mcss.RGraph;
 import org.openscience.cdk.isomorphism.mcss.RMap;
 import org.openscience.cdk.isomorphism.mcss.RNode;
