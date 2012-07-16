@@ -36,6 +36,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtom;
 import org.openscience.cdk.isomorphism.matchers.IQueryAtomContainer;
 import org.openscience.cdk.isomorphism.matchers.IQueryBond;
+import org.openscience.cdk.isomorphism.matchers.atom.AtomMatcherFactory;
 import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
 import org.openscience.cdk.isomorphism.matchers.atom.SymbolMatcher;
 import org.openscience.cdk.isomorphism.mcss.RGraph;
@@ -115,6 +116,7 @@ public class UniversalIsomorphismTester {
   final static int ID2 = 1;
   private static long start;
   private static long timeout=-1;
+  private static final IAtomMatcher DEFAULT_ATOM_MATCHER = AtomMatcherFactory.ofClass(SymbolMatcher.class);
 
   ///////////////////////////////////////////////////////////////////////////
   //                            Query Methods
@@ -137,6 +139,10 @@ public class UniversalIsomorphismTester {
    * @throws     CDKException if the first molecule is an instance of IQueryAtomContainer
    */
   public static boolean isIsomorph(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
+      return isIsomorph(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static boolean isIsomorph(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher)  throws CDKException{
 	  if (g1 instanceof IQueryAtomContainer)
 		  throw new CDKException(
 		      "The first IAtomContainer must not be an IQueryAtomContainer"
@@ -158,7 +164,7 @@ public class UniversalIsomorphismTester {
               return g1.getAtom(0).getSymbol().equals(atomSymbol);
 		  }
       }
-	  return (getIsomorphMap(g1, g2) != null);
+	  return (getIsomorphMap(g1, g2, matcher) != null);
   }
 
 
@@ -169,7 +175,12 @@ public class UniversalIsomorphismTester {
    * @param  g2  second molecule. May be an {@link IQueryAtomContainer}.
    * @return     the first isomorph mapping found projected of g1. This is a List of RMap objects containing Ids of matching bonds.
    */
+  @Deprecated
   public static List<RMap> getIsomorphMap(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
+    return getIsomorphMap(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static List<RMap> getIsomorphMap(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher)  throws CDKException{
 	  if (g1 instanceof IQueryAtomContainer)
 		  throw new CDKException(
 		      "The first IAtomContainer must not be an IQueryAtomContainer"
@@ -177,7 +188,7 @@ public class UniversalIsomorphismTester {
 	  
     List<RMap> result = null;
 
-    List<List<RMap>> rMapsList = search(g1, g2, getBitSet(g1), getBitSet(g2), false, false);
+    List<List<RMap>> rMapsList = search(g1, g2, getBitSet(g1), getBitSet(g2), false, false, matcher);
 
     if (!rMapsList.isEmpty()) {
       result = rMapsList.get(0);
@@ -249,8 +260,13 @@ public class UniversalIsomorphismTester {
    * @see #makeAtomsMapsOfBondsMaps(List, IAtomContainer, IAtomContainer)
    */
   public static List<List<RMap>> getSubgraphMaps(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
-    return search(g1, g2, new BitSet(), getBitSet(g2), true, true);
+    return getSubgraphMaps(g1, g2, DEFAULT_ATOM_MATCHER);
   }
+
+  public static List<List<RMap>> getSubgraphMaps(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher)  throws CDKException{
+    return search(g1, g2, new BitSet(), getBitSet(g2), true, true, matcher);
+  }
+
 
 
   /**
@@ -262,8 +278,12 @@ public class UniversalIsomorphismTester {
    *             {@link RMap} objects containing Ids of matching bonds.
    */
   public static List<RMap> getSubgraphMap(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
+    return getSubgraphMap(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static List<RMap> getSubgraphMap(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher)  throws CDKException{
     List<RMap> result = null;
-    List<List<RMap>> rMapsList = search(g1, g2, new BitSet(), getBitSet(g2), false, false);
+    List<List<RMap>> rMapsList = search(g1, g2, new BitSet(), getBitSet(g2), false, false, matcher);
 
     if (!rMapsList.isEmpty()) {
       result = rMapsList.get(0);
@@ -284,12 +304,19 @@ public class UniversalIsomorphismTester {
    *             {@link List} of {@link RMap} objects containing Ids of matching atoms.
    */
   public static List<List<RMap>> getSubgraphAtomsMaps(IAtomContainer g1,
-		                                              IAtomContainer g2)
+                                                      IAtomContainer g2)
+          throws CDKException {
+      return getSubgraphAtomsMaps(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static List<List<RMap>> getSubgraphAtomsMaps(IAtomContainer g1,
+		                                              IAtomContainer g2,
+                                                      IAtomMatcher matcher)
     throws CDKException {
       List<RMap> list = checkSingleAtomCases(g1, g2);
       if (list == null) {
           return makeAtomsMapsOfBondsMaps(
-              UniversalIsomorphismTester.getSubgraphMaps(g1, g2), g1, g2
+              UniversalIsomorphismTester.getSubgraphMaps(g1, g2, matcher), g1, g2
           );
       } else {
           List<List<RMap>> atomsMap = new ArrayList<List<RMap>>();
@@ -309,10 +336,17 @@ public class UniversalIsomorphismTester {
    */
   public static List<RMap> getSubgraphAtomsMap(IAtomContainer g1,
                                                IAtomContainer g2)
+          throws CDKException {
+    return getSubgraphAtomsMap(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static List<RMap> getSubgraphAtomsMap(IAtomContainer g1,
+                                               IAtomContainer g2,
+                                               IAtomMatcher matcher)
       throws CDKException {
       List<RMap> list = checkSingleAtomCases(g1, g2);
       if (list == null) {
-          return makeAtomsMapOfBondsMap(UniversalIsomorphismTester.getSubgraphMap(g1, g2), g1, g2);
+          return makeAtomsMapOfBondsMap(UniversalIsomorphismTester.getSubgraphMap(g1, g2, matcher), g1, g2);
       } else if (list.isEmpty()) {
           return null;
       } else {
@@ -328,6 +362,10 @@ public class UniversalIsomorphismTester {
    * @return     true if g2 a subgraph on g1
    */
   public static boolean isSubgraph(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
+    return isSubgraph(g1, g2, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static boolean isSubgraph(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher)  throws CDKException{
 	  if (g1 instanceof IQueryAtomContainer)
 		  throw new CDKException(
 		      "The first IAtomContainer must not be an IQueryAtomContainer"
@@ -352,7 +390,7 @@ public class UniversalIsomorphismTester {
           return false;
       }
       if (!testSubgraphHeuristics(g1, g2)) return false;
-	  return (getSubgraphMap(g1, g2) != null);
+	  return (getSubgraphMap(g1, g2, matcher) != null);
   }
 
 
@@ -412,16 +450,38 @@ public class UniversalIsomorphismTester {
    * This is the interface point between the CDK model and
    * the generic MCSS algorithm based on the RGRaph.
    *
+   * Although now deprecated this method will invoke with the default atom matcher which
+   * uses only the atom's symbol to determine a match.
+   *
    * @param  g1  Description of the first molecule
    * @param  g2  Description of the second molecule
    * @return     the rGraph
+   * @deprecated use method that specifies which atom matcher to use
+   * @see #buildRGraph(org.openscience.cdk.interfaces.IAtomContainer, org.openscience.cdk.interfaces.IAtomContainer, org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher)
    */
   public static RGraph buildRGraph(IAtomContainer g1, IAtomContainer g2)  throws CDKException{
-    RGraph rGraph = new RGraph();
-    nodeConstructor(rGraph, g1, g2);
-    arcConstructor(rGraph, g1, g2);
-    return rGraph;
+    return buildRGraph(g1, g2, DEFAULT_ATOM_MATCHER);
   }
+
+    /**
+     * Builds the {@see RGraph} (resolution graph), for two atom containers. This is the interface point between the
+     * CDK model and the generic MCSS algorithm based on the RGraph.
+     *
+     * @param g1      first container (not a IQueryAtomContainer)
+     * @param g2      second container (can be a IQueryAtomContainer)
+     * @param matcher logical matcher for atom
+     *
+     * @return        the resolution graph for MCSS
+     *
+     * @throws        CDKException thrown if the the first container is an {@see IQueryAtomContainer} (only allowed as g2)
+     */
+    public static RGraph buildRGraph(IAtomContainer g1, IAtomContainer g2, IAtomMatcher matcher) throws CDKException {
+        RGraph rGraph = new RGraph();
+        nodeConstructor(rGraph, g1, g2, matcher);
+        arcConstructor(rGraph, g1, g2, matcher);
+        return rGraph;
+    }
+
 
 
   /**
@@ -442,7 +502,15 @@ public class UniversalIsomorphismTester {
    */
   public static List<List<RMap>> search(IAtomContainer g1, IAtomContainer g2, BitSet c1,
 		  BitSet c2, boolean findAllStructure, boolean findAllMap)  throws CDKException{
-	  // remember start time
+    return search(g1, g2, c1,c2, findAllStructure, findAllMap, DEFAULT_ATOM_MATCHER);
+  }
+
+  public static List<List<RMap>> search(IAtomContainer g1, IAtomContainer g2,
+                                        BitSet c1,         BitSet c2,
+                                        boolean findAllStructure, boolean findAllMap,
+                                        IAtomMatcher matcher) throws CDKException {
+
+        // remember start time
 	  start = System.currentTimeMillis();
 	  
       // handle single query atom case separately
@@ -476,7 +544,7 @@ public class UniversalIsomorphismTester {
 	  List<List<RMap>> rMapsList = new ArrayList<List<RMap>>();
 
 	  // build the RGraph corresponding to this problem
-	  RGraph rGraph = buildRGraph(g1, g2); 
+	  RGraph rGraph = buildRGraph(g1, g2, matcher);
 	  // Set time data
 	  rGraph.setTimeout(UniversalIsomorphismTester.timeout);
 	  rGraph.setStart(UniversalIsomorphismTester.start);
@@ -743,9 +811,10 @@ public class UniversalIsomorphismTester {
    * @param  gr   the target RGraph
    * @param  ac1   first molecule. Must not be an {@link IQueryAtomContainer}.
    * @param  ac2   second molecule. May be an {@link IQueryAtomContainer}.
+   * @param  matcher an atom matcher that determines two atoms are equivalent
    * @throws CDKException if it takes too long to identify overlaps
    */
-  private static void nodeConstructor(RGraph gr, IAtomContainer ac1, IAtomContainer ac2) throws CDKException {
+  private static void nodeConstructor(RGraph gr, IAtomContainer ac1, IAtomContainer ac2, IAtomMatcher matcher) throws CDKException {
 	  if (ac1 instanceof IQueryAtomContainer)
 		  throw new CDKException(
 		      "The first IAtomContainer must not be an IQueryAtomContainer"
@@ -790,13 +859,13 @@ public class UniversalIsomorphismTester {
                 &&
                 ( // atome type conditions
                   ( // a1 = a2 && b1 = b2
-                	  ac1.getBond(i).getAtom(0).getSymbol().equals(ac2.getBond(j).getAtom(0).getSymbol()) &&
-                	  ac1.getBond(i).getAtom(1).getSymbol().equals(ac2.getBond(j).getAtom(1).getSymbol())
+                    matcher.matches(ac1.getBond(i).getAtom(0), ac2.getBond(j).getAtom(0)) &&
+                    matcher.matches(ac1.getBond(i).getAtom(1), ac2.getBond(j).getAtom(1))
                   )
                   ||
                   ( // a1 = b2 && b1 = a2
-                	  ac1.getBond(i).getAtom(0).getSymbol().equals(ac2.getBond(j).getAtom(1).getSymbol()) &&
-                	  ac1.getBond(i).getAtom(1).getSymbol().equals(ac2.getBond(j).getAtom(0).getSymbol())
+                    matcher.matches(ac1.getBond(i).getAtom(0), ac2.getBond(j).getAtom(1)) &&
+                    matcher.matches(ac1.getBond(i).getAtom(1), ac2.getBond(j).getAtom(0))
                   )
                 )
               ) {
@@ -817,9 +886,10 @@ public class UniversalIsomorphismTester {
    * @param  gr   the rGraph
    * @param  ac1   first molecule. Must not be an {@link IQueryAtomContainer}.
    * @param  ac2   second molecule. May be an {@link IQueryAtomContainer}.
+   * @param  matcher an atom matcher that determines two atoms are equivalent
    * @throws CDKException if it takes too long to get the overlaps
    */
-  private static void arcConstructor(RGraph gr, IAtomContainer ac1, IAtomContainer ac2) throws CDKException{
+  private static void arcConstructor(RGraph gr, IAtomContainer ac1, IAtomContainer ac2, IAtomMatcher matcher) throws CDKException{
     // each node is incompatible with himself
     for (int i = 0; i < gr.getGraph().size(); i++) {
       RNode x = (RNode) gr.getGraph().get(i);
@@ -860,7 +930,7 @@ public class UniversalIsomorphismTester {
             }
         } else {
             if (a1.equals(b1) || a2.equals(b2) ||
-                (!getCommonSymbol(a1, b1).equals(getCommonSymbol(a2, b2)))) {
+                (!matcher.matches(getCommonAtom(a1, b1), getCommonAtom(a2, b2)))) {
               x.getForbidden().set(j);
               y.getForbidden().set(i);
             } else if (hasCommonAtom(a1, b1)) {
@@ -892,7 +962,10 @@ public class UniversalIsomorphismTester {
    * @param  b  second bond
    * @return    the symbol of the common atom or "" if
    *            the 2 bonds have no common atom
+   * @deprecated no longer used (can use the more general getCommonAtom())
+   * @see #getCommonAtom(org.openscience.cdk.interfaces.IBond, org.openscience.cdk.interfaces.IBond)
    */
+  @Deprecated
   private static String getCommonSymbol(IBond a, IBond b) {
     String symbol = "";
 
@@ -903,6 +976,16 @@ public class UniversalIsomorphismTester {
     }
 
     return symbol;
+  }
+
+  private static IAtom getCommonAtom(IBond a, IBond b){
+      if (a.contains(b.getAtom(0))) {
+          return b.getAtom(0);
+      } else if (a.contains(b.getAtom(1))) {
+          return b.getAtom(1);
+      }
+      // should log here
+      return a.getBuilder().newInstance(IAtom.class);
   }
 
     /**
