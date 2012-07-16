@@ -25,7 +25,7 @@ import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
 
 
 /**
- * A IAtomMatcher implementation that allows 'or' combination
+ * A IAtomMatcher implementation that allows disjunction ('||')
  * of other matchers. We don't have functions in java (yet) but this
  * can be thought of as a high-order function.
  *
@@ -39,7 +39,7 @@ import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
  * @see org.openscience.cdk.isomorphism.UniversalIsomorphismTester
  *
  */
-public class OrMatcher implements IAtomMatcher {
+public class DisjunctionMatcher implements IAtomMatcher {
 
     private final IAtomMatcher left;
     private final IAtomMatcher right;
@@ -53,7 +53,7 @@ public class OrMatcher implements IAtomMatcher {
      * @param left  a atom matcher implementation
      * @param right a atom matcher implementation
      */
-    public OrMatcher(IAtomMatcher left, IAtomMatcher right) {
+    public DisjunctionMatcher(IAtomMatcher left, IAtomMatcher right) {
         this.left  = left;
         this.right = right;
     }

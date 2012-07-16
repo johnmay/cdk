@@ -24,7 +24,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
 
 /**
- * A IAtomMatcher implementation that allows 'and' combination
+ * A IAtomMatcher implementation that allows conjunction ('&&')
  * of other matchers. We don't have functions in java (yet) but this
  * can be thought of as a high-order function.
  *
@@ -38,7 +38,7 @@ import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
  * @see org.openscience.cdk.isomorphism.UniversalIsomorphismTester
  *
  */
-public class AndMatcher implements IAtomMatcher {
+public class ConjunctionMatcher implements IAtomMatcher {
 
     private final IAtomMatcher left;
     private final IAtomMatcher right;
@@ -52,7 +52,7 @@ public class AndMatcher implements IAtomMatcher {
      * @param left  a atom matcher implementation
      * @param right a atom matcher implementation
      */
-    public AndMatcher(IAtomMatcher left, IAtomMatcher right) {
+    public ConjunctionMatcher(IAtomMatcher left, IAtomMatcher right) {
         this.left  = left;
         this.right = right;
     }

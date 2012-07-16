@@ -21,9 +21,9 @@
 
 package org.openscience.cdk.isomorphism.matchers.atom;
 
-import org.openscience.cdk.isomorphism.matchers.atom.combinator.AndMatcher;
+import org.openscience.cdk.isomorphism.matchers.atom.combinator.ConjunctionMatcher;
+import org.openscience.cdk.isomorphism.matchers.atom.combinator.DisjunctionMatcher;
 import org.openscience.cdk.isomorphism.matchers.atom.combinator.NotMatcher;
-import org.openscience.cdk.isomorphism.matchers.atom.combinator.OrMatcher;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -202,12 +202,12 @@ public class AtomMatcherFactory {
             throw new IllegalArgumentException("Please provide at least two matchers");
 
         if (matchers.length == 2)
-            return new AndMatcher(matchers[0], matchers[1]);
+            return new ConjunctionMatcher(matchers[0], matchers[1]);
 
         // recursively call the and function with a shifted array, we
         // could get a small speed increase by iterating instead of copying
         // but I wouldn't expect the matcher array to be that long
-        return new AndMatcher(matchers[0], and(Arrays.copyOfRange(matchers, 1, matchers.length)));
+        return new ConjunctionMatcher(matchers[0], and(Arrays.copyOfRange(matchers, 1, matchers.length)));
 
     }
 
@@ -275,12 +275,12 @@ public class AtomMatcherFactory {
             throw new IllegalArgumentException("Please provide at least two matchers");
 
         if (matchers.length == 2)
-            return new OrMatcher(matchers[0], matchers[1]);
+            return new DisjunctionMatcher(matchers[0], matchers[1]);
 
         // recursively call the or function with a shifted array, we
         // could get a small speed increase by iterating instead of copying
         // but I wouldn't expect the matcher array to be that long
-        return new OrMatcher(matchers[0], or(Arrays.copyOfRange(matchers, 1, matchers.length)));
+        return new DisjunctionMatcher(matchers[0], or(Arrays.copyOfRange(matchers, 1, matchers.length)));
 
     }
 
