@@ -37,7 +37,7 @@ import org.openscience.cdk.isomorphism.matchers.atom.IAtomMatcher;
  * @see org.openscience.cdk.isomorphism.UniversalIsomorphismTester
  *
  */
-public class NotMatcher implements IAtomMatcher {
+public class NegationMatcher implements IAtomMatcher {
 
     private final IAtomMatcher matcher;
 
@@ -47,7 +47,7 @@ public class NotMatcher implements IAtomMatcher {
      *
      * @param matcher  a atom matcher implementation
      */
-    public NotMatcher(IAtomMatcher matcher) {
+    public NegationMatcher(IAtomMatcher matcher) {
         this.matcher = matcher;
     }
 

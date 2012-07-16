@@ -23,7 +23,7 @@ package org.openscience.cdk.isomorphism.matchers.atom;
 
 import org.openscience.cdk.isomorphism.matchers.atom.combinator.ConjunctionMatcher;
 import org.openscience.cdk.isomorphism.matchers.atom.combinator.DisjunctionMatcher;
-import org.openscience.cdk.isomorphism.matchers.atom.combinator.NotMatcher;
+import org.openscience.cdk.isomorphism.matchers.atom.combinator.NegationMatcher;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -344,7 +344,7 @@ public class AtomMatcherFactory {
      * @return return an atom matcher that will inverse the return value of the provided matcher
      */
     public static IAtomMatcher not(IAtomMatcher matcher) {
-        return new NotMatcher(matcher);
+        return new NegationMatcher(matcher);
     }
 
     /**
@@ -356,7 +356,7 @@ public class AtomMatcherFactory {
      * @return return an atom matcher that will inverse the return value of the provided matcher
      */
     public static IAtomMatcher not(Class<? extends IAtomMatcher> matcherClass) {
-        return new NotMatcher(ofClass(matcherClass));
+        return new NegationMatcher(ofClass(matcherClass));
     }
 
     /**
@@ -368,7 +368,7 @@ public class AtomMatcherFactory {
      * @return return an atom matcher that will inverse the return value of the provided matcher
      */
     public static IAtomMatcher not(String matcherName) {
-        return new NotMatcher(ofName(matcherName));
+        return new NegationMatcher(ofName(matcherName));
     }
 
     /**
