@@ -55,10 +55,16 @@ public class AtomMatcherFactory {
 
         classMap.put(SymbolMatcher.class, new SymbolMatcher());
         classMap.put(FormalChargeMatcher.class, new FormalChargeMatcher());
+        classMap.put(MassNumberMatcher.class, new MassNumberMatcher());
+        classMap.put(ChargeMatcher.class, new ChargeMatcher());
+        classMap.put(StereoParityMatcher.class, new StereoParityMatcher());
 
         // make sure these are lower case
         nameMap.put("symbol", new SymbolMatcher());
         nameMap.put("formalcharge", new FormalChargeMatcher());
+        nameMap.put("charge", new FormalChargeMatcher());
+        nameMap.put("mass", new MassNumberMatcher());
+        nameMap.put("parity", new StereoParityMatcher());
 
     }
 
@@ -201,7 +207,7 @@ public class AtomMatcherFactory {
         // recursively call the and function with a shifted array, we
         // could get a small speed increase by iterating instead of copying
         // but I wouldn't expect the matcher array to be that long
-        return new AndMatcher(matchers[0], and(Arrays.copyOfRange(matchers, 1, matchers.length - 1)));
+        return new AndMatcher(matchers[0], and(Arrays.copyOfRange(matchers, 1, matchers.length)));
 
     }
 
@@ -269,12 +275,12 @@ public class AtomMatcherFactory {
             throw new IllegalArgumentException("Please provide at least two matchers");
 
         if (matchers.length == 2)
-            return new AndMatcher(matchers[0], matchers[1]);
+            return new OrMatcher(matchers[0], matchers[1]);
 
         // recursively call the or function with a shifted array, we
         // could get a small speed increase by iterating instead of copying
         // but I wouldn't expect the matcher array to be that long
-        return new OrMatcher(matchers[0], or(Arrays.copyOfRange(matchers, 1, matchers.length - 1)));
+        return new OrMatcher(matchers[0], or(Arrays.copyOfRange(matchers, 1, matchers.length)));
 
     }
 
